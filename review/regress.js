@@ -106,8 +106,8 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   ok('연습장 입장: 소수 인원·내 공으로 시작', pr1.practice&&pr1.n<=6&&pr1.own, JSON.stringify(pr1));
   await pg.evaluate(()=>{ el('banner').classList.remove('show'); M.freeze=0; const u=M.user; u.x=34; u.y=16; setOwner(u); u.touchT=0; u.protT=2; input.shotHold=true; });
   await pg.waitForTimeout(400); await pg.evaluate(()=>{ input.shotRelease=true; }); await pg.waitForTimeout(4500);
-  const pr2=await pg.evaluate(()=>({own:M.ball.owner===M.user,shots:M.stats.shots,min:M.min,over:M.over}));
-  ok('연습장: 슛 후 다시 내 공으로 리셋·시간 멈춤', pr2.own&&pr2.shots>=1&&pr2.min===10&&!pr2.over, JSON.stringify(pr2));
+  const pr2=await pg.evaluate(()=>({own:M.ball.owner===M.user,resets:M.prResets||0,shots:M.stats.shots,min:M.min,over:M.over}));
+  ok('연습장: 슛 후 다시 내 공으로 리셋·시간 멈춤', pr2.resets>=1&&pr2.shots>=1&&pr2.min===10&&!pr2.over, JSON.stringify(pr2));
   const nsk=await pg.evaluate(async()=>{ const out={}; const NEW=['knuckle','nolook','rainbow','intercept','header','leader'];
     NEW.forEach(id=>{ if(!S.player.skills.includes(id)) S.player.skills.push(id); });
     out.defs=NEW.every(id=>SKILLS.find(s=>s.id===id)&&SK_PARAM[id]&&SK_EX[id]&&ICO[id]!=null&&!!ART.icons[ICO[id]]);

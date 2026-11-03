@@ -2753,7 +2753,7 @@ function practiceReset(){ if(!M) return; const u=M.user, b=M.ball; M.restart=nul
   b.vx=b.vy=b.vz=0; b.z=0; b.curve=0; b.fire=b.thunder=b.meteor=b.bike=b.thru=false; b.passTarget=null; b.offside=null;
   u.x=W/2+rnd(-14,14); u.y=rnd(24,34); u.vx=u.vy=0; u.fx=0; u.fy=-1; u.stun=0;
   M.players.forEach(q=>{ q.vx=q.vy=0; q.stun=0; q.tackleT=0; q.iceT=0; if(q.team===1&&q.role==='GK'){ q.x=W/2; q.y=1.5; } else if(q.team===1){ const k=M.players.filter(r=>r.team===1&&r.role!=='GK').indexOf(q); q.x=W/2+(k?8:-8)+rnd(-3,3); q.y=u.y-11+rnd(-2,2); } else if(q.team===0&&q.role==='GK'){ q.x=W/2; q.y=H-1.5; } else if(q!==u){ q.x=clamp(u.x+(u.x<W/2?16:-16),4,W-4); q.y=u.y-4; } });
-  setOwner(u,{clean:true}); u.touchT=0; u.protT=1; M.prOppT=0; }
+  setOwner(u,{clean:true}); u.touchT=0; u.protT=2.2; M.prOppT=0; M.prResets=(M.prResets||0)+1; }
 function practiceTick(dt){ M.min=10; M.minPlayed=10; for(let i=0;i<4;i++) M.cds[i]=Math.max(0,M.cds[i]-dt*2); M.mp=Math.min(100,M.mp+dt*12);
   if(M.freeze>0&&M.restart&&M.restart!==practiceReset){ M.restart=practiceReset; M.freeze=Math.min(M.freeze,1.0); }
   const o=M.ball.owner; if(o&&o.team===0&&!o.isUser&&o.role!=='GK'){ M.prMateT=(M.prMateT||0)+dt; if(M.prMateT>4){ M.prMateT=0; practiceReset(); return; } } else M.prMateT=0;

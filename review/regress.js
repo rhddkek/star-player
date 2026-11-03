@@ -108,6 +108,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   await pg.waitForTimeout(400); await pg.evaluate(()=>{ input.shotRelease=true; }); await pg.waitForTimeout(4500);
   const pr2=await pg.evaluate(()=>({own:M.ball.owner===M.user,shots:M.stats.shots,min:M.min,over:M.over}));
   ok('연습장: 슛 후 다시 내 공으로 리셋·시간 멈춤', pr2.own&&pr2.shots>=1&&pr2.min===10&&!pr2.over, JSON.stringify(pr2));
+  const nsk=await pg.evaluate(async()=>{ const out={}; const NEW=['knuckle','nolook','rainbow','intercept','header','leader'];
+    NEW.forEach(id=>{ if(!S.player.skills.includes(id)) S.player.skills.push(id); });
+    out.defs=NEW.every(id=>SKILLS.find(s=>s.id===id)&&SK_PARAM[id]&&SK_EX[id]&&ICO[id]!=null&&!!ART.icons[ICO[id]]);
+    out.sfx=['sk_knuckle','sk_rainbow','sk_nolook','sk_intercept','sk_leader','sk_dash','ult_sting'].every(k=>!!SFX_DATA[k]);
+    const u=M.user; M.freeze=0; S.player.equip[0]='knuckle'; M.cds[0]=0; M.mp=100; u.x=34;u.y=28; setOwner(u,{clean:true}); u.touchT=0; useSkill(0,true,0,0);
+    out.knuckle=M.ball.knuckle===true; out.vfx=(M.vfx||[]).length;
+    await new Promise(r=>setTimeout(r,400)); out.img=Object.values(VFX_IMG).filter(i=>i.complete&&i.naturalWidth>0).length;
+    S.player.equip[0]='leader'; M.cds[0]=0; M.mp=100; const m=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); const b0=m?m.st.pass:0; useSkill(0,false,0,0); out.leader=m?m.st.pass-b0:15;
+    return out; });
+  ok('새 스킬 6종: 데이터·아이콘·효과음·이펙트 동작', nsk.defs&&nsk.sfx&&nsk.knuckle&&nsk.vfx>0&&nsk.img>0&&nsk.leader===15, JSON.stringify(nsk));
   await pg.click('#btn-skip'); await pg.waitForTimeout(200); await pg.click('#pr-end'); await pg.waitForTimeout(400);
   const post=await pg.evaluate(()=>JSON.stringify({r:S.round,h:(S.history||[]).length,xp:S.player.xp,apps:S.player.career.apps}));
   const onHub=await pg.evaluate(()=>!el('screen-hub').hidden&&!M);

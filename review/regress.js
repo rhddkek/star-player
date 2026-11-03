@@ -117,6 +117,9 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await new Promise(r=>setTimeout(r,400)); out.img=Object.values(VFX_IMG).filter(i=>i.complete&&i.naturalWidth>0).length;
     S.player.equip[0]='leader'; M.cds[0]=0; M.mp=100; const m=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); const b0=m?m.st.pass:0; useSkill(0,false,0,0); out.leader=m?m.st.pass-b0:15;
     return out; });
+  const gp=await pg.evaluate(()=>{ const out={}; out.btns=!el('btn-prreset').hidden&&!el('btn-prdef').hidden; prToggleDef(); out.noDef=M.players.filter(q=>q.team===1&&q.role!=='GK').length===0; prToggleDef(); out.def=M.players.filter(q=>q.team===1&&q.role!=='GK').length>0;
+    const u=M.user; M.freeze=0; u.x=34;u.y=22; setOwner(u,{clean:true}); u.touchT=0; shoot(u,34,0,{power:0.7}); out.shot=!!M.prShot&&M.prShot.d>0; return out; });
+  ok('연습장: 리셋·수비 빼기/넣기 버튼, 직전 슛 기록', gp.btns&&gp.noDef&&gp.def&&gp.shot, JSON.stringify(gp));
   ok('새 스킬 6종: 데이터·아이콘·효과음·이펙트 동작', nsk.defs&&nsk.sfx&&nsk.knuckle&&nsk.vfx>0&&nsk.img>0&&nsk.leader===15, JSON.stringify(nsk));
   await pg.click('#btn-skip'); await pg.waitForTimeout(200); await pg.click('#pr-end'); await pg.waitForTimeout(400);
   const post=await pg.evaluate(()=>JSON.stringify({r:S.round,h:(S.history||[]).length,xp:S.player.xp,apps:S.player.career.apps}));
@@ -140,6 +143,10 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   for(const t of ['home','player','skill','league','transfer']){ const btn=await pg.$(`#tabs button[data-tab="${t}"]`); if(!btn) continue; await btn.click(); await pg.waitForTimeout(250);
     const r=await pg.evaluate(()=>{ const W=window.innerWidth; const bad=[]; document.querySelectorAll('.screen:not([hidden]) *').forEach(e=>{ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1&&getComputedStyle(e).position!=='fixed') bad.push((e.id||e.className||e.tagName).toString().slice(0,30)+':'+Math.round(b.right)); }); return {scroll:document.documentElement.scrollWidth>W,bad:bad.slice(0,4)}; });
     ok(`모바일 ${t} 탭: 가로 넘침 없음`, !r.scroll&&r.bad.length===0, r.bad.join(', ')); }
+  { const ln=await pg.evaluate(()=>{ S.number=9; save(); M=null; startMatch(false); const nums=M.players.filter(p=>p.team===0).map(p=>p.isUser?S.number:shirtNo(p)); const dup=nums.filter((n,i)=>nums.indexOf(n)!==i); const sc=el('sc-h').querySelector('span').textContent; cancelAnimationFrame(raf); ambience(false); M=null; el('m-overlay').hidden=true; show('screen-hub'); renderHub(); return {dup,sc}; });
+    ok('라인업 등번호 중복 없음 · 점수판 한글 약칭', ln.dup.length===0&&/[가-힣]/.test(ln.sc), JSON.stringify(ln)); }
+  { const sk=await pg.evaluate(()=>{ S.player.level=2; renderSkill.full=false; renderSkill.f='all'; tab='skill'; renderHub(); const n1=document.querySelectorAll('#tab-skill .skgrid button.sk').length; const btn=!!document.getElementById('sk-full'); renderSkill.full=true; renderHub(); const n2=document.querySelectorAll('#tab-skill .skgrid button.sk').length; renderSkill.full=false; renderHub(); return {n1,n2,btn}; });
+    ok('스킬 화면: 기본은 쓸 수 있는 것+다음 해금만, 전체 보기 펼치기', sk.btn&&sk.n1<sk.n2, JSON.stringify(sk)); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

@@ -185,6 +185,12 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let clicked=true; try{ await p2.click('#tut-go',{timeout:3000}); }catch(e){ clicked=false; } await p2.waitForTimeout(150);
     const st=await p2.evaluate(()=>({paused:M.paused,seen:S.tutSeen}));
     ok('첫 경기 조작법: 짧고 화면 안, 킥오프 눌림', clicked&&!st.paused&&st.seen&&box.top>=0&&box.btnB<=box.vh, JSON.stringify({...box,...st})); await c2.close(); }
+  // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
+  { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
+    await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));
+    await pg.click('#cer-skip'); await pg.waitForTimeout(200); await pg.click('#cer-go'); await pg.waitForTimeout(400);
+    const c2=await pg.evaluate(()=>{ const r={hub:!el('screen-hub').hidden,tab,offers:S.offers.length,tro:(S.trophies||[]).length,top:(S.trophies||[]).some(t=>t.kind==='top'),hist:Object.keys(S.leagueHist||{}).length}; tab='player'; renderPlayer.sub='records'; renderHub(); r.cab=document.querySelectorAll('.cab-i').length; tab='league'; renderLeague.view='hist'; renderLeague.cur=null; renderHub(); r.histRows=document.querySelectorAll('#tab-league table tr').length; renderLeague.view='table'; S.player.career.apps=80; const n0=hofLoad().length; retire(true); r.hof=hofLoad().length-n0; return r; });
+    ok('시즌 시상식(후보·발표) → 트로피 진열장 · 리그 역대 · 명예의 전당', c1.vis&&c1.noms===3&&c2.hub&&c2.tab==='transfer'&&c2.offers>0&&c2.top&&c2.cab>=3&&c2.hist===19&&c2.histRows>=2&&c2.hof===1, JSON.stringify({c1,c2})); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

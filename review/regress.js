@@ -149,6 +149,13 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('스킬 화면: 기본은 쓸 수 있는 것+다음 해금만, 전체 보기 펼치기', sk.btn&&sk.n1<sk.n2, JSON.stringify(sk)); }
   { const lg=await pg.evaluate(()=>({n:Object.keys(S.divs).length, it:S.divs['it-1'].clubs.length, fr:S.divs['fr-1'].clubs.length, star:clubStars(CLUBS['en-1-1']), low:clubStars(CLUBS['kr-2-0']), v:S.v}));
     ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===14&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v===3, JSON.stringify(lg)); }
+  // 패스 엔진: 롱패스·대지를 가르는 패스·버튼
+  { const pe=await pg.evaluate(async()=>{ S.noReplay=true; S.player.level=8; if(!S.player.skills.includes('split')) S.player.skills.push('split'); M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null;
+      const u=M.user; u.x=16; u.y=74; setOwner(u,{clean:true}); u.touchT=0; const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); q.x=54; q.y=40; passTo(u,q,{power:0.95,long:true}); const b=M.ball; let zmax=0; const L=landPt(b);
+      for(let i=0;i<40;i++){ updateBall(1/30); zmax=Math.max(zmax,b.z); if(b.z<=0&&i>5) break; }
+      const icon=!!pxi('split'), eyeIco=ICO.eye===5&&ART.icons.length===61; const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=0; updateHUD&&updateHUD(); const lab=el('k-shot').querySelector('span').textContent;
+      cancelAnimationFrame(raf); ambience(false); M=null; show('screen-hub'); renderHub(); return {zmax:+zmax.toFixed(1),landErr:+Math.hypot(L.x-54,L.y-40).toFixed(1),icon,eyeIco,lab,gest:!!document.querySelector('#k-pass .gest')}; });
+    ok('패스 엔진: 롱패스가 높이 떠서 동료 근처에 떨어짐 · 새 스킬 아이콘 · 상대 공일 때 따라가기 버튼', pe.zmax>6&&pe.landErr<9&&pe.icon&&pe.eyeIco&&pe.lab==='따라가기'&&pe.gest, JSON.stringify(pe)); }
   // 스타숍: 스폰서 계약 · 꾸미기 · 광고 촬영
   { const sh=await pg.evaluate(()=>{ endoInit(); S.player.rep=1500; S.player.money=50000; S.endo.offers=[]; S.endo.active=[]; let g=0; while(!S.endo.offers.length&&g++<20) endoMakeOffers(); const n=S.endo.offers.length; const o=S.endo.offers[0]; const m0=S.player.money; endoAccept(0);
       const signed=S.player.money-m0; const a=S.endo.active[0]; const notes=[]; const pay=endoAfterMatch({goals:3,assists:3,tackles:12,rating:8,injured:false},{type:'league'},notes);

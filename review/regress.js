@@ -147,6 +147,8 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('라인업 등번호 중복 없음 · 점수판 한글 약칭', ln.dup.length===0&&/[가-힣]/.test(ln.sc), JSON.stringify(ln)); }
   { const sk=await pg.evaluate(()=>{ S.player.level=2; renderSkill.full=false; renderSkill.f='all'; tab='skill'; renderHub(); const n1=document.querySelectorAll('#tab-skill .skgrid button.sk').length; const btn=!!document.getElementById('sk-full'); renderSkill.full=true; renderHub(); const n2=document.querySelectorAll('#tab-skill .skgrid button.sk').length; renderSkill.full=false; renderHub(); return {n1,n2,btn}; });
     ok('스킬 화면: 기본은 쓸 수 있는 것+다음 해금만, 전체 보기 펼치기', sk.btn&&sk.n1<sk.n2, JSON.stringify(sk)); }
+  { const lg=await pg.evaluate(()=>({n:Object.keys(S.divs).length, it:S.divs['it-1'].clubs.length, fr:S.divs['fr-1'].clubs.length, star:clubStars(CLUBS['en-1-1']), low:clubStars(CLUBS['kr-2-0']), v:S.v}));
+    ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===14&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v===3, JSON.stringify(lg)); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

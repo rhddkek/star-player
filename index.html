@@ -138,6 +138,14 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:700}
 .prbar button{background:#0b2a44e6;color:#fff;border:1px solid #7fd3ff88;border-radius:999px;padding:4px 10px;font-weight:800;font-size:.76rem;font-family:inherit}
 .prbar button[hidden]{display:none}
 .score .s{white-space:nowrap}
+.stars{white-space:nowrap;display:inline-flex;gap:0;vertical-align:-1px;font-size:.78rem;line-height:1}
+.stars i{font-style:normal}
+.stars .f{color:#f3a31a}
+.stars .e{color:#c9c2ad;opacity:.55}
+.stars .h{background:linear-gradient(90deg,#f3a31a 50%,rgba(201,194,173,.55) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stars.big{font-size:1rem}
+.stars.mini{color:#c98a0a;font-size:.68rem;font-weight:800;font-family:var(--font-num)}
+.elite{background:linear-gradient(90deg,#f3b43a,#ffd25a);color:#3a2600;font-size:.62rem;font-weight:800;padding:1px 6px;border-radius:999px;margin-left:4px;vertical-align:2px}
 .res-go{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 30%);z-index:5}
 .res-go .btn{flex:1}
 .np-fold summary{list-style:none} .np-fold summary::-webkit-details-marker{display:none} .np-fold[open] summary small{display:none}
@@ -504,9 +512,9 @@ const OVR_W = {
   MF:{pass:.3,ctrl:.25,spd:.15,shot:.15,tackle:.15},
   DF:{tackle:.35,str:.25,spd:.2,pass:.1,ctrl:.1},
 };
-// 나라 → 1부/2부. 클럽은 전부 가상. [이름, 약칭, 색1, 색2, 전력, 주급(만원/주), 요구 명성]
+// 나라 → 1부/2부. 클럽은 전부 가상(5대 리그 1부는 실제 구성을 '도시·지역 + 팀 색' 가명으로). [이름, 약칭, 색1, 색2, 전력, 주급(만원/주), 요구 명성, 재정 1~5]
 const COUNTRIES = [
-  {id:'kr',name:'한국',mult:1.0},{id:'jp',name:'일본',mult:1.3},{id:'de',name:'독일',mult:1.9},{id:'es',name:'스페인',mult:2.2},{id:'en',name:'잉글랜드',mult:2.5},
+  {id:'kr',name:'한국',mult:1.0},{id:'jp',name:'일본',mult:1.3},{id:'de',name:'독일',mult:1.9},{id:'es',name:'스페인',mult:2.2},{id:'it',name:'이탈리아',mult:2.1},{id:'fr',name:'프랑스',mult:1.8},{id:'en',name:'잉글랜드',mult:2.5},
 ];
 const CLUB_DATA = {
   'kr-2':[['칠성 FC','CS','#2f66d6','#ffffff',42,80,0],['안양 소나무 FC','AY','#1f7a3a','#ffffff',46,100,0],['천안 호두 FC','CA','#8a5a2b','#f3e3c4',45,95,0],['김포 들판 FC','GP','#27ae60','#f1c40f',48,110,40],['광주 무등 FC','GJ','#c9372c','#ffffff',50,130,60],['강릉 파도 FC','GN','#1b8fa6','#ffffff',52,150,80]],
@@ -514,16 +522,20 @@ const CLUB_DATA = {
   'jp-2':[['센다이 호시','SD','#b03a2e','#ffffff',52,200,120],['니가타 코메','NG','#27ae60','#ffffff',54,230,140],['히로시마 모미지','HS','#c0392b','#ffffff',56,260,160],['나고야 시로','NY','#ecf0f1','#b8860b',58,300,200],['고베 미나토','KB','#1f3a93','#ffffff',60,340,250],['오키나와 시사','OK','#16a085','#ffffff',50,180,120]],
   'jp-1':[['에도 라이징','ED','#1f3a93','#ffffff',72,1200,900],['오사카 나니와','OS','#00a8a8','#ffffff',68,900,700],['교토 코케','KY','#4b7f3a','#ffffff',64,650,550],['요코하마 카모메','YK','#5d6d7e','#ffffff',66,750,600],['삿포로 유키','SP','#74b9ff','#1f3a93',62,550,500],['후쿠오카 하카타','FK','#e17055','#ffffff',60,500,500]],
   'de-2':[['켐니츠 작센','KM','#2ecc71','#ffffff',62,700,700],['콘스탄츠 보덴제 SV','KN','#3498db','#ffffff',64,800,750],['바이마르 SC','WM','#6c3483','#ffffff',60,600,700],['슈트랄준트 오스트제','SR','#c0392b','#ffffff',66,900,850],['뷔르츠부르크 프랑켄','WU','#d35400','#ffffff',68,1100,950],['트리어 모젤 SV','TR','#1abc9c','#ffffff',70,1200,1050]],
-  'de-1':[['밤베르크 바이스','BA','#7b1e3a','#f1c40f',90,7000,4500],['만하임 슈탈','MH','#57606f','#e67e22',84,4500,3000],['함부르크 하펜','HH','#0e8f8f','#ffffff',76,2500,1900],['베를린 베어 SC','BB','#2c3e50','#f1c40f',74,2200,1700],['오펜부르크 발트 FC','OB','#1e8449','#ffffff',78,3000,2200],['뤼네부르크 노르트','LN','#2c3e50','#f39c12',72,2000,1600]],
+  'de-1':[['뮌헨 레드','MR','#dc052d','#ffffff',95,10220,6130,5],['레버쿠젠 레드블랙','LV','#e32221','#000000',88,5770,3460,4],['도르트문트 옐로','DY','#fde100','#000000',87,5320,3190,5],['라이프치히 화이트레드','LP','#ffffff','#dd0741',85,4520,2710,4],['프랑크푸르트 블랙레드','FF','#e1000f','#000000',83,3840,2300,4],['슈투트가르트 화이트레드','SG','#ffffff','#e32219',82,3540,2120,4],['프라이부르크 레드','FB','#e2001a','#000000',80,3010,1810,3],['볼프스부르크 그린','WG','#65b32e','#ffffff',79,2770,1660,4],['글라트바흐 그린','GB','#000000','#00a650',78,2550,1530,3],['호펜하임 블루','HO','#1961b5','#ffffff',78,2550,1530,3],['브레멘 그린','BG','#1d9053','#ffffff',77,2350,1410,3],['마인츠 레드','MZ','#c3141e','#ffffff',77,2350,1410,3],['베를린 레드','BR','#eb1923','#ffffff',76,2170,1300,3],['아우크스부르크 레드그린','AU','#ba3733','#46714d',75,2000,1200,2],['쾰른 레드화이트','KR','#ffffff','#ed1c24',75,2000,1200,3],['함부르크 블루','HB','#0a3f86','#ffffff',75,2000,1200,4],['함부르크 브라운','HP','#624839','#ffffff',73,1700,1020,2],['하이덴하임 레드블루','HD','#e2001a','#003b79',73,1700,1020,2]],
   'es-2':[['아빌라 메세타 CF','AV','#d35400','#ffffff',64,900,950],['하카 피레네 CF','JC','#7f8c8d','#ffffff',66,1000,1000],['시우다드레알 라 만차 CF','CR','#8e44ad','#f1c40f',62,800,900],['란사로테 카나리아 CF','LZ','#16a085','#f1c40f',68,1200,1150],['테루엘 아라곤 CF','TE','#c0392b','#f1c40f',70,1400,1250],['쿠엥카 둘세 CF','CU','#e84393','#ffffff',72,1500,1350]],
-  'es-1':[['마르베야 솔 CF','MB','#f39c12','#c0392b',93,9000,6000],['세고비아 몬타냐 CF','SG','#2c3e50','#ffffff',90,8000,5500],['베니도름 코스타 CF','BN','#1e90ff','#ffffff',80,3500,3000],['하엔 토로 CF','JA','#8e2a2a','#f1c40f',82,4000,3300],['투델라 에브로 CF','TU','#e67e22','#2c3e50',76,2800,2500],['루고 마르 CF','LU','#00cec9','#ffffff',74,2500,2400]],
+  'es-1':[['마드리드 화이트','MW','#ffffff','#00529f',96,11940,7160,5],['카탈루냐 블루레드','CB','#a50044','#004d98',95,11000,6600,5],['마드리드 레드화이트','MR','#cb3524','#ffffff',89,6740,4040,5],['빌바오 레드화이트','BL','#ee2523','#ffffff',84,4490,2690,4],['비야레알 옐로','VY','#ffe667','#005187',83,4130,2480,4],['산세바스티안 블루화이트','SS','#0067b1','#ffffff',81,3510,2110,4],['세비야 그린화이트','BG','#0bb363','#ffffff',82,3810,2290,4],['세비야 화이트레드','SW','#ffffff','#d71920',80,3240,1940,4],['비고 스카이','VG','#8ac3ee','#ffffff',79,2980,1790,3],['지로나 레드화이트','GR','#cd2534','#ffffff',78,2750,1650,3],['발렌시아 화이트','VW','#ffffff','#000000',78,2750,1650,4],['바예카스 화이트레드','RV','#ffffff','#e53027',76,2340,1400,2],['팜플로나 레드','PR','#d91a21','#0a346f',76,2340,1400,2],['마요르카 레드블랙','ML','#e20613','#000000',76,2340,1400,3],['헤타페 블루','GT','#005999','#ffffff',75,2150,1290,2],['바르셀로나 블루화이트','BW','#1d72b8','#ffffff',75,2150,1290,3],['비토리아 블루','VT','#0761af','#ffffff',74,1980,1190,2],['발렌시아 블루레드','LV','#004d98','#e20613',72,1690,1010,2],['엘체 그린화이트','EL','#05642c','#ffffff',72,1690,1010,2],['오비에도 블루','OV','#0047ab','#ffffff',71,1550,930,2]],
   'en-2':[['요크 로지스','YK','#f1c40f','#1a1a1a',70,1800,1300],['더들리 블랙컨트리 FC','DU','#8e44ad','#ffffff',68,1500,1300],['우스터 미들랜드 SC','WO','#2c3e50','#3498db',72,2200,1500],['켄들 펠러스','KD','#1abc9c','#2c3e50',74,2500,1700],['토키 코스트 FC','TQ','#c0392b','#2980b9',66,1500,1300],['뉴포트 드래곤스','NP','#c0392b','#2ecc71',76,3000,1900]],
-  'en-1':[['더럼 그리폰스','DH','#145a32','#f1c40f',92,14000,7500],['바스 로열스','BA','#6c3483','#f1c40f',95,15000,8500],['캔터베리 아처스','CT','#1f3a93','#ffffff',88,11000,6500],['트루로 앵커스','TR','#8e2a2a','#1f3a93',90,12000,7000],['윈체스터 크라운스','WC','#d35400','#2c3e50',86,9000,5800],['솔즈베리 스파이어스','SB','#2c3e50','#ecf0f1',78,4500,3600]],
+  'en-1':[['노스런던 레드','NL','#db0007','#ffffff',93,12020,7210,5],['맨체스터 스카이','MS','#6cabdd','#1c2c5b',94,13040,7820,5],['머지사이드 레드','MR','#c8102e','#f6eb61',94,13040,7820,5],['웨스트런던 블루','WB','#034694','#ffffff',90,9410,5650,5],['맨체스터 레드','MU','#da291c','#000000',86,6790,4070,5],['노스런던 화이트','NW','#ffffff','#132257',85,6260,3760,5],['타인사이드 블랙화이트','TY','#241f20','#ffffff',87,7370,4420,5],['웨스트미들랜즈 클라렛','WM','#670e36','#95bfe5',84,5770,3460,4],['서식스 블루','SX','#0057b8','#ffffff',81,4510,2710,3],['노팅엄 레드','NT','#dd0000','#ffffff',80,4160,2500,3],['사우스런던 레드블루','SL','#1b458f','#c4122e',79,3830,2300,3],['도싯 레드블랙','DS','#da291c','#000000',79,3830,2300,3],['미들섹스 레드화이트','MX','#e30613','#ffffff',76,3000,1800,3],['이스트런던 클라렛','EL','#7a263a','#1bb1e7',78,3530,2120,4],['머지사이드 블루','MB','#003399','#ffffff',76,3000,1800,4],['웨스트런던 화이트','FW','#ffffff','#000000',77,3260,1960,3],['울버햄프턴 골드','WV','#fdb913','#231f20',75,2770,1660,3],['요크셔 화이트','YW','#ffffff','#1d428a',75,2770,1660,4],['위어사이드 레드','WR','#eb172b','#ffffff',73,2350,1410,3],['랭커셔 클라렛','LC','#6c1d45','#99d6ea',72,2170,1300,2]],
+  'it-1':[['밀라노 블루블랙','MI','#010e80','#000000',92,8310,4990,5],['나폴리 스카이','NA','#12a0d7','#ffffff',91,7660,4600,5],['피에몬테 블랙화이트','PC','#000000','#ffffff',90,7060,4240,5],['밀라노 레드블랙','MR','#fb090b','#000000',88,5990,3590,5],['베르가모 블루블랙','BG','#1e71b8','#000000',87,5520,3310,4],['로마 옐로레드','RM','#8e1f2f','#f0bc42',86,5090,3050,4],['로마 스카이','RS','#87d8f7','#ffffff',84,4320,2590,4],['피렌체 퍼플','FI','#482e92','#ffffff',82,3670,2200,4],['볼로냐 레드블루','BO','#a21c26','#1a2f48',82,3670,2200,3],['코모 블루','CM','#003e7e','#ffffff',80,3120,1870,4],['토리노 마룬','TO','#8a1e03','#ffffff',77,2440,1460,3],['우디네 블랙화이트','UD','#000000','#ffffff',76,2250,1350,3],['제노바 레드블루','GE','#a01818','#002855',75,2080,1250,3],['파르마 옐로블루','PA','#fcd116','#1a3d7c',75,2080,1250,3],['사수올로 그린블랙','SA','#00a650','#000000',75,2080,1250,3],['칼리아리 레드블루','CA','#a5122a','#002350',74,1910,1150,2],['베로나 옐로블루','VR','#002f6c','#ffd200',73,1760,1060,2],['레체 옐로레드','LE','#ffd200','#e30613',72,1620,970,2],['피사 블랙블루','PI','#000000','#1e4c9a',71,1500,900,2],['크레모나 레드그레이','CR','#e2001a','#9a9a9a',71,1500,900,2]],
+  'it-2':[],
+  'fr-1':[['파리 블루레드','PS','#004170','#da291c',94,8330,5000,5],['마르세유 화이트블루','OM','#ffffff','#2faee0',85,4000,2400,4],['모나코 레드화이트','MO','#e51b22','#ffffff',84,3680,2210,4],['리옹 화이트','LY','#ffffff','#14387f',82,3130,1880,4],['릴 레드','LI','#e01e13','#ffffff',82,3130,1880,3],['니스 레드블랙','NI','#c4161c','#000000',80,2660,1600,4],['렌 레드블랙','RE','#e13327','#000000',79,2450,1470,3],['랑스 옐로레드','LN','#fff200','#ed1c24',79,2450,1470,3],['스트라스부르 블루','ST','#0058a4','#ffffff',79,2450,1470,3],['브레스트 레드','BR','#e30613','#ffffff',76,1920,1150,2],['툴루즈 퍼플','TL','#3e2c56','#ffffff',76,1920,1150,2],['낭트 옐로그린','NA','#fcd405','#00953a',74,1630,980,3],['파리 블루화이트','PF','#00285e','#ffffff',74,1630,980,3],['오세르 화이트블루','AX','#ffffff','#003d7c',73,1500,900,2],['르아브르 스카이','HV','#62b6e7','#1d2b4f',72,1380,830,2],['앙제 블랙화이트','AN','#000000','#ffffff',72,1380,830,2],['로리앙 오렌지','LO','#f58113','#000000',72,1380,830,2],['메스 마룬','MT','#7a1c2e','#ffffff',71,1280,770,2]],
+  'fr-2':[],
 };
 const CLUBS = {};
 Object.entries(CLUB_DATA).forEach(([div,arr])=>arr.forEach((c,i)=>{
   const id=div+'-'+i; const [country,d]=div.split('-');
-  CLUBS[id]={id,name:c[0],short:c[1],c1:c[2],c2:c[3],str:c[4],wage:c[5],rep:c[6],homeDiv:div,country};
+  CLUBS[id]={id,name:c[0],short:c[1],c1:c[2],c2:c[3],str:c[4],wage:c[5],rep:c[6],wealth:c[7]||null,homeDiv:div,country};
 }));
 /* 실제 리그 규모·승강 방식 참고 (2026 기준, 이름은 전부 가상) */
 const FMT={
@@ -539,11 +551,21 @@ const FMT={
   es:{n1:20,n2:22,rr1:2,rr2:2,up:2,down:3,post:['semi','final'],drawHigher:false,
       t1:'20팀 · 38경기 · 18~20위 자동 강등',
       t2:'22팀 · 42경기 · 1·2위 자동 승격 · 3~6위 승격 PO'},
+  it:{n1:20,n2:20,rr1:2,rr2:2,up:2,down:3,post:['semi','final'],drawHigher:true,
+      t1:'20팀 · 38경기 · 18~20위 자동 강등',
+      t2:'20팀 · 38경기 · 1·2위 자동 승격 · 3~6위 승격 PO (실제는 3~8위) · 무승부면 순위 높은 팀 진출'},
+  fr:{n1:18,n2:18,rr1:2,rr2:2,up:2,down:2,post:['rel'],relD1:15,relD2:2,drawHigher:false,
+      t1:'18팀 · 34경기 · 17·18위 자동 강등 · 16위는 2부 3위와 승강 PO',
+      t2:'18팀 · 34경기 · 1·2위 자동 승격 · 3위는 1부 16위와 승강 PO (실제는 3~5위 PO 승자)'},
   en:{n1:20,n2:24,rr1:2,rr2:2,up:2,down:3,post:['semi','final'],drawHigher:false,
       t1:'20팀 · 38경기 · 18~20위 자동 강등',
       t2:'24팀 · 46경기 · 1·2위 자동 승격 · 3~6위 승격 PO'},
 };
 const GEN={
+  it:{fmt:(c,n)=>`${c} ${n}`,nicks:['아퀼레','스텔라','레오니','팔키','토리','베르디','루피','피오레','델피니','그리포니'],
+      cities:[['팔레르모','PA'],['바리','BA'],['베네치아','VE'],['라스페치아','SP'],['모데나','MO'],['체세나','CE'],['카탄차로','CZ'],['레조에밀리아','RE'],['프로시노네','FR'],['엠폴리','EM'],['몬차','MZ'],['파도바','PD'],['아벨리노','AV'],['카라라','CR'],['만토바','MN'],['페스카라','PE'],['키아바리','CH'],['볼차노','BZ'],['살레르노','SA'],['브레시아','BS']]},
+  fr:{fmt:(c,n)=>`${c} ${n} FC`,nicks:['레종','에투알','포콩','루','블뢰','오랑주','미스트랄','앙크르','솔레유','로시뇰'],
+      cities:[['생테티엔','SE'],['몽펠리에','MP'],['랭스','RM'],['갱강','GG'],['아미앵','AM'],['그르노블','GR'],['안시','AC'],['클레르몽페랑','CF'],['됭케르크','DK'],['라발','LA'],['로데즈','RD'],['포','PU'],['바스티아','BT'],['낭시','NC'],['르망','LM'],['트루아','TR'],['불로뉴','BL'],['캉','CN']]},
   kr:{fmt:(c,n)=>`${c} ${n} FC`,nicks:['은하','별빛','강철','두루미','황소','돌고래','청솔','불꽃','해오름','참매','은빛','물결','바람개비','소리개'],
       cities:[['수원','SU'],['울산','US'],['포항','PH'],['성남','SN'],['청주','CJ'],['창원','CW'],['춘천','CC'],['원주','WJ'],['목포','MP'],['여수','YS'],['안산','AS'],['부천','BC'],['화성','HS'],['용인','YI'],['파주','PJ'],['김해','GH'],['경주','GU'],['아산','AN'],['충주','CU'],['진주','JN']]},
   jp:{fmt:(c,n)=>`${c} ${n}`,nicks:['가제','나미','다카','류세이','히카리','소라','이나즈마','사쿠라','유키','쓰키','호노오','가스미'],
@@ -562,8 +584,10 @@ const CITY_AVOID={수원:['#0d47a1','#2980b9'],울산:['#2980b9','#0d47a1','#f1c
   리즈:['#ffffff'],셰필드:['#c0392b','#2980b9','#0d47a1'],노팅엄:['#c0392b'],레스터:['#0d47a1','#2980b9'],더비:['#ffffff','#111111'],코번트리:['#1abc9c','#16a085','#2980b9'],버밍엄:['#0d47a1','#2980b9','#6d4c41'],브리스틀:['#c0392b'],플리머스:['#27ae60'],사우샘프턴:['#c0392b'],포츠머스:['#0d47a1','#2980b9'],브라이턴:['#2980b9','#0d47a1'],노리치:['#f1c40f','#27ae60'],입스위치:['#0d47a1','#2980b9'],왓퍼드:['#f1c40f','#111111'],루턴:['#f39c12','#d35400'],선덜랜드:['#c0392b'],미들즈브러:['#c0392b'],블랙번:['#2980b9','#ffffff'],볼턴:['#ffffff'],스토크:['#c0392b'],헐:['#f39c12','#d35400'],레딩:['#0d47a1','#2980b9'],옥스퍼드:['#f1c40f']};
 (function genClubs(){
   const PAL=['#c0392b','#2980b9','#27ae60','#8e44ad','#f39c12','#16a085','#2c3e50','#d35400','#e84393','#1abc9c','#7f8c8d','#f1c40f','#111111','#ffffff','#6d4c41','#0d47a1'];
+  const K2={en:14,de:12,es:14}; const FACW={en:1.8,de:1.3,es:1.4,it:1.35,fr:1.15}; const R2={it:[60,71],fr:[58,69]};
   COUNTRIES.forEach((co,ci)=>{ const G=GEN[co.id], F=FMT[co.id]; let k=0;
-    ['1','2'].forEach(dn=>{ const div=co.id+'-'+dn; const exist=Object.values(CLUBS).filter(c=>c.homeDiv===div);
+    ['1','2'].forEach(dn=>{ const div=co.id+'-'+dn; const exist=Object.values(CLUBS).filter(c=>c.homeDiv===div); if(dn==='2'&&K2[co.id]!=null) k=K2[co.id];
+      if(!exist.length&&R2[co.id]){ const need2=F.n2; for(let i=0;i<need2;i++){ const [city,code]=G.cities[k++]; const seed=ci*1000+500+i*7; const nick=G.nicks[Math.floor(hash(seed+3)*G.nicks.length)]; const str=Math.round(R2[co.id][0]+(R2[co.id][1]-R2[co.id][0])*hash(seed+7)); let ci0=Math.floor(hash(seed+11)*PAL.length); const c1=PAL[ci0]; let c2=PAL[Math.floor(hash(seed+13)*PAL.length)]; if(c2===c1) c2=c1==='#ffffff'?'#111111':'#ffffff'; const wage=Math.round(200*Math.pow(1.085,str-50)*FACW[co.id]*0.75/10)*10; const id=div+'-'+i; CLUBS[id]={id,name:G.fmt(city,nick),short:code,c1,c2,str,wage,rep:Math.round(wage*0.6/10)*10,homeDiv:div,country:co.id}; } return; }
       const need=(dn==='1'?F.n1:F.n2)-exist.length; const strs=exist.map(c=>c.str).sort((a,b)=>a-b);
       const lo=strs[0]-4, hi=dn==='1'?strs[Math.floor(strs.length/2)]:strs[strs.length-1];
       for(let i=0;i<need;i++){ const [city,code]=G.cities[k++]; const seed=ci*1000+(dn==='1'?0:500)+i*7;
@@ -576,6 +600,7 @@ const CITY_AVOID={수원:['#0d47a1','#2980b9'],울산:['#2980b9','#0d47a1','#f1c
       }
     });
   });
+  Object.values(CLUBS).forEach(c=>{ if(c.wealth==null) c.wealth=clamp(Math.round((c.str-46)/9),1,5); }); // 재정: 명문일수록 돈이 많아 전력이 잘 안 떨어짐
 })();
 const ICON_PATHS={
   dash:'M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7',
@@ -663,6 +688,8 @@ const NAME_POOLS = {
   jp:[['사토','스즈키','다카하시','다나카','와타나베','이토','야마모토','나카무라','고바야시','가토'],['하루토','유토','소타','유마','렌','리쿠','아오이','하야토','다이키','쇼'],true],
   de:[['뮐러','슈미트','슈나이더','피셔','베버','마이어','바그너','베커','슐츠','호프만'],['루카스','레온','핀','요나스','파울','막스','노아','펠릭스','엘리아스','얀'],false],
   es:[['가르시아','로드리게스','곤살레스','페르난데스','로페스','마르티네스','산체스','페레스','고메스','루이스'],['알레한드로','다니엘','파블로','알바로','아드리안','다비드','디에고','하비에르','마르코스','세르히오'],false],
+  it:[['로시','루소','페라리','에스포지토','비앙키','로마노','콜롬보','리치','마리니','그레코','브루노','갈로'],['로렌초','마테오','레오나르도','프란체스코','알레산드로','안드레아','리카르도','토마소','페데리코','다비데','니콜로','지오반니'],false],
+  fr:[['마르탱','베르나르','뒤부아','토마','로베르','리샤르','프티','뒤랑','르루아','모로','시몽','로랑'],['루카','위고','테오','라파엘','아르튀르','루이','쥘','가브리엘','아당','레오','노에','마티스'],false],
   en:[['스미스','존스','테일러','브라운','윌리엄스','윌슨','존슨','데이비스','로빈슨','라이트'],['올리버','해리','잭','조지','제이콥','찰리','토머스','오스카','윌리엄','제임스'],false],
 };
 function playerName(clubId,i){
@@ -718,7 +745,7 @@ function newGame(name,pos){
   S={
     player:{name,pos,level:1,xp:0,points:5,stats:{...base},money:300,rep:0,skills:['dash'],equip:['dash',null,null,null],items:[],age:18,cond:100,injury:0,natl:{caps:0,goals:0},cups:0,
       career:{apps:0,goals:0,assists:0,ratings:[],titles:0}},
-    v:2, clubId:'kr-2-0', wage:80, season:1, round:1, divs, tables:{}, fixtures:{}, offers:[], offersFor:null, history:[], lastResults:[], pstats:{}, form:[], awards:[], contractEnd:2, weekAct:null, weekMsg:'', pendingNat:false, natDone:{}, cup:null, cupPending:false, natLog:[],
+    v:3, clubId:'kr-2-0', wage:80, season:1, round:1, divs, tables:{}, fixtures:{}, offers:[], offersFor:null, history:[], lastResults:[], pstats:{}, form:[], awards:[], contractEnd:2, weekAct:null, weekMsg:'', pendingNat:false, natDone:{}, cup:null, cupPending:false, natLog:[],
   };
   startSeason();
   save();
@@ -728,15 +755,19 @@ function divName(divId){ const [c,d]=divId.split('-'); return COUNTRIES.find(x=>
 function divMult(divId){ const [c,d]=divId.split('-'); return COUNTRIES.find(x=>x.id===c).mult*(d==='1'?1.5:1); }
 function seasonTransferNews(){ // 시즌 시작: 클럽 전력 변동 + 가상 이적 뉴스
   const news=[]; S.baseStr=S.baseStr||{}; S.rebirth=S.rebirth||{};
-  Object.values(CLUBS).forEach(c=>{ if(c.nat) return; if(S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; const base=S.baseStr[c.id]; const drift=Math.round((Math.random()-0.5)*4); c.str=clamp(c.str+drift,base-6,base+6); });
+  const mv=S.moved||{up:[],down:[]};
+  Object.values(CLUBS).forEach(c=>{ if(c.nat) return; if(S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; const base=S.baseStr[c.id]; const w=c.wealth||2;
+    let target=base; if(mv.down.includes(c.id)) target-=Math.max(0,6-w*1.1); if(mv.up.includes(c.id)) target+=w>=3?2:1; // 강등: 가난한 팀은 주축이 떠나고, 부자 팀은 지킴
+    const pull=0.2+w*0.09; c.str=Math.round(clamp(c.str+(target-c.str)*pull+(Math.random()-0.5)*3,base-8,base+6)); });
   const all=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId);
-  for(let k=0;k<8;k++){ const from=all[Math.floor(Math.random()*all.length)]; const cand=all.filter(c=>c!==from&&c.str>=from.str-4); const to=cand[Math.floor(Math.random()*cand.length)]||all[0]; const i=1+Math.floor(Math.random()*10);
+  for(let k=0;k<8;k++){ const from=all[Math.floor(Math.random()*all.length)]; const cand=all.filter(c=>c!==from&&c.str>=from.str-4&&(c.wealth||2)>=(from.wealth||2)); const pool=cand.flatMap(c=>Array(c.wealth||1).fill(c)); const to=pool[Math.floor(Math.random()*pool.length)]||all[0]; /* 돈 많은 구단이 사 간다 */ const i=1+Math.floor(Math.random()*10);
     const nm=playerName(from.id,i); const fee=Math.round(Math.pow(from.str/10,3)*rnd(40,120)/10)*10; news.push({nm,from:from.id,to:to.id,fee,role:ROLES[i]});
     from.str=clamp(from.str-1,S.baseStr[from.id]-6,99); to.str=clamp(to.str+1,20,S.baseStr[to.id]+6); S.rebirth[from.id+'-'+i]=(S.rebirth[from.id+'-'+i]||0)+irnd(8,14); }
   // 34세 넘은 가상 선수는 은퇴 → 같은 자리에 새 선수(나이 리셋)
   Object.values(CLUBS).forEach(c=>{ if(c.nat) return; for(let i=0;i<11;i++){ if(aiAge(c.id,i)>=35){ S.rebirth[c.id+'-'+i]=(S.rebirth[c.id+'-'+i]||0)+irnd(13,17); } } });
   S.news=news; }
 function startSeason(){
+  setTimeout(()=>{ try{ saveStr(); save(); }catch(e){} },0);
   if(S.season>1) seasonTransferNews(); else { S.baseStr={}; Object.values(CLUBS).forEach(c=>{ if(!c.nat) S.baseStr[c.id]=c.str; }); S.news=[]; }
   if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4;
   S.captain=S.season>1&&(S.role||roleAt(CLUBS[S.clubId]).k)==='core'&&S.player.rep>=2000&&(S.seasonsAtClub||0)>=1; S.seasonsAtClub=(S.prevClub===S.clubId)?(S.seasonsAtClub||0)+1:0; S.prevClub=S.clubId;
@@ -868,7 +899,7 @@ function postEvent(){ if(!S.post) postInit();
       if(mine){ const home=mine.a===S.clubId; return {type:'po',me:CLUBS[S.clubId],opp:CLUBS[home?mine.b:mine.a],home,label:COUNTRIES.find(x=>x.id===co).name+' '+PO_NAMES[mine.type],co,tie:mine}; }
       st.ties.forEach(t=>{ if(!t.done){ const [a,b]=simMatch(CLUBS[t.a].str,CLUBS[t.b].str,0.1); postResolve(co,t,a,b); } }); postAdvance(co); } }
   return null; }
-const CUP_NAMES={kr:'한빛컵',jp:'벚꽃배',de:'라인강 컵',es:'태양의 컵',en:'크라운컵'};
+const CUP_NAMES={kr:'한빛컵',jp:'벚꽃배',de:'라인강 컵',es:'태양의 컵',it:'로마 트로피',fr:'센강 컵',en:'크라운컵'};
 /* 스타 챔피언스컵: 지난 시즌 각국 1부 상위 4팀(20팀). 1라운드 8팀 → 16강 → 8강 → 4강 → 결승. 리그 중간중간 열림 */
 function ccInit(){ const q=[]; COUNTRIES.forEach(co=>{ const src=(S.lastTop4&&S.lastTop4[co.id])||S.divs[co.id+'-1'].clubs.slice().sort((a,b)=>CLUBS[b].str-CLUBS[a].str).slice(0,4); src.forEach(c=>{ if(CLUBS[c]) q.push(c); }); });
   const all=q.slice().sort((a,b)=>CLUBS[b].str-CLUBS[a].str); const N=all.length; let p2=1; while(p2*2<=N) p2*=2; const nPre=N-p2;
@@ -930,6 +961,9 @@ function simulateOthers(){ // 내 경기 제외 전 리그 진행
    ========================================================= */
 let tab='home';
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.hidden=true); el(id).hidden=false; }
+function clubStars(c){ if(!c||c.nat) return 0; return clamp(Math.round((c.str-38)/57*10)/2,0.5,5); }
+function starHTML(c,big){ const n=clubStars(c); let h=''; for(let i=1;i<=5;i++) h+=`<i class="${n>=i?'f':n>=i-0.5?'h':'e'}">★</i>`; return `<span class="stars${big?' big':''}" title="${n}성">${h}</span>`; }
+function wealthTxt(c){ return ['','재정 열악','재정 보통','재정 안정','부자 구단','초부자 명문'][c.wealth||1]; }
 function crestHTML(c,size=''){ return `<div class="crest" style="background:${c.c1};color:${c.c2};${size}">${esc(c.short)}</div>`; }
 function renderHub(){
   const p=S.player, club=CLUBS[S.clubId], d=divOf(S.clubId);
@@ -959,7 +993,7 @@ function renderHome(){
   const grid=h(`<div class="home-grid"></div>`); box.append(grid);
   const cond=Math.round(p.cond);
   // ① 선수 카드
-  const pc=h(`<div class="card pcard2"><div class="sec">커리어 · ${esc(club.name)}<span class="pill">${divName(d.id)} ${myRank}위</span></div>
+  const pc=h(`<div class="card pcard2"><div class="sec">커리어 · ${esc(club.name)} ${starHTML(club)}<span class="pill">${divName(d.id)} ${myRank}위</span></div>
     <div class="pc2"><canvas width="168" height="150"></canvas>
       <div style="min-width:0;display:flex;flex-direction:column;justify-content:center">
         <div class="pc2-top"><div style="min-width:0"><div class="pc-name">${esc(p.name)}</div><div class="pos">${p.pos} · Lv.${p.level}${S.captain?' · Ⓒ 주장':''}</div></div><div class="ovrbox"><span>OVR</span><b class="num">${ovr()}</b></div></div>
@@ -984,7 +1018,7 @@ function renderHome(){
     const mode=renderHome.mode||'play';
     const card=h(`<div class="card nm"><div class="sec">다음 경기<span class="pill">${esc(ev.label)}</span></div>
       <div class="stadium"><canvas width="360" height="150"></canvas><div class="ov">
-        <div class="tm">${crestSVG(left,58)}<b>${esc(left.name)}</b></div><div class="vsx">VS<small>${home?'홈 경기':'원정 경기'}</small></div><div class="tm">${crestSVG(right,58)}<b>${esc(right.name)}</b></div></div></div>
+        <div class="tm">${crestSVG(left,58)}<b>${esc(left.name)}</b>${left.nat?'':starHTML(left)}</div><div class="vsx">VS<small>${home?'홈 경기':'원정 경기'}</small></div><div class="tm">${crestSVG(right,58)}<b>${esc(right.name)}</b>${right.nat?'':starHTML(right)}</div></div></div>
       <div class="nm-meta">${isL?`상대 ${oppRank}위 · `:''}전력 ${opp.str} · ${tacticOf(opp).name} ${TACTIC_FORM[tacticOf(opp).id]} · 우리 ${TACTIC_FORM[tacticOf(ev.me).id]}${v?`<br>🏟 ${esc(v.name)} · ${v.kind}`:''}</div>
       ${chips.length?`<div class="row" style="justify-content:center;gap:6px;margin-top:4px">${chips.join('')}</div>`:''}
       ${(()=>{ const st2=matchStory(ev); return st2?`<div class="story">${st2}</div>`:''; })()}
@@ -1304,16 +1338,17 @@ function renderLeague(){
   const sel=h(`<div class="card"><h2>리그</h2><div class="row" style="margin-top:8px" id="div-sel"></div><div id="div-table" style="margin-top:10px"></div></div>`);
   box.append(sel);
   const ds=sel.querySelector('#div-sel');
-  const order=['kr-2','kr-1','jp-2','jp-1','de-2','de-1','es-2','es-1','en-2','en-1'];
-  let cur=renderLeague.cur||myDiv;
-  order.forEach(id=>ds.append(h(`<button class="btn sm ${id===cur?'primary':''}" data-d="${id}">${divName(id)}</button>`)));
+  let cur=renderLeague.cur||myDiv; const [cCo,cDn]=cur.split('-');
+  ds.style.flexDirection='column'; ds.style.alignItems='stretch'; ds.style.gap='6px';
+  ds.append(h(`<div class="row" style="gap:5px;flex-wrap:wrap">${COUNTRIES.map(co=>`<button class="btn sm ${co.id===cCo?'primary':''}" data-d="${co.id}-${co.id===cCo?cDn:'1'}">${co.name}${co.id===myDiv.split('-')[0]?' ⭐':''}</button>`).join('')}</div>`));
+  ds.append(h(`<div class="row" style="gap:5px">${['1','2'].map(dn=>`<button class="btn sm ${dn===cDn?'on':''}" style="flex:1" data-d="${cCo}-${dn}">${dn}부${cCo+'-'+dn===myDiv?' (우리 리그)':''}</button>`).join('')}</div>`));
   ds.addEventListener('click',e=>{ const b=e.target.closest('button[data-d]'); if(!b) return; renderLeague.cur=b.dataset.d; renderLeague(); });
   const st=standings(cur);
   const [cId,dn]=cur.split('-');
   const view=renderLeague.view||'table';
   const tabsHtml=`<div class="segs" style="margin:8px 0">${[['table','순위'],['g','득점'],['a','도움'],['cup','컵대회'],['cc','챔스'],['po','PO']].map(([k,n])=>`<button class="btn sm ${view===k?'on':''}" data-v="${k}">${n}</button>`).join('')}</div>`;
   if(view==='cc'){ const c=S.cc; const inIt=c&&c.teams.includes(S.clubId);
-    sel.querySelector('#div-table').innerHTML=tabsHtml+`<p style="margin:0 0 6px;font-size:.85rem">스타 챔피언스컵 · 지난 시즌 각국 1부 상위 4팀 (20팀) · ${inIt?'<b style="color:var(--accent)">우리 팀 참가 중</b>':'우리 팀 불참 — 1부 4위 안에 들면 다음 시즌 참가'}</p>`+(c?`<p class="muted" style="margin:0 0 6px;font-size:.82rem">${c.champion?'우승: <b style="color:var(--accent)">'+esc(CLUBS[c.champion].name)+'</b>':'진행 중: '+c.stages[c.stage]}</p>`+c.stages.map((nm,st)=>({nm,st})).reverse().map(({nm,st})=>{ const rs=c.results.filter(r=>r.stage===st); if(!rs.length) return ''; return `<h3 style="margin-top:8px">${nm}</h3>`+rs.map(r=>`<div class="row between ${r.a===S.clubId||r.b===S.clubId?'':'muted'}" style="font-size:.86rem"><span>${esc(CLUBS[r.a].name)}</span><b class="num" style="color:var(--fg)">${r.ga} - ${r.gb}${r.pk?' <small>(PK)</small>':''}</b><span>${esc(CLUBS[r.b].name)}</span></div>`).join(''); }).join('')+(c.stage<c.stages.length&&c.pairs.length?`<h3 style="margin-top:8px">다음 ${c.stages[c.stage]} 대진</h3>`+c.pairs.map(([a,b])=>`<div class="row between" style="font-size:.86rem"><span>${esc(CLUBS[a].name)}</span><span class="muted">vs</span><span>${esc(CLUBS[b].name)}</span></div>`).join(''):''):'');
+    sel.querySelector('#div-table').innerHTML=tabsHtml+`<p style="margin:0 0 6px;font-size:.85rem">스타 챔피언스컵 · 지난 시즌 각국 1부 상위 4팀 (${(S.cc&&S.cc.teams||[]).length||COUNTRIES.length*4}팀) · ${inIt?'<b style="color:var(--accent)">우리 팀 참가 중</b>':'우리 팀 불참 — 1부 4위 안에 들면 다음 시즌 참가'}</p>`+(c?`<p class="muted" style="margin:0 0 6px;font-size:.82rem">${c.champion?'우승: <b style="color:var(--accent)">'+esc(CLUBS[c.champion].name)+'</b>':'진행 중: '+c.stages[c.stage]}</p>`+c.stages.map((nm,st)=>({nm,st})).reverse().map(({nm,st})=>{ const rs=c.results.filter(r=>r.stage===st); if(!rs.length) return ''; return `<h3 style="margin-top:8px">${nm}</h3>`+rs.map(r=>`<div class="row between ${r.a===S.clubId||r.b===S.clubId?'':'muted'}" style="font-size:.86rem"><span>${esc(CLUBS[r.a].name)}</span><b class="num" style="color:var(--fg)">${r.ga} - ${r.gb}${r.pk?' <small>(PK)</small>':''}</b><span>${esc(CLUBS[r.b].name)}</span></div>`).join(''); }).join('')+(c.stage<c.stages.length&&c.pairs.length?`<h3 style="margin-top:8px">다음 ${c.stages[c.stage]} 대진</h3>`+c.pairs.map(([a,b])=>`<div class="row between" style="font-size:.86rem"><span>${esc(CLUBS[a].name)}</span><span class="muted">vs</span><span>${esc(CLUBS[b].name)}</span></div>`).join(''):''):'');
     sel.querySelector('#div-table').querySelector('.segs').addEventListener('click',e=>{ const b=e.target.closest('button[data-v]'); if(!b) return; renderLeague.view=b.dataset.v; renderLeague(); });
     return; }
   if(view==='po'){ const pst=(S.post&&S.post[cId])||(S.lastPost&&S.lastPost[cId]); const F2=FMT[cId];
@@ -1334,8 +1369,8 @@ function renderLeague(){
   }
   const F=FMT[cId]; const nT=st.length; const zone=i=>{ if(dn==='1'){ if(i===0) return '#f3b43a'; if(i>=nT-F.down) return '#e25c5c'; if(F.post.includes('rel')&&i===F.relD1) return '#ff9a3c'; } else { if(i<F.up) return '#4fc77f'; if(F.post.includes('semi')&&i>=2&&i<=5) return '#5aa9e6'; if(F.post.includes('rel')&&F.relFrom!=='final'&&i===F.relD2) return '#5aa9e6'; } return 'transparent'; };
   sel.querySelector('#div-table').innerHTML=tabsHtml+`<p style="margin:0 0 4px;font-size:.85rem">${dn==='1'?F.t1:F.t2}</p><p class="muted" style="margin:0 0 6px;font-size:.8rem">${dn==='1'?'🟨 우승 · 🟧 승강 PO · 🟥 강등':'🟩 자동 승격 · 🟦 승격 PO'} · 요구 명성 ${Math.min(...S.divs[cur].clubs.map(c=>CLUBS[c].rep)).toLocaleString()}~${Math.max(...S.divs[cur].clubs.map(c=>CLUBS[c].rep)).toLocaleString()} · 보상 배율 ×${divMult(cur).toFixed(1)}</p>
-    <div class="tbl"><table><tr><th>#</th><th class="n">클럽</th><th>전력</th><th>경기</th><th>승</th><th>무</th><th>패</th><th>득실</th><th>승점</th></tr>
-    ${st.map((r,i)=>{const c=CLUBS[r.c];return `<tr class="${r.c===S.clubId?'me':''}"><td style="border-left:4px solid ${zone(i)}">${i+1}</td><td class="n"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c.c1};border:1px solid ${c.c2};vertical-align:middle;margin-right:6px"></span>${esc(c.name)}</td><td>${c.str}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga>0?'+':''}${r.gf-r.ga}</td><td class="num" style="font-size:1rem">${r.pts}</td></tr>`;}).join('')}</table></div>`;
+    <div class="tbl"><table><tr><th>#</th><th class="n">클럽</th><th>경기</th><th>승</th><th>무</th><th>패</th><th>득실</th><th>승점</th></tr>
+    ${st.map((r,i)=>{const c=CLUBS[r.c];return `<tr class="${r.c===S.clubId?'me':''}"><td style="border-left:4px solid ${zone(i)}">${i+1}</td><td class="n"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c.c1};border:1px solid ${c.c2};vertical-align:middle;margin-right:6px"></span>${esc(c.name)} <span class="stars mini">★${clubStars(c)}</span></td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga>0?'+':''}${r.gf-r.ga}</td><td class="num" style="font-size:1rem">${r.pts}</td></tr>`;}).join('')}</table></div>`;
   sel.querySelector('#div-table').querySelector('.segs').addEventListener('click',e=>{ const b=e.target.closest('button[data-v]'); if(!b) return; renderLeague.view=b.dataset.v; renderLeague(); });
 }
 
@@ -1433,9 +1468,9 @@ function renderTransfer(){
       ${left<=0&&!S.loan?'<small class="muted">계약 마지막 시즌: 겨울에 해외 구단과 사전 계약(보스만) 가능, 시즌이 끝나면 자유계약(FA)으로 이적료 없이 이적할 수 있습니다.</small>':'<small class="muted">계약이 남아 있으면 사려는 구단이 이적료를 내야 해서 부자 구단만 제안합니다 (이적료의 10%는 내 몫).</small>'}</div></div>`));
     { const cc=contractCard(); if(cc) box.append(cc); }
     const ids=Object.keys(sc.f).sort((a,b)=>sc.f[b]-sc.f[a]);
-    box.append(h(`<div class="card"><div class="sec"><span class="row" style="gap:6px">${pxi('scout',22)} 스카우트 관심 구단</span><span class="pill">최대 3</span></div>${ids.length?`<div class="list">${ids.map(id=>{ const c=CLUBS[id], v=sc.f[id]; return `<div class="item">${crestHTML(c)}<div class="tx"><b>${esc(c.name)} ${sc.visit===id?'<span class="pill acc">다음 경기 관전</span>':''}</b><small>${divName(divOf(c.id).id)} · 전력 ${c.str} · 주급 수준 ${fmtMoney(c.wage)}</small><div class="bar m" style="margin-top:4px"><i style="width:${v}%;${v>=70?'background:linear-gradient(90deg,#f3b43a,#ffd25a)':''}"></i></div><small>${scoutLabel(v)} · ${v}/100${v>=70?' — 이적시장이 열리면 제안':''}</small></div></div>`; }).join('')}</div>`:'<p class="muted" style="margin:0">아직 스카우트가 없습니다. 경기를 뛰면 위 리그 구단들이 지켜보기 시작합니다.</p>'}
+    box.append(h(`<div class="card"><div class="sec"><span class="row" style="gap:6px">${pxi('scout',22)} 스카우트 관심 구단</span><span class="pill">최대 3</span></div>${ids.length?`<div class="list">${ids.map(id=>{ const c=CLUBS[id], v=sc.f[id]; return `<div class="item">${crestHTML(c)}<div class="tx"><b>${esc(c.name)} ${starHTML(c)} ${sc.visit===id?'<span class="pill acc">다음 경기 관전</span>':''}</b><small>${divName(divOf(c.id).id)} · ${wealthTxt(c)} · 주급 수준 ${fmtMoney(c.wage)}</small><div class="bar m" style="margin-top:4px"><i style="width:${v}%;${v>=70?'background:linear-gradient(90deg,#f3b43a,#ffd25a)':''}"></i></div><small>${scoutLabel(v)} · ${v}/100${v>=70?' — 이적시장이 열리면 제안':''}</small></div></div>`; }).join('')}</div>`:'<p class="muted" style="margin:0">아직 스카우트가 없습니다. 경기를 뛰면 위 리그 구단들이 지켜보기 시작합니다.</p>'}
       ${sc.lastMsg?`<small class="muted" style="display:block;margin-top:8px">최근: ${esc(sc.lastMsg.msg)}</small>`:''}<small class="muted" style="display:block;margin-top:4px">스카우트가 온 경기에서 감독 임무를 달성하고 평점이 높으면 관심이 크게 오릅니다. 70을 넘으면 명성이 모자라도 제안이 옵니다.</small></div>`));
-    box.append(h(`<div class="card"><h3>다음 목표 클럽</h3><div class="list" style="margin-top:8px">${nextTargets().map(c=>`<div class="item">${crestHTML(c)}<div class="tx"><b>${esc(c.name)}</b><small>${divName(divOf(c.id).id)} · 명성 ${c.rep.toLocaleString()} 필요 (${Math.max(0,Math.round(c.rep*(hasItem('jet')?0.7:1)-p.rep)).toLocaleString()} 부족) · OVR ${c.str-14} 이상</small></div></div>`).join('')}</div></div>`));
+    box.append(h(`<div class="card"><h3>다음 목표 클럽</h3><div class="list" style="margin-top:8px">${nextTargets().map(c=>`<div class="item">${crestHTML(c)}<div class="tx"><b>${esc(c.name)} ${starHTML(c)}</b><small>${divName(divOf(c.id).id)} · 명성 ${c.rep.toLocaleString()} 필요 (${Math.max(0,Math.round(c.rep*(hasItem('jet')?0.7:1)-p.rep)).toLocaleString()} 부족) · OVR ${c.str-14} 이상</small></div></div>`).join('')}</div></div>`));
     return;
   }
   if(S.offersFor==='end'&&S.lastCeremony){ const c=S.lastCeremony; box.append(h(`<div class="card" style="background:linear-gradient(180deg,#2a2412,var(--panel));border-color:#5a4a1a"><span class="label">시즌 ${c.season} 시상식 · ${divName(c.div)}</span>
@@ -1446,7 +1481,7 @@ function renderTransfer(){
   const list=h(`<div class="list"></div>`);
   S.offers.forEach((o,i)=>{ const c=CLUBS[o.clubId], d=divOf(c.id).id;
     const v=o.v==null?1:o.v; const vw=[1.12,1,0.92][v], vy=[o.years,o.years,Math.max(3,o.years)][v];
-    list.append(h(`<div class="item" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row" style="gap:12px">${crestHTML(c)}<div class="tx"><b>${esc(c.name)} ${o.renew?'<span class="pill">재계약</span>':''}</b><small>${divName(d)} · 전력 ${c.str} · 보상 ×${divMult(d).toFixed(1)}</small><small>예상 역할 <span class="pill ${roleAt(c).c}">${roleAt(c).t}</span> ${roleAt(c).desc}</small><small>${(()=>{ const tac=tacticOf(c); const du=(DUTIES[S.player.pos]||DUTIES.FW)[tac.id]; const comp=Math.max(20,c.str+Math.round((hash(c.str*7+c.id.length)-0.5)*8)); return `선호 포메이션 ${TACTIC_FORM[tac.id]} · 내 역할 <b>${du?du.t:'-'}</b> · 경쟁자 OVR ${comp} ${comp>ovr()+3?'<span class="pill bad">열세</span>':comp<ovr()-3?'<span class="pill good">우세</span>':'<span class="pill acc">박빙</span>'}`; })()}</small><small>${(!o.renew&&S.season<S.contractEnd)?`이적료 ${fmtMoney(marketValue())} (10% 당신 몫)`:''}</small></div></div>
+    list.append(h(`<div class="item" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row" style="gap:12px">${crestHTML(c)}<div class="tx"><b>${esc(c.name)} ${clubStars(c)>=4.5?'<span class="elite">명문</span>':''} ${o.renew?'<span class="pill">재계약</span>':''}</b><small>${starHTML(c)} · ${divName(d)} · ${wealthTxt(c)} · 보상 ×${divMult(d).toFixed(1)}</small><small>예상 역할 <span class="pill ${roleAt(c).c}">${roleAt(c).t}</span> ${roleAt(c).desc}</small><small>${(()=>{ const tac=tacticOf(c); const du=(DUTIES[S.player.pos]||DUTIES.FW)[tac.id]; const comp=Math.max(20,c.str+Math.round((hash(c.str*7+c.id.length)-0.5)*8)); return `선호 포메이션 ${TACTIC_FORM[tac.id]} · 내 역할 <b>${du?du.t:'-'}</b> · 경쟁자 OVR ${comp} ${comp>ovr()+3?'<span class="pill bad">열세</span>':comp<ovr()-3?'<span class="pill good">우세</span>':'<span class="pill acc">박빙</span>'}`; })()}</small><small>${(!o.renew&&S.season<S.contractEnd)?`이적료 ${fmtMoney(marketValue())} (10% 당신 몫)`:''}</small></div></div>
       ${o.loan?`<div class="gdeal" style="display:grid;grid-template-columns:40px 1fr;gap:2px 8px;align-items:center">${por('agent',40)}<div><b>🔁 반 시즌 임대 (에이전트 제안)</b><small>주급은 ${esc(CLUBS[S.clubId].short)}가 그대로 지급 · 시즌이 끝나면 자동 복귀 · 이 팀에선 <b>${roleAt(c).t}</b></small></div></div><div class="row between"><span class="muted" style="font-size:.85rem">출전 기회를 늘리는 선택</span><button class="btn sm primary" data-o="${i}">임대 수락</button></div></div>`:
       `${o.pre?'<div class="gdeal offer"><b>📝 보스만 사전 계약</b><small>계약 마지막 시즌이라 해외 구단과 미리 계약할 수 있습니다. 이번 시즌은 지금 팀에서 뛰고, 끝나면 이적료 없이 합류 (FA 계약금 포함)</small></div>':''}${o.raised?`<div class="gdeal offer"><b>🔥 경쟁 입찰</b><small>${esc(o.raised)}와 경쟁하느라 조건을 한 번 올렸습니다</small></div>`:''}${o.scouted?'<span class="pill info" style="align-self:flex-start">👀 스카우트가 직접 추천한 제안</span>':''}${o.low?'<span class="pill bad" style="align-self:flex-start">부진으로 낮아진 재계약 조건</span>':''}
       <div class="negot">${[['💰 주급 우선',`주급 +12% · ${o.years}년 · 계약금 없음`],['⚖️ 균형',`기본 주급 · ${o.years}년 · 계약금 ${o.renew?4:8}주급`],['🛡 주전 보장',`주급 -8% · ${Math.max(3,o.years)}년 · 계약금 ${o.renew?2:4}주급 · 선발 보장`]].map(([t,d],k)=>`<button class="${v===k?'on':''}" data-v="${k}" data-oi="${i}"><b>${t}</b><small>${d}</small></button>`).join('')}</div>
@@ -1500,6 +1535,7 @@ function endSeason(){
   if(ta&&ta.me&&ta.a>0){ p.rep+=Math.round(200*divMult(myDiv)); p.money+=S.wage*5; notes.push(`🎯 ${divName(myDiv)} 도움왕 (${ta.a}도움)!`); }
   const rv=rivalInfo(); if(rv&&rv.mine===rv.theirs){ notes.push(`🤝 라이벌 ${rv.name}와 동률로 시즌 종료 (${rv.mine}:${rv.theirs})`); } else if(rv){ if(rv.lead){ S.rival.wins=(S.rival.wins||0)+1; p.rep+=Math.round(120*divMult(myDiv)); notes.push(`🔥 라이벌 ${rv.name}에 앞섰습니다 (${rv.label} ${rv.mine}:${rv.theirs})`); } else { S.rival.losses=(S.rival.losses||0)+1; notes.push(`😤 라이벌 ${rv.name}에 밀렸습니다 (${rv.mine}:${rv.theirs})`); } }
   // 승격/강등
+  S.moved={up:[],down:[]};
   COUNTRIES.forEach(co=>{
     const d1=S.divs[co.id+'-1'], d2=S.divs[co.id+'-2'];
     const s1=standings(d1.id), s2=standings(d2.id);
@@ -1509,6 +1545,7 @@ function endSeason(){
     if(s2[0].c===S.clubId){ p.career.titles++; p.rep+=250*divMult(d2.id); notes.push(`🏆 ${divName(d2.id)} 우승!`); }
     if(up.includes(S.clubId)) notes.push(`⬆️ ${CLUBS[S.clubId].name} ${co.name} 1부 승격!`);
     if(down.includes(S.clubId)) notes.push(`⬇️ ${CLUBS[S.clubId].name} ${co.name} 2부 강등`);
+    S.moved=S.moved||{up:[],down:[]}; S.moved.up.push(...up); S.moved.down.push(...down);
     d1.clubs=d1.clubs.filter(c=>!down.includes(c)).concat(up);
     d2.clubs=d2.clubs.filter(c=>!up.includes(c)).concat(down);
   });
@@ -3416,11 +3453,20 @@ function importSave(after){ const inp=document.createElement('input'); inp.type=
 function resetInputs(){ Object.keys(keys).forEach(k=>keys[k]=false); ['pass','shot','thru'].forEach(k=>{ input[k+'Hold']=false; input[k+'Release']=false; }); input.sprint=false; input.joyActive=false; input.jx=input.jy=0; input.shotMod=null; input.sk=[false,false,false,false]; if(typeof joyId!=='undefined'){ joyId=null; try{ joyEl.classList.remove('show'); }catch(e){} } if(M) M.charge=null; }
 window.addEventListener('blur',resetInputs);
 document.addEventListener('visibilitychange',()=>{ resetInputs(); if(document.hidden&&M&&!M.over&&!M.paused&&!M.replay&&!el('screen-match').hidden){ try{ el('btn-skip').onclick(); }catch(e){} } });
-function migrateV2(){ if(S.v===2) return;
+function saveStr(){ if(!S) return; S.cstr={}; Object.values(CLUBS).forEach(c=>{ if(!c.nat) S.cstr[c.id]=c.str; }); }
+function restoreStr(){ if(S&&S.cstr) Object.entries(S.cstr).forEach(([id,v])=>{ if(CLUBS[id]) CLUBS[id].str=v; }); }
+function migrateV3(){ if((S.v||0)>=3) return; // 5대 리그 실제 구성 반영 + 이탈리아·프랑스 추가
+  S.baseStr=S.baseStr||{}; ['en-1','de-1','es-1'].forEach(dv=>Object.values(CLUBS).forEach(c=>{ if(c.homeDiv===dv){ S.baseStr[c.id]=c.str; if(S.cstr) delete S.cstr[c.id]; } }));
+  ['it','fr'].forEach(co=>['1','2'].forEach(dn=>{ const id=co+'-'+dn; if(S.divs[id]) return; S.divs[id]={id,clubs:Object.values(CLUBS).filter(c=>c.homeDiv===id).map(c=>c.id)}; const d=S.divs[id];
+    d.clubs.forEach(c=>{ if(S.baseStr[c]==null) S.baseStr[c]=CLUBS[c].str; }); S.tables[id]={}; d.clubs.forEach(c=>S.tables[id][c]={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}); S.fixtures[id]=makeFixtures(d.clubs,FMT[co]['rr'+dn]);
+    for(let r=0;r<S.round-1;r++){ (S.fixtures[id][r]||[]).forEach(([a,b])=>{ const [ga,gb]=simMatch(CLUBS[a].str,CLUBS[b].str); applyResult(id,a,b,ga,gb); }); } }));
+  if(S.cup){ const keep=S.cup; const saved={...keep}; try{ cupInit(); ['kr','jp','de','es','en'].forEach(k=>{ if(saved[k]) S.cup[k]=saved[k]; }); }catch(e){ S.cup=keep; } }
+  S.v=3; toast('이탈리아·프랑스 리그가 추가되고, 5대 리그 1부가 실제 구성으로 바뀌었습니다'); }
+function migrateV2(){ if((S.v||0)>=2) return;
   const placed=new Set(); Object.values(S.divs).forEach(d=>d.clubs.forEach(c=>placed.add(c)));
   Object.values(CLUBS).forEach(c=>{ if(c.nat||placed.has(c.id)) return; S.divs[c.homeDiv].clubs.push(c.id); });
   S.v=2; startSeason(); toast('리그가 실제 규모로 확장되어 이번 시즌을 1라운드부터 다시 시작합니다'); }
-el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.cc) ccInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
+el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); restoreStr(); migrateV3(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.cc) ccInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
 document.querySelectorAll('#tabs .ti').forEach(t=>t.innerHTML=icon(t.dataset.i,22));
 initTitle(); sprInit();
 </script>

@@ -185,6 +185,27 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let clicked=true; try{ await p2.click('#tut-go',{timeout:3000}); }catch(e){ clicked=false; } await p2.waitForTimeout(150);
     const st=await p2.evaluate(()=>({paused:M.paused,seen:S.tutSeen}));
     ok('첫 경기 조작법: 짧고 화면 안, 킥오프 눌림', clicked&&!st.paused&&st.seen&&box.top>=0&&box.btnB<=box.vh, JSON.stringify({...box,...st})); await c2.close(); }
+  // UX 정리: 경기 안내 하나 · 버튼 상태 · 따라가기 잠금 · 평점 이유
+  { const mu=await pg.evaluate(()=>{ S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; M.introT=0;
+      const u=M.user; const r={};
+      popup(u.x,u.y-2.4,'패스 옵니다!','#fff'); r.dup=!M.upop; popup(u.x,u.y-1.5,'요청!','#fff'); popup(u.x,u.y-1.8,'좋은 침투','#fff'); r.one=!!M.upop&&M.upop.t==='좋은 침투'&&!M.popups.some(p=>Math.abs(p.x-u.x)<1.6);
+      const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=1; updateHUD(); r.def=document.querySelector('.ctl .mainrow').dataset.st;
+      const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); setOwner(q,{clean:true}); M._objT=1; updateHUD(); r.sup=document.querySelector('.ctl .mainrow').dataset.st; r.passDim=el('k-pass').classList.contains('dim');
+      u.x=o.x+0.8; u.y=o.y+0.8; setOwner(o,{clean:true}); input.shotHold=true; updateUser(1/60); r.chase=M.chasing; r.noCharge=!M.charge;
+      setOwner(u,{clean:true}); updateUser(1/60); r.lock=!!M.chaseLock; const sh0=M.stats.shots; input.shotRelease=true; updateUser(1/60); updateUser(1/60); r.noShot=M.stats.shots===sh0&&!M.chaseLock&&M.ball.owner===u;
+      M.min=30; M._objT=0; M._lr=null; updateHUD(); M.stats.passOk+=5; M.stats.passes+=5; M._objT=0; updateHUD(); r.why=el('live-rt').textContent;
+      cancelAnimationFrame(raf); ambience(false); M=null; input.shotHold=false; show('screen-hub'); renderHub(); return r; });
+    ok('경기 안내: 중복 팝업 버림·선수 위 한 칸 · 버튼 상태(수비/지원) · 따라가기로 잡아도 자동 슛 없음 · 평점 변화 이유', mu.dup&&mu.one&&mu.def==='def'&&mu.sup==='sup'&&mu.passDim&&mu.chase&&mu.noCharge&&mu.lock&&mu.noShot&&/패스 성공 \+/.test(mu.why), JSON.stringify(mu)); }
+  // UX 정리: 홈 · 성장 · 스킬 · 스타숍 · 기록
+  { const ux=await pg.evaluate(()=>{ const r={}; S.weekAct=null; S.player.injury=0; S.endo.offers=[]; tab='home'; renderHub(); const go=el('btn-go'); r.go=!!go&&getComputedStyle(go).position==='sticky'; r.modes=document.querySelectorAll('#sel-mode [data-mode]').length>=3; r.noMarket=!el('tab-home').textContent.includes('시장 가치');
+      tab='player'; renderPlayer.sub='stat'; renderPlayer.pend={shot:2}; S.player.points=Math.max(3,S.player.points); renderHub(); r.apply=el('pt-apply').textContent; r.sinfo=document.querySelector('.sinfo').textContent; r.wk=document.querySelectorAll('#wk-card .wk-o').length; r.wkTxt=/성공률 \d+% · 컨디션 −12/.test(el('wk-card').textContent); renderPlayer.pend={};
+      renderPlayer.sub='profile'; renderHub(); r.prof=el('tab-player').textContent.includes('이번 시즌')&&el('tab-player').textContent.includes('시장 가치');
+      renderPlayer.sub='records'; renderHub(); r.rs=document.querySelectorAll('#tab-player .rs').length>0||!(S.history||[]).length;
+      tab='skill'; renderSkill.sel=null; renderSkill.f='all'; renderHub(); document.querySelector('#tab-skill [data-f="tackle"]').click(); const sel=SKILLS.find(x=>x.id===renderSkill.sel); r.fsel=sel&&sel.type==='tackle'; r.sit=!!document.querySelector('#tab-skill .sk-sit'); const ls=[...document.querySelectorAll('#tab-skill .sk')].map(b=>SKILLS.find(x=>x.id===b.dataset.sk).lvl); r.sorted=ls.every((v,i)=>!i||ls[i-1]<=v); renderSkill.f='all';
+      tab='shop'; renderShop.sub='endo'; renderHub(); r.now=!!document.querySelector('#tab-shop [data-ad]')||S.player.rep<100; r.brandFold=S.player.rep>=2500||!!document.querySelector('#tab-shop details');
+      renderShop.sub='gear'; renderHub(); r.buy=[...document.querySelectorAll('#tab-shop [data-gb]')].some(b=>/^구매 · |부족$/.test(b.textContent));
+      renderShop.sub='cos'; renderCos.prev=null; renderHub(); document.querySelector('#tab-shop [data-cv="b_gold"]').click(); r.prev=renderCos.prev==='b_gold'&&!!document.querySelector('.cos-pv canvas')&&/맞춤|축구화/.test(document.querySelector('.cos-pv').textContent); renderCos.prev=null; tab='home'; renderHub(); return r; });
+    ok('홈(경기 시작 고정·모드 보상·시장 가치는 프로필로) · 성장(전→후·주간 활동 비용) · 스킬(분류↔선택·레벨순·상황 먼저) · 스타숍(지금 할 수 있는 것·구매·미리보기) · 기록(승무패)', Object.values(ux).every(v=>v===true||typeof v==='number'&&v===3||typeof v==='string')&&ux.wk===3&&/2포인트 적용 · 남은/.test(ux.apply)&&/→/.test(ux.sinfo), JSON.stringify(ux)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));

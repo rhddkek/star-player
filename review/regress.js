@@ -149,6 +149,10 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('스킬 화면: 기본은 쓸 수 있는 것+다음 해금만, 전체 보기 펼치기', sk.btn&&sk.n1<sk.n2, JSON.stringify(sk)); }
   { const lg=await pg.evaluate(()=>({n:Object.keys(S.divs).length, it:S.divs['it-1'].clubs.length, fr:S.divs['fr-1'].clubs.length, star:clubStars(CLUBS['en-1-1']), low:clubStars(CLUBS['kr-2-0']), v:S.v}));
     ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===14&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v===3, JSON.stringify(lg)); }
+  // 리그 화면: 나라 → 1·2부 → 팀/선수 순위 → 기록 종류
+  { const lg2=await pg.evaluate(()=>{ for(let i=0;i<3;i++) autoMatch(true); tab='league'; renderLeague.cur=null; renderLeague.view='players'; renderLeague.pf='kp'; renderHub(); const W=innerWidth; const bad=[]; document.querySelectorAll('#tab-league *').forEach(e=>{ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1) bad.push((e.className||e.tagName).toString().slice(0,20)); });
+      const rows=document.querySelectorAll('#tab-league table tr').length; const kpN=Object.values(S.pstats).filter(v=>v.kp>0).length, csN=Object.values(S.pstats).filter(v=>v.cs>0).length; const co=document.querySelectorAll('.lg-co button').length; renderLeague.view='table'; renderHub(); return {bad,rows,kpN,csN,co}; });
+    ok('리그 화면: 나라 8칸·선수 순위(기회창출·클린시트) · 가로 넘침 없음', lg2.bad.length===0&&lg2.rows>3&&lg2.kpN>20&&lg2.csN>3&&lg2.co===8, JSON.stringify(lg2)); }
   // 패스 엔진: 롱패스·대지를 가르는 패스·버튼
   { const pe=await pg.evaluate(async()=>{ S.noReplay=true; S.player.level=8; if(!S.player.skills.includes('split')) S.player.skills.push('split'); M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null;
       const u=M.user; u.x=16; u.y=74; setOwner(u,{clean:true}); u.touchT=0; const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); q.x=54; q.y=40; passTo(u,q,{power:0.95,long:true}); const b=M.ball; let zmax=0; const L=landPt(b);
@@ -158,7 +162,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('패스 엔진: 롱패스가 높이 떠서 동료 근처에 떨어짐 · 새 스킬 아이콘 · 상대 공일 때 따라가기 버튼', pe.zmax>6&&pe.landErr<9&&pe.icon&&pe.eyeIco&&pe.lab==='따라가기'&&pe.gest, JSON.stringify(pe)); }
   // 스타숍: 스폰서 계약 · 꾸미기 · 광고 촬영
   { const sh=await pg.evaluate(()=>{ endoInit(); S.player.rep=1500; S.player.money=50000; S.endo.offers=[]; S.endo.active=[]; let g=0; while(!S.endo.offers.length&&g++<20) endoMakeOffers(); const n=S.endo.offers.length; const o=S.endo.offers[0]; const m0=S.player.money; endoAccept(0);
-      const signed=S.player.money-m0; const a=S.endo.active[0]; const notes=[]; const pay=endoAfterMatch({goals:3,assists:3,tackles:12,rating:8,injured:false},{type:'league'},notes);
+      const signed=S.player.money-m0; const a=S.endo.active[0]; a.kpi={k:'goals',n:3,m:8,t:'test'}; const notes=[]; const pay=endoAfterMatch({goals:3,assists:3,tackles:12,rating:8,injured:false},{type:'league'},notes);
       const cats=new Set(S.endo.active.map(x=>x.cat)).size===S.endo.active.length; return {n,signed,sign:o.sign,pay,base:o.pay,done:a.done,notes:notes.length,cats,brands:ENDO_BRANDS.filter(b=>b.rep<=1500).length}; });
     ok('스폰서: 제안 생성·계약금·경기당 광고비·보너스 조건', sh.n>0&&sh.signed===sh.sign&&sh.pay>=sh.base&&sh.done&&sh.cats, JSON.stringify(sh)); }
   { await pg.evaluate(()=>{ renderShop.sub='cos'; tab='shop'; renderHub(); }); const m0=await pg.evaluate(()=>S.player.money); await pg.click('button[data-cb="b_pink"]'); await pg.waitForTimeout(150);

@@ -177,7 +177,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const pe=await pg.evaluate(async()=>{ S.noReplay=true; S.player.level=8; if(!S.player.skills.includes('split')) S.player.skills.push('split'); M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null;
       const u=M.user; u.x=16; u.y=74; setOwner(u,{clean:true}); u.touchT=0; const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); q.x=54; q.y=40; passTo(u,q,{power:0.95,long:true}); const b=M.ball; let zmax=0; const L=landPt(b);
       for(let i=0;i<40;i++){ updateBall(1/30); zmax=Math.max(zmax,b.z); if(b.z<=0&&i>5) break; }
-      const icon=!!pxi('split'), eyeIco=ICO.eye===5&&ART.icons.length===61; const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=0; updateHUD&&updateHUD(); const lab=el('k-shot').querySelector('span').textContent;
+      const icon=!!pxi('split'), eyeIco=ICO.eye===5&&ART.icons.length===63; const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=0; updateHUD&&updateHUD(); const lab=el('k-shot').querySelector('span').textContent;
       cancelAnimationFrame(raf); ambience(false); M=null; show('screen-hub'); renderHub(); return {zmax:+zmax.toFixed(1),landErr:+Math.hypot(L.x-54,L.y-40).toFixed(1),icon,eyeIco,lab,gest:!!document.querySelector('#k-pass .gest')}; });
     ok('패스 엔진: 롱패스가 높이 떠서 동료 근처에 떨어짐 · 새 스킬 아이콘 · 상대 공일 때 따라가기 버튼', pe.zmax>6&&pe.landErr<9&&pe.icon&&pe.eyeIco&&pe.lab==='따라가기'&&pe.gest, JSON.stringify(pe)); }
   // 스타숍: 스폰서 계약 · 꾸미기 · 광고 촬영
@@ -220,6 +220,24 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       renderShop.sub='gear'; renderHub(); r.buy=[...document.querySelectorAll('#tab-shop [data-gb]')].some(b=>/^구매 · |부족$/.test(b.textContent));
       renderShop.sub='cos'; renderCos.prev=null; renderHub(); document.querySelector('#tab-shop [data-cv="b_gold"]').click(); r.prev=renderCos.prev==='b_gold'&&!!document.querySelector('.cos-pv canvas')&&/맞춤|축구화/.test(document.querySelector('.cos-pv').textContent); renderCos.prev=null; tab='home'; renderHub(); return r; });
     ok('홈(경기 시작 고정·모드 보상·시장 가치는 프로필로) · 성장(전→후·주간 활동 비용) · 스킬(분류↔선택·레벨순·상황 먼저) · 스타숍(지금 할 수 있는 것·구매·미리보기) · 기록(승무패)', Object.values(ux).every(v=>v===true||typeof v==='number'&&v===3||typeof v==='string')&&ux.wk===3&&/2포인트 적용 · 남은/.test(ux.apply)&&/→/.test(ux.sinfo), JSON.stringify(ux)); }
+  // 골키퍼 캐치 · 동료 패스 · 원투 침투 · 스루 강약 · 스킬 연출 · 새 필살기
+  { const g2=await pg.evaluate(()=>{ S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf); const r={};
+      const gk=M.players.find(p=>p.team===1&&p.role==='GK'); const u=M.user; let caught=0, hold=0;
+      for(let i=0;i<12;i++){ M.players.forEach(q=>{ if(q.team===1&&q.role!=='GK'){ q.x=5; q.y=60; } }); gk.x=W/2; gk.y=1.2; gk.vx=gk.vy=0; gk.diveT=0; gk.catchT=0; u.x=W/2+0.3; u.y=17; setOwner(u,{clean:true}); u.touchT=0; shoot(u,gk.x,0,{power:0.35}); for(let f=0;f<60;f++){ updateBall(1/60); M.players.forEach(q=>{ if(q.catchT>0) q.catchT-=1/60; }); if(M.ball.owner===gk){ caught++; if(animFor(gk).an==='catch') hold++; break; } if(M.ball.y<0) break; } }
+      r.caught=caught; r.hold=hold; r.sprites=!!(SPR.gk&&SPR.gk.catch&&SPR.gk.throw);
+      // 동료 패스: 세고 정확하게 내 발로
+      let got=0; for(let i=0;i<10;i++){ const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role==='MF'); q.x=20; q.y=70; u.x=40; u.y=60; u.vx=u.vy=0; M.players.forEach(z=>{ if(z.team===1){ z.x=60; z.y=100; } }); M.freeze=0; M.restart=null; M.setPiece=null; M.over=false; setOwner(q,{clean:true}); q.touchT=0; q.st={...q.st,pass:35}; passTo(q,u,{power:0.5}); for(let f=0;f<120;f++){ updateBall(1/60); updatePossession&&updatePossession(1/60); if(M.ball.owner===u){ got++; break; } } }
+      r.passGot=got;
+      // 원투 침투
+      const mt=M.players.find(p=>p.team===0&&!p.isUser&&p.role==='MF'); u.x=30; u.y=60; mt.x=36; mt.y=56; setOwner(u,{clean:true}); u.touchT=0; passTo(u,mt,{power:0.5}); r.gg=!!M.giveGo; setOwner(mt,{clean:true}); mt.touchT=0; u.vy=-7; u.vx=0; M.decisionT=0; M.freeze=0; M.restart=null; M.t+=0.5; updateAI(1/60); r.ggBall=!!(M.ball.passTarget===u&&M.ball.thru);
+      // 스루 강약
+      const q2=M.players.find(p=>p.team===0&&p.role==='FW'); q2.x=30; q2.y=40; q2.vx=0; q2.vy=-3; const a=thruPoint(q2,0.45), b2=thruPoint(q2,1); r.thruSpan=+Math.hypot(a.x-b2.x,a.y-b2.y).toFixed(1);
+      // 스킬 연출 + 새 필살기
+      S.player.skills.push('dash','tornado','triple'); S.player.equip=['dash','tornado','triple',null]; S.player.level=Math.max(S.player.level,12); M.mp=100; M.cds=[0,0,0,0]; u.x=34; u.y=50; setOwner(u,{clean:true}); u.touchT=0; useSkill(0,true,0,-1); r.ban=!!M.skBan&&M.dashT>0;
+      M.mp=100; M.dashT=0; const ds=M.players.filter(p=>p.team===1&&p.role!=='GK').slice(0,3); ds.forEach((d,i)=>{ d.x=u.x+[2,-2,0][i]; d.y=u.y+[0,0,2][i]; d.stun=0; }); setOwner(u,{clean:true}); useSkill(1,true,0,-1); for(let f=0;f<80;f++) updateUser(1/60); r.torn=ds.filter(d=>d.stun>0.2||d.tornHit).length; r.tornBall=M.ball.owner===u; r.tornDash=M.dashT>0;
+      M.mp=100; M.cds=[0,0,0,0]; u.x=34; u.y=24; setOwner(u,{clean:true}); u.touchT=0; useSkill(2,true,0,-1); r.triple=!!M.ball.triple&&!M.ball.owner;
+      ambience(false); M=null; show('screen-hub'); renderHub(); return r; });
+    ok('골키퍼 정면 슛 캐치·안고 있는 동작 · 동료 패스 정확도 · 원투 침투 · 스루 강약 · 스킬 발동 연출 · 토네이도 드리블 · 분신 슛', g2.sprites&&g2.caught>=2&&g2.hold===g2.caught&&g2.passGot>=8&&g2.gg&&g2.ggBall&&g2.thruSpan>=7&&g2.ban&&g2.torn>=2&&g2.tornBall&&g2.tornDash&&g2.triple, JSON.stringify(g2)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));

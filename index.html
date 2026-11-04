@@ -281,8 +281,8 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:700}
 .lu-dot{cursor:pointer}
 .lu-dot.sel{outline:2px solid #fff;outline-offset:1px}
 .lu-dot.me{width:26px;height:26px;border:2.5px solid #2ee6d6;box-shadow:0 0 8px #2ee6d6}
-.overlay{position:absolute;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:16px;pointer-events:auto}
-.overlay .card{width:100%;max-width:420px}
+.overlay{position:absolute;inset:0;background:#000a;display:flex;align-items:flex-start;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));pointer-events:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.overlay .card{width:100%;max-width:420px;margin:auto 0}
 
 /* ===== 허브 리디자인 ===== */
 .hub-head{background:linear-gradient(180deg,#14213d,#0f1a33);border-bottom:2px solid #22355a}
@@ -452,7 +452,7 @@ button.ult[id^="k-s"]{box-shadow:0 0 0 2px #f3b43a,0 0 14px rgba(243,180,58,.6)}
     </div>
   </div>
   <nav class="tabs" id="tabs">
-    <button class="on" data-tab="home"><span class="ti" data-i="home"></span>홈</button><button data-tab="player"><span class="ti" data-i="grow"></span>성장</button><button data-tab="skill"><span class="ti" data-i="skill"></span>스킬</button><button data-tab="league"><span class="ti" data-i="league"></span>리그</button><button data-tab="transfer"><span class="ti" data-i="transfer"></span>이적<span class="dot" id="tr-dot" hidden></span></button>
+    <button class="on" data-tab="home"><span class="ti" data-i="home"></span>홈</button><button data-tab="player"><span class="ti" data-i="grow"></span>성장</button><button data-tab="skill"><span class="ti" data-i="skill"></span>스킬</button><button data-tab="shop"><span class="ti" data-i="shop"></span>스타숍<span class="dot" id="shop-dot" hidden></span></button><button data-tab="league"><span class="ti" data-i="league"></span>리그</button><button data-tab="transfer"><span class="ti" data-i="transfer"></span>이적<span class="dot" id="tr-dot" hidden></span></button>
   </nav>
 </div>
 
@@ -614,6 +614,7 @@ const ICON_PATHS={
   lock:'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3',
   plus:'M12 5v14M5 12h14',
   home:'M3 11l9-7 9 7v9h-6v-6H9v6H3z',
+  shop:'M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2',
   player:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6',
   skill:'M13 2L4 14h7l-1 8 9-12h-7z',
   train:'M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12',
@@ -707,7 +708,49 @@ const NAT_ME={id:'nat-kr',name:'대한민국',short:'KOR',c1:'#c8102e',c2:'#ffff
 const NAT_OPPS=[['일본','JPN','#1a3a8f','#ffffff',70,'jp'],['호주','AUS','#f2c200','#0a5c3a',66,'en'],['이란','IRN','#ffffff','#239f40',68,'en'],['사우디','KSA','#0b7a3b','#ffffff',65,'en'],['브라질','BRA','#f2d400','#1f8f3f',92,'es'],['프랑스','FRA','#1f3a93','#ffffff',90,'es'],['독일','GER','#ffffff','#000000',88,'de'],['스페인','ESP','#c8102e','#f2c200',89,'es'],['잉글랜드','ENG','#ffffff','#1f3a93',87,'en'],['아르헨티나','ARG','#79c4ea','#ffffff',91,'es']];
 CLUBS[NAT_ME.id]=NAT_ME;
 NAT_OPPS.forEach((n,i)=>{ CLUBS['nat-o'+i]={id:'nat-o'+i,name:n[0],short:n[1],c1:n[2],c2:n[3],str:n[4],country:n[5],nat:true,homeDiv:null}; });
-const SPONSORS=[{rep:0,name:'없음',pct:0},{rep:150,name:'동네 치킨집',pct:0.2},{rep:800,name:'스포츠 브랜드',pct:0.4},{rep:2500,name:'글로벌 브랜드',pct:0.8},{rep:6000,name:'월드 아이콘 계약',pct:1.5}];
+const SPONSORS=[{rep:0,name:'없음',pct:0},{rep:150,name:'동네 에이전시',pct:0.1},{rep:800,name:'스포츠 에이전시',pct:0.2},{rep:2500,name:'글로벌 에이전시',pct:0.4},{rep:6000,name:'월드 에이전시',pct:0.75}];
+// 개인 광고·스폰서 계약 (브랜드는 전부 가상)
+const ENDO_BRANDS=[
+  {id:'chick',name:'바삭치킨',cat:'식품',tier:0,rep:100,ic:'🍗'},{id:'gym',name:'근육공장 피트니스',cat:'헬스',tier:0,rep:150,ic:'🏋️'},{id:'mart',name:'동네마트 24',cat:'유통',tier:0,rep:200,ic:'🛒'},
+  {id:'volt',name:'블루볼트 에너지',cat:'음료',tier:1,rep:800,ic:'🥤'},{id:'pixel',name:'픽셀플레이 게임즈',cat:'게임',tier:1,rep:900,ic:'🎮'},{id:'sky',name:'스카이텔 통신',cat:'통신',tier:1,rep:1100,ic:'📱'},
+  {id:'nova',name:'노바 스트리트',cat:'패션',tier:2,rep:2500,ic:'🧥'},{id:'hanbit',name:'한빛 모터스',cat:'자동차',tier:2,rep:3000,ic:'🚗'},{id:'chrono',name:'크로노스 워치',cat:'시계',tier:2,rep:3500,ic:'⌚'},
+  {id:'aurora',name:'오로라 항공',cat:'항공',tier:3,rep:6000,ic:'✈️'},{id:'starbank',name:'스타뱅크 글로벌',cat:'금융',tier:3,rep:7000,ic:'🏦'}];
+const ENDO_TIER=[{n:'지역',pct:0.08},{n:'전국',pct:0.15},{n:'글로벌',pct:0.25},{n:'월드',pct:0.4}];
+const COS=[ // 꾸미기 (경기 화면에 보임)
+  {id:'b_neon',slot:'boot',name:'네온 그린 축구화',v:'#39ff14',price:30},{id:'b_pink',slot:'boot',name:'핫핑크 축구화',v:'#ff3fa4',price:30},{id:'b_black',slot:'boot',name:'블랙아웃 축구화',v:'#1b1b1b',price:40},
+  {id:'b_ice',slot:'boot',name:'아이스 블루 축구화',v:'#7fe3ff',price:60},{id:'b_white',slot:'boot',name:'화이트골드 축구화',v:'#f5efcf',price:120},{id:'b_gold',slot:'boot',name:'레전드 골드 축구화',v:'#ffcf3a',price:600,rep:3000},
+  {id:'s_red',slot:'sock',name:'맞춤 스타킹 · 레드',v:'#d63a2f',price:20},{id:'s_black',slot:'sock',name:'맞춤 스타킹 · 블랙',v:'#1f1f1f',price:20},{id:'s_white',slot:'sock',name:'맞춤 스타킹 · 화이트',v:'#f2f2f2',price:20},{id:'s_gold',slot:'sock',name:'맞춤 스타킹 · 골드',v:'#e7b32f',price:80},
+  {id:'k_navy',slot:'kit',name:'맞춤 연습복 · 네이비',v:'#24345e',price:50},{id:'k_mint',slot:'kit',name:'맞춤 연습복 · 민트',v:'#36c9a0',price:50},{id:'k_purple',slot:'kit',name:'맞춤 연습복 · 퍼플',v:'#7b4bd6',price:80},{id:'k_black',slot:'kit',name:'맞춤 연습복 · 올블랙',v:'#191919',price:120},
+  {id:'t_fire',slot:'trail',name:'슛 궤적 · 불꽃',v:'fire',price:150,rep:500},{id:'t_ice',slot:'trail',name:'슛 궤적 · 얼음',v:'ice',price:150,rep:500},{id:'t_gold',slot:'trail',name:'슛 궤적 · 황금',v:'gold',price:400,rep:1500},{id:'t_rainbow',slot:'trail',name:'슛 궤적 · 무지개',v:'rainbow',price:900,rep:3000},
+  {id:'n_gold',slot:'tag',name:'이름표 · 골드 플레이트',v:'gold',price:100,rep:300},{id:'n_neon',slot:'tag',name:'이름표 · 네온',v:'neon',price:100,rep:300},{id:'n_star',slot:'tag',name:'이름표 · 스타 (★)',v:'star',price:500,rep:2500}];
+const COS_SLOTS=[['boot','축구화 색'],['sock','맞춤 스타킹'],['kit','맞춤 연습복 (연습장에서 착용)'],['trail','슛 궤적'],['tag','경기 이름표']];
+function endoInit(){ S.endo=S.endo||{active:[],offers:[],last:0,brand:null,log:[]}; S.cos=S.cos||{owned:[],eq:{}}; }
+function brandValue(){ // 광고 단가: 명성 + 최근 평점 + 소속 구단 별
+  const p=S.player, f=(S.form&&S.form.length)?S.form.reduce((a,b)=>a+b,0)/S.form.length:6.2; const st=clubStars(CLUBS[S.clubId]);
+  return Math.max(0,Math.round(p.rep*0.6+(f-6)*400+st*250)); }
+function brandGrade(v){ return v>=6000?'S':v>=3000?'A':v>=1200?'B':v>=400?'C':'D'; }
+function endoKpi(){ const pos=S.player.pos; const r=Math.random(); if(pos==='FW') return r<0.6?{k:'goals',n:3,m:8,t:'8경기 안에 3골'}:{k:'rating',n:6.8,m:8,t:'8경기 평균 평점 6.8'};
+  if(pos==='MF') return r<0.5?{k:'ga',n:3,m:8,t:'8경기 안에 골+도움 3'}:{k:'rating',n:6.8,m:8,t:'8경기 평균 평점 6.8'}; return r<0.5?{k:'tackles',n:10,m:8,t:'8경기 안에 태클 성공 10'}:{k:'rating',n:6.8,m:8,t:'8경기 평균 평점 6.8'}; }
+function endoPrune(){ const E=S.endo; E.offers=E.offers.filter(o=>o.season===S.season&&o.until>S.round); }
+function endoMaxSlots(){ return S.player.rep>=6000?4:3; }
+function endoMakeOffers(){ endoInit(); const E=S.endo, p=S.player; endoPrune();
+  if(E.active.length+E.offers.length>=endoMaxSlots()+1) return 0; const held=new Set(E.active.map(a=>a.cat).concat(E.offers.map(o=>o.cat)));
+  const pool=ENDO_BRANDS.filter(b=>p.rep>=b.rep&&!held.has(b.cat)); if(!pool.length) return 0; const n=Math.min(pool.length,Math.random()<0.4?2:1); let made=0;
+  for(let i=0;i<n;i++){ const b=pool.splice(Math.floor(Math.random()*pool.length),1)[0]; const T=ENDO_TIER[b.tier]; const bv=brandValue();
+    const pay=Math.max(10,Math.round(S.wage*T.pct*(0.8+clubStars(CLUBS[S.clubId])*0.1)*(0.85+Math.min(0.6,bv/8000))*rnd(0.9,1.2)/5)*5);
+    const kpi=endoKpi(); E.offers.push({id:b.id,name:b.name,cat:b.cat,ic:b.ic,tier:b.tier,pay,sign:pay*4,bonus:pay*6,kpi,len:15,season:S.season,until:S.round+3}); made++; }
+  return made; }
+function endoAccept(i){ endoInit(); const E=S.endo, o=E.offers[i]; if(!o) return; if(E.active.length>=endoMaxSlots()) return toast(`광고 계약은 최대 ${endoMaxSlots()}개까지입니다`);
+  E.offers.splice(i,1); S.player.money+=o.sign; E.active.push({...o,left:o.len,prog:{n:0,m:0,sum:0},done:false}); E.log.unshift(`${o.name} 계약 · 계약금 ${fmtMoney(o.sign)}`); toast(`${o.ic} ${o.name} 광고 계약! 계약금 ${fmtMoney(o.sign)}`); save(); renderHub(); }
+function endoAfterMatch(r,ev,notes){ endoInit(); const E=S.endo; let pay=0; endoPrune(); if(ev.type==='nat') return 0;
+  E.active.forEach(a=>{ if(!r.injured){ pay+=a.pay; } a.left--; const K=a.kpi, P=a.prog; if(!a.done&&!r.injured&&P.m<K.m){ P.m++; if(K.k==='goals') P.n+=r.goals; else if(K.k==='ga') P.n+=r.goals+r.assists; else if(K.k==='tackles') P.n+=r.auto?2:(r.tackles||0); else if(K.k==='rating'){ P.sum+=r.rating; P.n=+(P.sum/P.m).toFixed(2); }
+      const ok=K.k==='rating'?(P.m>=K.m&&P.n>=K.n):P.n>=K.n; if(ok){ a.done=true; S.player.money+=a.bonus; S.player.rep+=20+a.tier*30; notes.push(`${a.ic} ${a.name} 보너스 달성! +${fmtMoney(a.bonus)}`); }
+      else if(P.m>=K.m){ a.done=true; if(K.k==='rating'&&P.n<6.0){ a.left=0; notes.push(`${a.ic} ${a.name}: 이미지 하락으로 계약 해지`); } else notes.push(`${a.ic} ${a.name} 보너스 조건 실패`); } } });
+  E.active=E.active.filter(a=>{ if(a.left<=0){ E.log.unshift(`${a.name} 계약 종료`); return false; } return true; });
+  if(E.brand&&!r.injured){ const bp=Math.round((S.player.rep*0.012+r.goals*8+r.assists*5)*(1+E.brand.lv*0.35)); E.brand.earn=(E.brand.earn||0)+bp; pay+=bp; }
+  if(S.round%3===0||Math.random()<0.18){ const n=endoMakeOffers(); if(n) notes.push(`📨 광고 제안 ${n}건 도착 — 스타숍에서 확인`); }
+  E.log=E.log.slice(0,8); return pay; }
+function adShootPay(){ endoInit(); const bv=brandValue(); return Math.max(10,Math.round((S.wage*0.35+bv*0.05)*(1+S.endo.active.length*0.15)/5)*5); }
 function sponsorOf(){ let b=SPONSORS[0]; SPONSORS.forEach(x=>{ if(S.player.rep>=x.rep) b=x; }); return b; }
 function marketValue(){ const p=S.player, o=ovr(); const af=p.age<=23?1.3:p.age<=29?1:p.age<=32?0.6:0.3; return Math.round(Math.pow(o/10,3.2)*180*af*(1+p.rep/5000)); }
 function trainChance(){ const a=S.player.age; const base=a<=21?0.65:a<=26?0.5:a<=30?0.3:0.15; return base*(0.7+S.player.cond/100*0.5); }
@@ -824,7 +867,7 @@ function gearTotal(){ const G=S.gear||{}; const tot={st:{},inj:0,sta:0,mp:0,cd:0
   const cnt={}; GEAR_SLOTS.forEach(sl=>{ const g=G[sl.id]; if(!g) return; cnt[g.brand]=(cnt[g.brand]||0)+1; const e=gearEffect(sl.id,g); Object.entries(e.st).forEach(([k,v])=>tot.st[k]=(tot.st[k]||0)+v); tot.inj+=e.inj; tot.sta+=e.sta; tot.mp+=e.mp; tot.cd+=e.cd; });
   Object.entries(cnt).forEach(([b,n])=>{ if(n>=4){ const B=GEAR_BRANDS.find(x=>x.id===b); tot.st[B.k]=(tot.st[B.k]||0)+1; tot.set=B; } });
   return tot; }
-function bootColor(){ const g=(S.gear||{}).boots; if(!g) return null; return g.tier===5?'#ffcf3a':GEAR_BRANDS.find(x=>x.id===g.brand).c; }
+function bootColor(){ const cb=cosVal('boot'); if(cb) return cb; const g=(S.gear||{}).boots; if(!g) return null; return g.tier===5?'#ffcf3a':GEAR_BRANDS.find(x=>x.id===g.brand).c; }
 
 function hasItem(id){ return S.player.items.includes(id); }
 function myFixture(){ ensureSplit(); const d=divOf(S.clubId); const ms=S.fixtures[d.id][S.round-1]; if(!ms) return null; return ms.find(m=>m[0]===S.clubId||m[1]===S.clubId)||null; }
@@ -971,13 +1014,12 @@ function renderHub(){
   el('hub-name').textContent=`시즌 ${S.season} · ${Math.min(S.round,seasonLen(d.id))}라운드`;
   el('hub-sub').textContent=`${club.name} · ${divName(d.id)} · 주급 ${fmtMoney(S.wage)}`; el('btn-settings').innerHTML=icon('gear',20); el('hub-coin').innerHTML=pxi('coins',26);
   el('hub-money').textContent=fmtMoney(p.money);
-  el('tr-dot').hidden=!(S.offers.length);
+  el('tr-dot').hidden=!(S.offers.length); try{ endoInit(); el('shop-dot').hidden=!(S.endo.offers.length); }catch(e){}
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
   document.querySelectorAll('.tabpanel').forEach(t=>t.hidden=true);
   el('tab-'+tab).hidden=false;
   el('hub-col').classList.toggle('wide',tab==='home'); if(renderHub._lastTab!==tab){ const w=document.querySelector('#screen-hub .wrap'); if(w) w.scrollTop=0; renderHub._lastTab=tab; }
-  if(tab==='shop') tab='player';
-  ({home:renderHome,player:renderPlayer,skill:renderSkill,league:renderLeague,transfer:renderTransfer})[tab]();
+  ({home:renderHome,player:renderPlayer,skill:renderSkill,shop:renderShop,league:renderLeague,transfer:renderTransfer})[tab]();
 }
 document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; tab=b.dataset.tab; renderHub(); });
 
@@ -1177,12 +1219,11 @@ function renderPlayer(){
   const prevOvr=(()=>{ const w=OVR_W[p.pos]; let o=0; for(const k in w) o+=Math.min(99,p.stats[k]+(pend[k]||0))*w[k]; return Math.round(o); })();
   const head=h(`<div class="card"><div class="gp-head"><canvas width="168" height="150"></canvas><div style="min-width:0"><div class="pc-name" style="font-family:var(--font-display);font-size:1.25rem">${esc(p.name)}</div><div class="muted" style="font-weight:700;font-size:.82rem">${p.pos} · Lv.${p.level}</div></div>
     <div class="ovrbox"><span>OVR</span><b class="num">${prevOvr}</b>${prevOvr!==ovr()?`<span style="color:#ffd25a">+${prevOvr-ovr()} 예정</span>`:''}</div><div class="ptsbox"><span>남은 포인트</span><b><i>P</i>${left}</b></div></div>
-    <div class="subtabs" style="margin-top:12px">${[['stat','능력치'],['gear','장비'],['profile','프로필'],['records','기록']].map(([k,t])=>`<button data-sub="${k}" class="${sub===k?'on':''}">${t}</button>`).join('')}</div></div>`);
+    <div class="subtabs" style="margin-top:12px">${[['stat','능력치'],['profile','프로필'],['records','기록']].map(([k,t])=>`<button data-sub="${k}" class="${sub===k?'on':''}">${t}</button>`).join('')}</div></div>`);
   box.append(head); drawLocker(head.querySelector('canvas'),club);
   head.querySelector('.subtabs').addEventListener('click',e=>{ const b=e.target.closest('button[data-sub]'); if(!b) return; renderPlayer.sub=b.dataset.sub; renderHub(); });
   if(sub==='gear'){ renderGear(box); return; }
   if(sub==='profile'||sub==='records'){ const tmp=document.createElement('div'); try{ playerCards(tmp); }catch(e){ console.warn(e); } [...tmp.children].forEach(c=>{ if(c.dataset.sec===sub) box.append(c); });
-    if(sub==='profile') renderLife(box);
     if(!box.children.length||box.children.length===1) box.append(h(`<div class="card"><p class="muted" style="margin:0">아직 기록이 없습니다. 경기를 치르면 쌓입니다.</p></div>`)); return; }
   // 능력치 배분
   const selK=renderPlayer.selK||'shot'; const w=OVR_W[p.pos];
@@ -1208,11 +1249,12 @@ function renderPlayer(){
     renderPlayer._tc=tc; }
   // 주간 훈련
   const wk=h(`<div class="card" id="wk-card"><div class="sec">주간 훈련<span class="pill">성공률 ${Math.round(trainChance()*100)}%</span></div>
-    ${p.injury>0?`<p style="margin:0"><span class="pill bad">부상 ${p.injury}주</span> 회복 중에는 훈련할 수 없습니다.</p>`:S.weekAct?`<p style="margin:0;font-size:.9rem"><span class="pill info">${S.weekAct==='rest'?'휴식':'훈련'}</span> ${esc(S.weekMsg)}</p>`:
-    `<p class="muted" style="margin:0 0 8px;font-size:.84rem">일주일에 한 번. 훈련은 능력치 +1 (컨디션 -12), 휴식은 다음 경기 뒤 컨디션 +15. 현재 컨디션 ${Math.round(p.cond)}.</p><div class="wk-btns" id="train-btns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${STATS.map(([k,n])=>`<button class="btn sm" data-tr="${k}">${n}</button>`).join('')}<button class="btn sm" data-tr="rest" style="border-color:#3cb48c">휴식</button></div>`}</div>`);
+    ${p.injury>0?`<p style="margin:0"><span class="pill bad">부상 ${p.injury}주</span> 회복 중에는 훈련할 수 없습니다.</p>`:S.weekAct?`<p style="margin:0;font-size:.9rem"><span class="pill info">${S.weekAct==='rest'?'휴식':S.weekAct==='ad'?'광고 촬영':'훈련'}</span> ${esc(S.weekMsg)}</p>`:
+    `<p class="muted" style="margin:0 0 8px;font-size:.84rem">일주일에 한 번. 훈련은 능력치 +1 (컨디션 -12), 휴식은 다음 경기 뒤 컨디션 +15. 현재 컨디션 ${Math.round(p.cond)}.</p><div class="wk-btns" id="train-btns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${STATS.map(([k,n])=>`<button class="btn sm" data-tr="${k}">${n}</button>`).join('')}<button class="btn sm" data-tr="rest" style="border-color:#3cb48c">휴식</button>${p.rep>=100?`<button class="btn sm" data-tr="ad" style="border-color:#f3b43a;grid-column:span 4">📸 광고 촬영 · 약 ${fmtMoney(adShootPay())} (컨디션 -8)</button>`:''}</div>`}</div>`);
   box.append(wk);
   wk.querySelector('#train-btns')?.addEventListener('click',e=>{ const b=e.target.closest('button[data-tr]'); if(!b) return; const k=b.dataset.tr;
     if(k==='rest'){ S.weekAct='rest'; S.weekMsg='경기 후 컨디션 +15'; }
+    else if(k==='ad'){ const pay=adShootPay(); p.money+=pay; p.cond=Math.max(0,p.cond-8); const rp=Math.round(4+p.rep*0.004); p.rep+=rp; S.weekAct='ad'; endoInit(); const br=S.endo.active[0]; S.weekMsg=`${br?br.name:'지역 광고'} 촬영 · +${fmtMoney(pay)} · 명성 +${rp}`; }
     else { const okT=Math.random()<trainChance(); p.cond=Math.max(0,p.cond-12); S.weekAct='train'; const nm=STATS.find(x=>x[0]===k)[1]; if(okT&&p.stats[k]<99){ p.stats[k]++; S.weekMsg=`${nm} 훈련 성공! ${nm} ${p.stats[k]}`; } else S.weekMsg=`${nm} 훈련 — 이번 주는 성과 없음`; }
     save(); renderHub(); });
   // 개인 훈련 (돈)
@@ -1283,21 +1325,46 @@ function skillName(id){ const s=SKILLS.find(x=>x.id===id); return s?s.name:'비�
 function typeName(t){ return {shot:'슛',dash:'돌파',tackle:'수비',pass:'패스',buff:'버프',roll:'회피'}[t]; }
 
 function renderShop(){
-  const p=S.player, box=el('tab-shop'); box.innerHTML='';
-  renderGear(box);
-  const disc=hasItem('mansion')?0.75:1;
-  const cost=k=>Math.round(Math.max(40, S.wage*1.2 + (p.stats[k]-30)*6)*disc);
-  box.append(h(`<div class="card"><h2>훈련장</h2><p class="muted" style="margin:4px 0 10px">돈으로 능력치를 1씩 올립니다. 높을수록 비싸지고, 주급이 오르면 가격 기준도 오릅니다.</p>
-    <div class="list" id="train-list">${STATS.map(([k,n])=>`<div class="stat-row"><b>${n}</b><div class="bar"><i style="width:${p.stats[k]}%"></i></div><b class="num" style="text-align:right;font-size:1.1rem">${p.stats[k]}</b><button class="btn sm ${p.money>=cost(k)&&p.stats[k]<99?'primary':''}" data-t="${k}" ${p.money>=cost(k)&&p.stats[k]<99?'':'disabled'} style="font-size:.72rem;padding:4px 4px">${fmtMoney(cost(k))}</button></div>`).join('')}</div></div>`));
-  box.querySelector('#train-list').addEventListener('click',e=>{ const b=e.target.closest('button[data-t]'); if(!b) return; const k=b.dataset.t; const c=cost(k); if(p.money<c||p.stats[k]>=99) return; p.money-=c; p.stats[k]++; save(); renderHub(); });
-  const list=h(`<div class="card"><h2>생활</h2><p class="muted" style="margin:4px 0 10px">주급이 오를수록 살 수 있는 것이 늘어납니다. 전부 영구 효과입니다.</p><div class="list" id="item-list"></div></div>`);
-  const il=list.querySelector('#item-list');
-  ITEMS.forEach(it=>{ const owned=hasItem(it.id); il.append(h(`<div class="item ${owned?'owned':''}"><div class="ic">${pxi(it.id,34)||it.icon}</div><div class="tx"><b>${it.name}</b><small>${it.desc}</small></div>${owned?'<span class="pill good">보유</span>':`<button class="btn sm ${p.money>=it.price?'primary':''}" data-i="${it.id}" ${p.money>=it.price?'':'disabled'}>${fmtMoney(it.price)}</button>`}</div>`)); });
-  il.addEventListener('click',e=>{ const b=e.target.closest('button[data-i]'); if(!b) return; const it=ITEMS.find(x=>x.id===b.dataset.i); if(p.money<it.price) return; p.money-=it.price; p.items.push(it.id); toast(`${it.name} 구입!`); save(); renderHub(); });
-  box.append(list);
+  const p=S.player, box=el('tab-shop'); box.innerHTML=''; endoInit(); endoPrune(); const sub=renderShop.sub||'endo';
+  const bv=brandValue(), gr=brandGrade(bv);
+  box.append(h(`<div class="card"><div class="row between"><div><h2>스타숍</h2><small class="muted">광고로 벌고, 장비·꾸미기에 쓰는 곳</small></div><div style="text-align:right"><span class="label">브랜드 가치</span><div class="num" style="font-size:1.6rem;color:var(--accent);line-height:1">${gr} <small style="font-size:.8rem">${bv.toLocaleString()}</small></div></div></div>
+    <div class="subtabs" style="margin-top:10px">${[['endo','스폰서·광고'+(S.endo.offers.length?` (${S.endo.offers.length})`:'')],['gear','장비'],['cos','꾸미기'],['life','생활']].map(([k,t])=>`<button data-shs="${k}" class="${sub===k?'on':''}">${t}</button>`).join('')}</div></div>`));
+  box.firstElementChild.querySelector('.subtabs').addEventListener('click',e=>{ const b=e.target.closest('button[data-shs]'); if(!b) return; renderShop.sub=b.dataset.shs; renderHub(); });
+  if(sub==='gear'){ renderGear(box); return; }
+  if(sub==='life'){ renderLife(box); return; }
+  if(sub==='cos'){ renderCos(box); return; }
+  const E=S.endo; const sp=sponsorOf();
+  const act=h(`<div class="card"><div class="sec">광고 계약<span class="pill">${E.active.length}/${endoMaxSlots()}</span></div>
+    ${E.active.length?E.active.map(a=>{ const K=a.kpi, P=a.prog; const pr=K.k==='rating'?(P.m?`평균 ${P.n} (${P.m}/${K.m}경기)`:'아직 0경기'):`${P.n}/${K.n} (${P.m}/${K.m}경기)`; const pct=K.k==='rating'?Math.min(100,P.m/K.m*100):Math.min(100,P.n/K.n*100);
+      return `<div class="item" style="flex-direction:column;align-items:stretch;gap:4px"><div class="row between"><b>${a.ic} ${esc(a.name)} <small class="muted">· ${a.cat} · ${ENDO_TIER[a.tier].n}</small></b><span class="pill acc">경기당 ${fmtMoney(a.pay)}</span></div>
+        <small>보너스 조건: ${K.t} → ${fmtMoney(a.bonus)} ${a.done?'<span class="pill">종료</span>':''}</small><div class="bar"><i style="width:${pct}%"></i></div><small class="muted">진행 ${pr} · 남은 계약 ${a.left}경기</small></div>`; }).join(''):'<p class="muted" style="margin:0">아직 광고 계약이 없습니다. 명성을 올리고 좋은 경기를 하면 브랜드가 먼저 연락해 옵니다.</p>'}
+    <small class="muted" style="display:block;margin-top:6px">같은 업종은 하나만 · 부상으로 빠진 경기는 광고비가 없습니다 · 평점이 계속 낮으면 해지될 수 있어요</small></div>`);
+  box.append(act);
+  const off=h(`<div class="card"><div class="sec">📨 들어온 제안<span class="pill">${E.offers.length}</span></div>${E.offers.length?E.offers.map((o,i)=>`<div class="item" style="flex-direction:column;align-items:stretch;gap:6px"><div class="row between"><b>${o.ic} ${esc(o.name)} <small class="muted">· ${o.cat} · ${ENDO_TIER[o.tier].n}</small></b><small class="muted">${Math.max(0,o.until-S.round)}라운드 뒤 만료</small></div>
+      <small>계약금 <b>${fmtMoney(o.sign)}</b> · 경기당 <b>${fmtMoney(o.pay)}</b> × ${o.len}경기 · 보너스 ${fmtMoney(o.bonus)} (${o.kpi.t})</small>
+      <div class="row" style="gap:6px"><button class="btn sm primary" data-ea="${i}" style="flex:1">계약</button><button class="btn sm" data-ed="${i}" style="flex:1">거절</button></div></div>`).join(''):`<p class="muted" style="margin:0">지금은 제안이 없습니다. 경기를 치르다 보면 들어옵니다 (명성 ${ENDO_BRANDS[0].rep}부터).</p>`}</div>`);
+  off.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(b.dataset.ea!=null) endoAccept(+b.dataset.ea); if(b.dataset.ed!=null){ E.offers.splice(+b.dataset.ed,1); save(); renderHub(); } });
+  box.append(off);
+  const brCost=[0,3000,12000,40000], brLv=E.brand?E.brand.lv:0;
+  const brand=h(`<div class="card"><div class="sec">✨ 개인 브랜드<span class="pill">${E.brand?`Lv.${E.brand.lv}`:'명성 2,500부터'}</span></div>
+    <p class="muted" style="margin:0 0 8px;font-size:.86rem">내 이름을 건 굿즈 라인. 경기마다 명성·골·도움에 비례한 수입이 들어옵니다${E.brand?` · 지금까지 ${fmtMoney(E.brand.earn||0)} 벌었습니다`:''}.</p>
+    ${brLv>=3?'<span class="pill good">최고 단계</span>':`<button class="btn ${p.rep>=2500&&p.money>=brCost[brLv+1]?'primary':''} block" id="br-up" ${p.rep>=2500?'':'disabled'}>${brLv?'브랜드 확장':'브랜드 런칭'} · ${fmtMoney(brCost[brLv+1])}${p.rep<2500?' (명성 2,500 필요)':''}</button>`}</div>`);
+  brand.addEventListener('click',e=>{ if(!e.target.closest('#br-up')) return; const c=brCost[brLv+1]; if(p.money<c) return toast('돈이 부족합니다'); p.money-=c; E.brand={lv:brLv+1,earn:(E.brand&&E.brand.earn)||0}; toast(brLv?'개인 브랜드 확장!':`'${p.name}' 브랜드 런칭!`); save(); renderHub(); });
+  box.append(brand);
+  box.append(h(`<div class="card"><div class="sec">기본 후원 · 주간 광고 촬영</div><p style="margin:0;font-size:.88rem">에이전시 후원: <b>${esc(sp.name)}</b> · 주급의 ${Math.round(sp.pct*100)}% 매 경기<br>주간 훈련 칸에서 <b>📸 광고 촬영</b>을 고르면 바로 약 ${fmtMoney(adShootPay())}을 법니다 (그 주는 훈련 대신).</p>${E.log.length?`<small class="muted" style="display:block;margin-top:6px">최근: ${E.log.slice(0,3).map(esc).join(' · ')}</small>`:''}</div>`));
 }
-
-
+function cosOn(slot){ return S&&S.cos&&S.cos.eq?S.cos.eq[slot]||null:null; }
+function cosVal(slot){ const id=cosOn(slot); const it=id&&COS.find(c=>c.id===id); return it?it.v:null; }
+function renderCos(box){ const p=S.player, C=S.cos;
+  COS_SLOTS.forEach(([slot,title])=>{ const items=COS.filter(c=>c.slot===slot);
+    const card=h(`<div class="card"><div class="sec">${title}${C.eq[slot]?`<button class="btn sm" data-cu="${slot}" style="margin-left:auto">기본으로</button>`:''}</div><div class="list" style="gap:6px">${items.map(it=>{ const own=C.owned.includes(it.id), on=C.eq[slot]===it.id, lock=it.rep&&p.rep<it.rep;
+      const sw=it.v.startsWith('#')?`<span style="display:inline-block;width:22px;height:22px;border-radius:6px;background:${it.v};border:2px solid #0003"></span>`:`<span style="font-size:1.2rem">${{fire:'🔥',ice:'❄️',gold:'✨',rainbow:'🌈',neon:'💡',star:'⭐'}[it.v]||'🏷️'}</span>`;
+      return `<div class="item ${on?'owned':''}" style="${lock?'opacity:.55':''}"><div class="ic">${sw}</div><div class="tx"><b>${it.name}</b><small>${lock?`명성 ${it.rep.toLocaleString()} 필요`:own?'보유':fmtMoney(it.price)}</small></div>${on?'<span class="pill good">착용 중</span>':own?`<button class="btn sm" data-ce="${it.id}">착용</button>`:lock?'':`<button class="btn sm ${p.money>=it.price?'primary':''}" data-cb="${it.id}">${fmtMoney(it.price)}</button>`}</div>`; }).join('')}</div></div>`);
+    card.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+      if(b.dataset.cu){ delete C.eq[b.dataset.cu]; save(); renderHub(); return; }
+      if(b.dataset.ce){ C.eq[slot]=b.dataset.ce; save(); toast('착용했습니다 — 경기에서 확인해 보세요'); renderHub(); return; }
+      if(b.dataset.cb){ const it=COS.find(x=>x.id===b.dataset.cb); if(p.money<it.price) return toast('돈이 부족합니다'); p.money-=it.price; C.owned.push(it.id); C.eq[slot]=it.id; toast(`${it.name} 구입 · 착용`); save(); renderHub(); } });
+    box.append(card); }); }
 function gearOffer(){ // 장비 스폰서 제안 (명성 800+)
   if(S.gearDeal||S.player.rep<800) return null;
   if(S.gearOffer&&S.gearOffer.season===S.season) return S.gearOffer.declined?null:S.gearOffer;
@@ -1650,6 +1717,7 @@ function finishMatch(r,silent){
   if(S.rival&&S.rival.club===r.opp.id&&!r.injured&&r.rating>=7.5){ rep+=Math.round(40*m); notes.push('라이벌 맞대결 활약'); }
   const sp=sponsorOf(); const sponsorPay=ev.type==='nat'?0:Math.round(S.wage*sp.pct);
   let money=(ev.type==='nat'?Math.round(S.wage*0.5):S.wage)+sponsorPay+(r.injured?0:Math.round((r.goals*0.5+r.assists*0.3)*S.wage));
+  let endoPay=0; try{ endoPay=endoAfterMatch(r,ev,notes); }catch(e){} money+=endoPay;
   let gearPay=0; if(S.gearDeal&&S.gear&&S.gear.boots&&S.gear.boots.brand===S.gearDeal.brand&&ev.type!=='nat'&&!r.injured){ gearPay=Math.round(S.wage*S.gearDeal.pct); money+=gearPay; }
   if(S.gear&&S.gear.boots&&!r.injured){ const bt=S.gear.boots; if(S.gearDeal&&S.gearDeal.brand===bt.brand){ const mt=gearMaxTier(); if(mt>bt.tier){ bt.tier=mt; bt.dur=100; notes.push(`👟 ${GEAR_BRANDS.find(x=>x.id===bt.brand).name}가 새 ${GEAR_TIERS[mt-1].n} 축구화를 보내왔습니다`); } else if(bt.dur<40){ bt.dur=100; notes.push('👟 스폰서가 축구화를 새것으로 교체해 줬습니다'); } }
     else { const before=bt.dur; bt.dur=Math.max(0,bt.dur-(r.auto?3:8)); if(before>0&&bt.dur<=0) notes.push('👟 축구화가 다 닳았습니다 — 성장 › 장비에서 수리하세요 (효과 절반)'); else if(before>=25&&bt.dur<25) notes.push('👟 축구화가 많이 닳았습니다'); } }
@@ -1677,7 +1745,7 @@ function finishMatch(r,silent){
   MS.forEach(([k,t,ok])=>{ if(ok&&!S.ms[k]&&!r.injured){ S.ms[k]={season:S.season,age:p.age}; notes.push('🏅 '+t+'!'); p.rep+=10; } });
   save();
   scoutAfterMatch(r,ev,myG,oppG,notes);
-  const G={xp,rep,money,lvls,myG,oppG,motm,notes,sponsorPay,sp,gearPay}; if(silent) return G;
+  const G={xp,rep,money,lvls,myG,oppG,motm,notes,sponsorPay,sp,gearPay,endoPay}; if(silent) return G;
   renderResult(r,G);
 }
 function pressEvent(r,g){
@@ -1767,7 +1835,7 @@ function renderResult(r,g){
     const nextLine=nxt?`${esc(nxt.home?'홈':'원정')} vs ${esc(nxt.opp.name)}${story?` · ${story}`:benchNext?' · 벤치 출발 예정 — 평점을 올려야 선발로 돌아갑니다':' · 선발 출전 예정'}`:'시즌 마무리';
     const lvUp=g.lvls&&g.lvls.length;
     col.append(h(`<div class="card hi"><div class="row between"><div><span class="label">내 평점</span><div class="num" style="font-size:2.4rem;line-height:1;color:var(--accent)">${r.rating.toFixed(1)}</div></div><div style="text-align:right">${best.map(b2=>`<div style="font-weight:800">${b2}</div>`).join('')||'<small class="muted">눈에 띄는 장면이 없었습니다</small>'}</div></div>
-      <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><span class="pill">경험치 +${g.xp}</span><span class="pill">명성 +${g.rep}</span><span class="pill acc">+${fmtMoney(g.money)}</span>${lvUp?`<span class="pill good">레벨 업! Lv.${g.lvls[g.lvls.length-1]} · 포인트 +${g.lvls.length*4}</span>`:''}</div>
+      <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><span class="pill">경험치 +${g.xp}</span><span class="pill">명성 +${g.rep}</span><span class="pill acc">+${fmtMoney(g.money)}</span>${g.endoPay?`<span class="pill">광고 +${fmtMoney(g.endoPay)}</span>`:''}${lvUp?`<span class="pill good">레벨 업! Lv.${g.lvls[g.lvls.length-1]} · 포인트 +${g.lvls.length*4}</span>`:''}</div>
       ${r.objRes?`<div class="row" style="margin-top:8px;gap:4px;flex-wrap:wrap">${r.objRes.map(o=>`<span class="pill ${o.done?'good':''}" style="font-size:.72rem">${o.done?'✅':'❌'} ${esc(o.t)}</span>`).join('')}</div>`:''}
       <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:.9rem"><b>다음 경기</b> ${nextLine}</div></div>`)); }
   if(r.injured){ col.append(h(`<div class="card"><h3>부상 결장</h3><p class="muted" style="margin:4px 0 0">${esc(p.name)} 없이 치른 경기입니다. 남은 결장 ${p.injury}주.</p></div>`)); }
@@ -1868,7 +1936,7 @@ function drawSprite(pl,col){ // 성공하면 true
   let frames=set[st.dir]||set.south||Object.values(set)[0]; if(!frames||!frames.length) return false;
   const n=frames.length; let fi=st.once?Math.min(n-1,Math.floor(clamp(st.prog,0,0.999)*n)):Math.floor(st.prog)%n;
   const img=frames[fi]; const key=st.ch+st.an+(set[st.dir]?st.dir:'s')+fi;
-  const cv2=st.ch==='gk'?(pl.team===1?tinted(img,key,35,75,'#3ddc84'):img):st.ch==='ref'?img:tinted(img,key,195,265,col,pl.team===0?M.myKit2:pl.team===1?M.oppKit2:'#f2f2f2',pl.isUser?M.bootC:null);
+  const cv2=st.ch==='gk'?(pl.team===1?tinted(img,key,35,75,'#3ddc84'):img):st.ch==='ref'?img:tinted(img,key,195,265,col,pl.isUser&&cosVal('sock')?cosVal('sock'):pl.team===0?M.myKit2:pl.team===1?M.oppKit2:'#f2f2f2',pl.isUser?M.bootC:null);
   if(!cv2||!(cv2.width||cv2.naturalWidth)) return false;
   const w=cv2.width||cv2.naturalWidth, h=cv2.height||cv2.naturalHeight; const s=3.1/45; // 스프라이트 45px ≈ 3.1m (작은 화면에서도 잘 보이게)
   const lift=st.lift?Math.sin(clamp(st.prog,0,1)*Math.PI)*st.lift:0; const squash=(pl.role==='GK'&&pl.rushing)?0.85:1;
@@ -1985,19 +2053,7 @@ function startMatch(highlight,practice){
     document.querySelectorAll('.lu-dot').forEach(d=>d.addEventListener('click',()=>{ document.querySelectorAll('.lu-dot.sel').forEach(x=>x.classList.remove('sel')); d.classList.add('sel'); el('lu-info').innerHTML=`<b style="color:var(--fg)">${d.textContent}번 ${d.dataset.nm}</b> · ${d.dataset.ps} · ${d.dataset.cl}`; }));
     el('lu-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); venueIntro(); }; } else if(!M.bench) setTimeout(()=>{ if(M) venueIntro(); },60);
   if(!S.tutSeen){ M.paused=true; const sk=SKILLS.find(x=>x.id===S.player.equip[0]);
-    showOverlay(`<h3>조작 방법</h3><div class="list" style="gap:6px;margin:10px 0 14px;font-size:.92rem">
-      <div>🕹️ <b>이동</b> — 화면 왼쪽을 누른 채 드래그 (PC: 방향키)</div>
-      <div>⚽ <b>패스</b> — 길게 누를수록 세게, 끝까지 = 로빙 패스. 측면 깊은 곳에선 <b>크로스</b>로 바뀜 (짧게=낮은 크로스, 길게=높은 크로스) (PC: Z)</div>
-      <div>🎯 <b>스루</b> — 침투하는 동료 앞 공간으로. 길게 = 더 깊게, 끝까지 = 로빙 스루. 동료가 공을 가졌을 땐 <b>침투 요청</b> (PC: F)</div>
-      <div>🥅 <b>슛</b> — 길게 누를수록 세게, 게이지가 빨개지면 <b>강슛</b>. 슛 버튼을 <b>위로 밀면 칩슛·로빙슛</b>, <b>옆으로 밀면 감아차기</b> (PC: X 슛 · R 칩/로빙 · E 감아차기)</div>
-      <div>🙆 <b>헤딩</b> — 떠 있는 공에 닿으면 자동 (피지컬이 높을수록 경합에서 이김). 공을 받을 땐 드리블이 낮으면 잠깐 트래핑 시간이 생깁니다</div>
-      <div>💨 <b>달리기</b> — 누르고 있는 동안 질주, 체력이 빨리 닳습니다 (PC: Space)</div>
-      <div>🛡️ <b>공이 없을 때</b> — 패스 버튼 = 태클, 슛 버튼 = 동료에게 패스 요청</div>
-      ${sk?`<div>${sk.icon} <b>스킬: ${sk.name}</b> — ${sk.desc} (PC: C·V·B·N)</div>`:''}
-      <div><b style="color:#2ee6d6">청록 링·▼</b>이 내 선수, <b style="color:#ffe066">노란 링</b>이 공, <b style="color:#f3b43a">▲</b>가 상대 골문 방향입니다</div>
-      <div>🚩 <b>세트피스</b>를 내가 맡으면 — 패스 = 짧게, 슛 = 코너킥 크로스 / 롱 스로인 / 프리킥·PK 슈팅</div>
-      <div>🌀 우리 팀이 공을 잡으면 <b style="color:#2ee6d6">청록 점선 원</b>이 침투하기 좋은 빈 공간입니다 (처음 몇 경기만)</div>
-      <div>📏 노란 점선이 <b>오프사이드 라인</b>입니다. 패스 받을 때 그 선보다 앞에 있으면 반칙</div></div>
+    showOverlay(`<h3>조작 방법</h3>${ctlHelp(false)}
       <button class="btn primary block" id="tut-go">킥오프!</button>`);
     el('tut-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; S.tutSeen=true; save(); lastT=performance.now(); };
   }
@@ -2005,8 +2061,9 @@ function startMatch(highlight,practice){
   el('btn-skip').onclick=()=>{ if(M.over) return; M.paused=true;
     if(M.practice){ showOverlay(`<h3>연습장</h3><p class="muted" style="margin:4px 0 0;font-size:.85rem">보상과 기록은 남지 않습니다. 스킬은 쿨타임이 3배 빨리 돌고, 필살기 횟수 제한이 없습니다.</p><div class="list" style="margin-top:10px"><button class="btn primary" id="pr-go">계속 연습</button><button class="btn" id="pr-reset">공 다시 받기</button><button class="btn" id="pr-end">연습 끝내기</button></div>`);
       el('pr-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); }; el('pr-reset').onclick=()=>{ el('m-overlay').hidden=true; practiceReset(); M.paused=false; lastT=performance.now(); }; el('pr-end').onclick=()=>endPractice(); return; }
-    showOverlay(`<h3>일시정지</h3><div class="list" style="margin-top:10px"><button class="btn primary" id="pz-go">계속하기</button><button class="btn" id="pz-skip">⏩ 남은 경기 넘기기</button><button class="btn" id="pz-shake">화면 흔들림: ${S.noShake?'끔':'켬'}</button><button class="btn" id="pz-mute">소리: ${S.mute?'끔':'켬'}</button><button class="btn" id="pz-run">침투 위치 안내: ${runHintOn()?'켬':'끔'}</button><button class="btn" id="pz-bs">버튼 크기: ${['보통','작게','크게'][S.btnSize||0]}</button><button class="btn" id="pz-ba">버튼 투명도: ${['불투명','조금 투명','투명'][S.btnAlpha||0]}</button></div>`);
+    showOverlay(`<h3>일시정지</h3><div class="list" style="margin-top:10px"><button class="btn primary" id="pz-go">계속하기</button><button class="btn" id="pz-help">🎮 조작법</button><button class="btn" id="pz-skip">⏩ 남은 경기 넘기기</button><button class="btn" id="pz-shake">화면 흔들림: ${S.noShake?'끔':'켬'}</button><button class="btn" id="pz-mute">소리: ${S.mute?'끔':'켬'}</button><button class="btn" id="pz-run">침투 위치 안내: ${runHintOn()?'켬':'끔'}</button><button class="btn" id="pz-bs">버튼 크기: ${['보통','작게','크게'][S.btnSize||0]}</button><button class="btn" id="pz-ba">버튼 투명도: ${['불투명','조금 투명','투명'][S.btnAlpha||0]}</button></div>`);
     el('pz-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); };
+    el('pz-help').onclick=()=>{ showOverlay(`<h3>조작법</h3>${ctlHelp(true)}<button class="btn primary block" id="hp-go">계속하기</button>`); el('hp-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); }; };
     el('pz-shake').onclick=()=>{ S.noShake=!S.noShake; save(); el('pz-shake').textContent='화면 흔들림: '+(S.noShake?'끔':'켬'); };
     el('pz-mute').onclick=()=>{ S.mute=!S.mute; save(); ambience(!S.mute); el('pz-mute').textContent='소리: '+(S.mute?'끔':'켬'); el('btn-mute').textContent=S.mute?'🔇':'🔊'; };
     el('pz-run').onclick=()=>{ S.runHint=!runHintOn(); save(); el('pz-run').textContent='침투 위치 안내: '+(runHintOn()?'켬':'끔'); };
@@ -2022,6 +2079,25 @@ function pickKit(club,avoid){ const okKit=(c,av)=>colorDist(c,'#ffffff')>=170&&c
   return [club.c1,club.c2].concat(['#d6332b','#1f4fd1','#111111','#8e2fc0','#ff7a00','#e0218a']).find(c=>okKit(c,avoid))||'#d6332b'; }
 function kit2(club,c1){ const L=rgbHsl(...hexRgb(c1))[2]; return [club.c2,L<0.5?'#f2f2f2':'#151515'].find(c=>colorDist(c,c1)>=180)||'#f2f2f2'; }
 function colorDist(a,b){ const p=c=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)]; const A=p(a),B=p(b); return Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1])+Math.abs(A[2]-B[2]); }
+function ctlHelp(full){ const sk=S&&SKILLS.find(x=>x.id===S.player.equip[0]); const pc=typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches;
+  const L=full?[
+    `🕹️ <b>이동</b> 화면 왼쪽 드래그 · 💨 <b>달리기</b> 누르는 동안`,
+    `⚽ <b>패스</b> 길게 = 세게, 끝까지 = 로빙. 측면 깊은 곳에선 크로스`,
+    `🎯 <b>스루</b> 침투하는 동료 앞 공간으로. 동료가 공을 가지면 침투 요청`,
+    `🥅 <b>슛</b> 길게 = 강슛. 버튼을 위로 밀면 칩슛, 옆으로 밀면 감아차기`,
+    `🙆 <b>헤딩</b> 떠 있는 공에 닿으면 자동`,
+    `🛡️ <b>공 없을 때</b> 패스 = 태클, 슛 = 패스 요청`,
+    sk?`${sk.icon} <b>${sk.name}</b> ${sk.desc}`:'',
+    `🚩 <b>세트피스</b> 패스 = 짧게, 슛 = 크로스·슈팅`,
+    `<b style="color:#2ee6d6">청록 링</b> 나 · <b style="color:#ffe066">노란 링</b> 공 · <b style="color:#ffe066">노란 점선</b> 오프사이드 라인 · <b style="color:#2ee6d6">청록 점선 원</b> 침투 공간`,
+    pc?`⌨️ 방향키 이동 · Z 패스 · F 스루 · X 슛 (R 칩 · E 감아차기) · Space 달리기 · C·V·B·N 스킬`:''
+  ]:[
+    `🕹️ 왼쪽 드래그로 <b>이동</b>, 오른쪽 버튼으로 <b>패스·스루·슛</b>`,
+    `💪 버튼을 <b>길게 누를수록 세게</b> — 슛 버튼을 위로 밀면 칩슛, 옆으로 밀면 감아차기`,
+    `🛡️ 공이 없을 땐 패스 버튼이 <b>태클</b>`,
+    pc?`⌨️ 방향키 · Z 패스 · F 스루 · X 슛 · Space 달리기`:''
+  ];
+  return `<div class="list" style="gap:6px;margin:10px 0 12px;font-size:${full?'.86':'.95'}rem;line-height:1.45">${L.filter(Boolean).map(x=>`<div>${x}</div>`).join('')}</div>${full?'':'<small class="muted" style="display:block;margin:-4px 0 12px">자세한 조작은 경기 중 ⏸ 메뉴 › 조작법에서 다시 볼 수 있어요</small>'}`; }
 function showOverlay(html){ const o=el('m-overlay'); o.innerHTML=`<div class="card">${html}</div>`; o.hidden=false; }
 
 function shirtNo(p){ let n=p.i===0?1:p.i+1; if(p.team===0&&S&&S.number&&n===S.number&&M&&M.mySlot!=null) n=M.mySlot+1; return n; } // 내 등번호와 겹치면 내 원래 자리 번호를 넘겨받음
@@ -2992,7 +3068,7 @@ function practiceTick(dt){ M.min=10; M.minPlayed=10; for(let i=0;i<4;i++) M.cds[
   const o=M.ball.owner; if(o&&o.team===0&&!o.isUser&&o.role!=='GK'){ M.prMateT=(M.prMateT||0)+dt; if(M.prMateT>4){ M.prMateT=0; practiceReset(); return; } } else M.prMateT=0;
   if(o&&(o.team===1||(o.team===0&&o.role==='GK'))){ M.prOppT=(M.prOppT||0)+dt; if(M.prOppT>1.0){ popup(M.user.x,M.user.y-1.8,'다시!','#cfe8ff'); practiceReset(); } } else if(!(!o&&M.ball.lastKicker&&M.ball.lastKicker.team===1)) M.prOppT=0; else { M.prOppT=(M.prOppT||0)+dt; if(M.prOppT>1.2){ popup(M.user.x,M.user.y-1.8,'다시!','#cfe8ff'); practiceReset(); return; } }
   if(!o&&(M.ball.y>H*0.62)){ M.prOppT=(M.prOppT||0)+dt; if(M.prOppT>1.5) practiceReset(); } }
-function startPractice(){ audioInit(); startMatch(false,true); prHUD(); }
+function startPractice(){ audioInit(); startMatch(false,true); const kc=cosVal('kit'); if(kc&&M){ M.myTeamColor=kc; } prHUD(); }
 function prHUD(){ const on=!!(M&&M.practice); el('btn-prreset').hidden=!on; el('btn-prdef').hidden=!on; if(!on) return; el('btn-prdef').textContent=M.prBench?'수비 넣기':'수비 빼기'; el('live-rt').hidden=true; }
 function prToggleDef(){ if(!M||!M.practice) return; if(M.prBench){ M.players.push(...M.prBench); M.prBench=null; } else { M.prBench=M.players.filter(q=>q.team===1&&q.role!=='GK'); M.players=M.players.filter(q=>!M.prBench.includes(q)); } practiceReset(); prHUD(); }
 function prShotDone(res){ if(M&&M.practice&&M.prShot&&!M.prShot.res){ M.prShot.res=res; M.prShotT=M.t; } }
@@ -3087,7 +3163,7 @@ function draw(){
   M.trail=M.trail||[]; const bsp=Math.hypot(b.vx,b.vy);
   if(!b.owner&&bsp>6){ M.trail.push({x:b.x,y:b.y-b.z*0.5,life:0.25}); }
   M.trail=M.trail.filter(t=>(t.life-=1/60)>0);
-  if(M.trail.length>1){ ctx.lineCap='round'; for(let i=1;i<M.trail.length;i++){ const a=M.trail[i-1], c=M.trail[i]; const k=c.life/0.25; ctx.strokeStyle=b.fire?`rgba(255,150,60,${k*0.7})`:b.thunder?`rgba(255,240,120,${k*0.8})`:`rgba(255,255,255,${k*0.55})`; ctx.lineWidth=0.18+k*0.42; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(c.x,c.y); ctx.stroke(); } ctx.lineCap='butt'; }
+  if(M.trail.length>1){ ctx.lineCap='round'; for(let i=1;i<M.trail.length;i++){ const a=M.trail[i-1], c=M.trail[i]; const k=c.life/0.25; const tr=b.isShot&&b.lastKicker&&b.lastKicker.isUser&&!b.fire&&!b.thunder?cosVal('trail'):null; ctx.strokeStyle=b.fire||tr==='fire'?`rgba(255,150,60,${k*0.75})`:b.thunder?`rgba(255,240,120,${k*0.8})`:tr==='ice'?`rgba(140,220,255,${k*0.8})`:tr==='gold'?`rgba(255,210,70,${k*0.85})`:tr==='rainbow'?`hsla(${(i*40+M.t*200)%360},90%,62%,${k*0.85})`:`rgba(255,255,255,${k*0.55})`; ctx.lineWidth=0.18+k*0.42; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(c.x,c.y); ctx.stroke(); } ctx.lineCap='butt'; }
   // 바닥 링 (공 위치를 항상 표시)
   ctx.strokeStyle=b.owner===M.user?'rgba(255,255,255,.0)':'rgba(255,224,102,.85)'; ctx.lineWidth=0.17; ctx.beginPath(); ctx.ellipse(b.x,b.y+0.15,1.05,0.62,0,0,Math.PI*2); ctx.stroke();
   ctx.fillStyle='rgba(0,0,0,.45)'; ctx.beginPath(); ctx.ellipse(b.x+b.z*0.15,b.y+0.25+b.z*0.1,0.6,0.34,0,0,Math.PI*2); ctx.fill();
@@ -3111,7 +3187,7 @@ function draw(){
   ctx.restore();
   postFX(cw,ch,night);
   ctx.save(); ctx.translate(cw/2-camx*ppm,ch/2-camy*ppm);
-  const u=M.user; const headY=u.y*ppm-(SPR_READY?3.0:1.1)*ppm; ctx.font='bold 11px "Noto Sans KR",sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.shadowColor='#000'; ctx.shadowBlur=4; ctx.fillText((S.captain?'Ⓒ ':'')+u.name+' '+S.number,u.x*ppm,headY-9);
+  const u=M.user; const headY=u.y*ppm-(SPR_READY?3.0:1.1)*ppm; ctx.font='bold 11px "Noto Sans KR",sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.shadowColor='#000'; ctx.shadowBlur=4; { const tg=cosVal('tag'); const txt=(S.captain?'Ⓒ ':'')+(tg==='star'?'★ ':'')+u.name+' '+S.number; if(tg){ ctx.save(); ctx.shadowBlur=0; const tw=ctx.measureText(txt).width+14; ctx.fillStyle=tg==='gold'?'rgba(150,105,10,.88)':tg==='neon'?'rgba(10,30,50,.85)':'rgba(60,20,90,.88)'; if(tg==='neon'){ ctx.shadowColor='#2ee6d6'; ctx.shadowBlur=10; } ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(u.x*ppm-tw/2,headY-21,tw,16,8); else ctx.rect(u.x*ppm-tw/2,headY-21,tw,16); ctx.fill(); if(tg==='gold'||tg==='star'){ ctx.strokeStyle=tg==='gold'?'#ffd25a':'#c9a6ff'; ctx.lineWidth=1.2; ctx.stroke(); } ctx.restore(); ctx.fillStyle=tg==='gold'?'#fff3c4':tg==='neon'?'#8ff5ea':'#f3e6ff'; } ctx.fillText(txt,u.x*ppm,headY-9); ctx.fillStyle='#fff'; }
   ctx.shadowBlur=0; ctx.fillStyle='#2ee6d6'; ctx.beginPath(); ctx.moveTo(u.x*ppm-6,headY-5); ctx.lineTo(u.x*ppm+6,headY-5); ctx.lineTo(u.x*ppm,headY+3); ctx.closePath(); ctx.fill(); ctx.shadowBlur=4;
   if(M.passPrev&&M.ball.owner===M.user){ const pp=M.passPrev, t=pp.t; const hx=t.x*ppm, hy=t.y*ppm-(SPR_READY?3.2:1.4)*ppm; ctx.shadowBlur=0; ctx.font='bold 11px "Noto Sans KR",sans-serif'; const txt='🙋 '+pp.kind; const tw=ctx.measureText(txt).width+12;
     ctx.fillStyle=pp.risk<0.3?'rgba(16,90,60,.92)':pp.risk<0.7?'rgba(120,90,10,.92)':'rgba(130,30,30,.92)'; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(hx-tw/2,hy-17,tw,18,9); else ctx.rect(hx-tw/2,hy-17,tw,18); ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(txt,hx,hy-4); ctx.shadowBlur=4; }

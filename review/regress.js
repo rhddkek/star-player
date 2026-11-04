@@ -140,7 +140,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const c2=await pg.$('#btn-continue'); if(c2) await c2.click(); await pg.waitForTimeout(600); }
 
   // 5) 모바일 각 탭: 가로 넘침·잘림
-  for(const t of ['home','player','skill','league','transfer']){ const btn=await pg.$(`#tabs button[data-tab="${t}"]`); if(!btn) continue; await btn.click(); await pg.waitForTimeout(250);
+  for(const t of ['home','player','skill','shop','league','transfer']){ const btn=await pg.$(`#tabs button[data-tab="${t}"]`); if(!btn) continue; await btn.click(); await pg.waitForTimeout(250);
     const r=await pg.evaluate(()=>{ const W=window.innerWidth; const bad=[]; document.querySelectorAll('.screen:not([hidden]) *').forEach(e=>{ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1&&getComputedStyle(e).position!=='fixed') bad.push((e.id||e.className||e.tagName).toString().slice(0,30)+':'+Math.round(b.right)); }); return {scroll:document.documentElement.scrollWidth>W,bad:bad.slice(0,4)}; });
     ok(`모바일 ${t} 탭: 가로 넘침 없음`, !r.scroll&&r.bad.length===0, r.bad.join(', ')); }
   { const ln=await pg.evaluate(()=>{ S.number=9; save(); M=null; startMatch(false); const nums=M.players.filter(p=>p.team===0).map(p=>p.isUser?S.number:shirtNo(p)); const dup=nums.filter((n,i)=>nums.indexOf(n)!==i); const sc=el('sc-h').querySelector('span').textContent; cancelAnimationFrame(raf); ambience(false); M=null; el('m-overlay').hidden=true; show('screen-hub'); renderHub(); return {dup,sc}; });
@@ -149,6 +149,25 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('스킬 화면: 기본은 쓸 수 있는 것+다음 해금만, 전체 보기 펼치기', sk.btn&&sk.n1<sk.n2, JSON.stringify(sk)); }
   { const lg=await pg.evaluate(()=>({n:Object.keys(S.divs).length, it:S.divs['it-1'].clubs.length, fr:S.divs['fr-1'].clubs.length, star:clubStars(CLUBS['en-1-1']), low:clubStars(CLUBS['kr-2-0']), v:S.v}));
     ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===14&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v===3, JSON.stringify(lg)); }
+  // 스타숍: 스폰서 계약 · 꾸미기 · 광고 촬영
+  { const sh=await pg.evaluate(()=>{ endoInit(); S.player.rep=1500; S.player.money=50000; S.endo.offers=[]; S.endo.active=[]; let g=0; while(!S.endo.offers.length&&g++<20) endoMakeOffers(); const n=S.endo.offers.length; const o=S.endo.offers[0]; const m0=S.player.money; endoAccept(0);
+      const signed=S.player.money-m0; const a=S.endo.active[0]; const notes=[]; const pay=endoAfterMatch({goals:3,assists:3,tackles:12,rating:8,injured:false},{type:'league'},notes);
+      const cats=new Set(S.endo.active.map(x=>x.cat)).size===S.endo.active.length; return {n,signed,sign:o.sign,pay,base:o.pay,done:a.done,notes:notes.length,cats,brands:ENDO_BRANDS.filter(b=>b.rep<=1500).length}; });
+    ok('스폰서: 제안 생성·계약금·경기당 광고비·보너스 조건', sh.n>0&&sh.signed===sh.sign&&sh.pay>=sh.base&&sh.done&&sh.cats, JSON.stringify(sh)); }
+  { await pg.evaluate(()=>{ renderShop.sub='cos'; tab='shop'; renderHub(); }); const m0=await pg.evaluate(()=>S.player.money); await pg.click('button[data-cb="b_pink"]'); await pg.waitForTimeout(150);
+    const cs=await pg.evaluate(()=>({own:S.cos.owned.includes('b_pink'),eq:S.cos.eq.boot,boot:bootColor(),m:S.player.money}));
+    ok('꾸미기: 핑크 축구화 구입·착용 → 경기 축구화 색', cs.own&&cs.eq==='b_pink'&&cs.boot==='#ff3fa4'&&m0-cs.m===30, JSON.stringify(cs)); }
+  for(const sub of ['endo','gear','cos','life']){ const r=await pg.evaluate(sub=>{ renderShop.sub=sub; tab='shop'; renderHub(); const W=window.innerWidth; const bad=[]; document.querySelectorAll('#tab-shop *').forEach(e=>{ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1) bad.push((e.id||e.className||e.tagName).toString().slice(0,30)); }); return {bad,txt:el('tab-shop').textContent.length}; },sub);
+    ok(`모바일 스타숍 ${sub}: 가로 넘침 없음`, r.bad.length===0&&r.txt>50, r.bad.slice(0,3).join(', ')); }
+  { const ad=await pg.evaluate(()=>{ S.weekAct=null; S.player.injury=0; S.player.cond=90; tab='player'; renderPlayer.sub='stat'; renderHub(); const b=document.querySelector('button[data-tr="ad"]'); if(!b) return {btn:false}; const m0=S.player.money, c0=S.player.cond; b.click(); return {btn:true,act:S.weekAct,dm:S.player.money-m0,dc:S.player.cond-c0}; });
+    ok('주간 광고 촬영: 돈 +, 컨디션 -8', ad.btn&&ad.act==='ad'&&ad.dm>0&&ad.dc<=0, JSON.stringify(ad)); }
+  // 첫 경기 조작법: 작은 아이폰(사파리 툴바 포함 높이)에서도 킥오프 버튼이 눌림
+  { const c2=await b.newContext({...devices['iPhone SE'],viewport:{width:375,height:548}}); const p2=await c2.newPage(); await p2.goto(FILE); await p2.click('#btn-new'); await p2.waitForTimeout(600);
+    await p2.evaluate(()=>{ S.tutSeen=false; S.noReplay=true; startMatch(false); }); await p2.waitForTimeout(300);
+    const box=await p2.evaluate(()=>{ const c=el('m-overlay').querySelector('.card').getBoundingClientRect(); const g=el('tut-go').getBoundingClientRect(); return {top:Math.round(c.top),h:Math.round(c.height),btnB:Math.round(g.bottom),vh:innerHeight}; });
+    let clicked=true; try{ await p2.click('#tut-go',{timeout:3000}); }catch(e){ clicked=false; } await p2.waitForTimeout(150);
+    const st=await p2.evaluate(()=>({paused:M.paused,seen:S.tutSeen}));
+    ok('첫 경기 조작법: 짧고 화면 안, 킥오프 눌림', clicked&&!st.paused&&st.seen&&box.top>=0&&box.btnB<=box.vh, JSON.stringify({...box,...st})); await c2.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

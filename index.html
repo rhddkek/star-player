@@ -522,7 +522,7 @@ button.ult[id^="k-s"]{box-shadow:0 0 0 2px #f3b43a,0 0 14px rgba(243,180,58,.6)}
           <button class="btn on" data-pos="FW">공격수</button><button class="btn" data-pos="MF">미드필더</button><button class="btn" data-pos="DF">수비수</button>
         </div></div>
       <p class="muted" style="font-size:.85rem;margin:10px 0 0" id="pos-desc"></p>
-      <button class="btn primary block" style="margin-top:14px" id="btn-new">칠성 FC와 계약하고 시작</button>
+      <button class="btn primary block" style="margin-top:14px" id="btn-new">▶ 커리어 시작 — 고교 졸업반부터</button>
     </div>
     <p class="muted" style="font-size:.8rem;margin:0">PC: 방향키/WASD 이동 · Z 패스/크로스/태클 · F 스루 · X 슛 · R 칩/로빙 · E 감아차기 · C·V·B·N 스킬. 모바일: 왼쪽 화면 드래그로 이동, 오른쪽 버튼.</p>
   </div></div>
@@ -1175,7 +1175,7 @@ function renderHome(){
   const box=el('tab-home'); box.innerHTML='';
   const st=standings(d.id); const myRank=st.findIndex(x=>x.c===S.clubId)+1;
   if(S.compIntro){ S.compIntro=false; setTimeout(()=>{ if(!el('screen-hub').hidden&&tab==='home') compIntroModal(); else S.compIntro=true; },120); }
-  if(S.byeNote){ S.byeNote=false; setTimeout(()=>toast('휴식 라운드: 우리 팀은 이번 라운드 경기가 없습니다'),50); }
+  if(S.byeNote){ S.byeNote=false; if(ev) setTimeout(()=>toast('휴식 라운드: 우리 팀은 이번 라운드 경기가 없습니다'),50); }
   { const cc=contractCard(); if(cc) box.append(cc); }
   if(S.loan) box.append(h(`<div class="card" style="padding:10px 14px"><small>🔁 <b>${esc(club.name)}</b> 임대 중 · 시즌이 끝나면 <b>${esc(CLUBS[S.loan.parent].name)}</b>로 복귀</small></div>`));
   if(S.preContract) box.append(h(`<div class="card" style="padding:10px 14px"><small>📝 보스만 사전 계약: 시즌이 끝나면 <b>${esc(CLUBS[S.preContract.clubId].name)}</b>로 이적료 없이 합류</small></div>`));
@@ -1218,7 +1218,7 @@ function renderHome(){
     </div>`);
     grid.append(card); drawStadiumBanner(card.querySelector('.stadium canvas'),v?v.tier:2,home?pickKit(ev.me,[]):opp.c1);
     card.querySelector('#sel-mode')?.addEventListener('click',e=>{ const b=e.target.closest('button[data-mode]'); if(!b) return; renderHome.mode=b.dataset.mode; renderHub(); });
-    card.querySelector('#btn-go')?.addEventListener('click',()=>{ const m=renderHome.mode||'play'; if(m==='play'){ audioInit(); startMatch(false); } else if(m==='hl'){ audioInit(); startMatch(true); } else if(m==='auto') autoMatch(); else autoBatch(5); });
+    card.querySelector('#btn-go')?.addEventListener('click',()=>{ const m=md[0]; if(m==='play'){ audioInit(); startMatch(false); } else if(m==='hl'){ audioInit(); startMatch(true); } else if(m==='auto') autoMatch(); else autoBatch(5); });
   } else {
     let html='';
     if(S.post&&S.post[CLUBS[S.clubId].country]){ const rs=S.post[CLUBS[S.clubId].country].results; if(rs.length) html+=`<div style="margin-bottom:10px">${rs.map(r=>`<div class="row between ${r.a===S.clubId||r.b===S.clubId?'':'muted'}" style="font-size:.85rem"><span>${PO_NAMES[r.type]}</span><span>${esc(CLUBS[r.a].short)} <b class="num" style="color:var(--fg)">${r.ga}-${r.gb}</b> ${esc(CLUBS[r.b].short)}${r.pk?' (PK)':''}</span></div>`).join('')}</div>`; }
@@ -1342,7 +1342,7 @@ function updStarter(){ if(S.trust==null) return; if(S.starter==null) S.starter=S
 function trustReset(club,bonus=0){ S.trust=Math.min(85,trustStart(club)+bonus); S.starter=S.trust>=TRUST_UP; S.comp=genComp(club); S.compIntro=true; }
 function trustMigrate(){ const role=S.role||roleAt(CLUBS[S.clubId]).k; const f=S.form||[]; const avg=f.length?f.reduce((a,b)=>a+b,0)/f.length:6.3; S.starter=role!=='prospect'||avg>=6.5; S.trust=Math.round(S.starter?clamp(64+(avg-6.3)*15,60,85):clamp(40+(avg-6.3)*15,20,58)); S.comp=genComp(CLUBS[S.clubId]); }
 function trustAfterMatch(r,ev){ if(S.trust==null||ev.type==='nat'||ev.pro||r.injured) return null; ensureComp(); const was=!!S.starter; updStarter(); const was2=!!S.starter;
-  let d=(r.rating-6.3)*12+(r.goals||0)*4+(r.assists||0)*3+(r.objRes&&r.objRes[0]&&r.objRes[0].done?5:0)+(r.bench&&r.rating>=6.8?4:0)+(ovr()>S.comp.ovr?2:ovr()<S.comp.ovr-6?-1:0);
+  let d=(r.bench?(r.rating-6.0)*14+2:(r.rating-6.3)*12)+(r.goals||0)*4+(r.assists||0)*3+(r.objRes&&r.objRes[0]&&r.objRes[0].done?5:0)+(r.bench&&r.rating>=6.8?4:0)+(ovr()>S.comp.ovr?2:ovr()<S.comp.ovr-6?-1:0);
   if(r.auto) d*=0.6; d=Math.round(clamp(d,-15,18)); S.trust=clamp(S.trust+d,0,100); updStarter();
   return {d,v:S.trust,up:!was2&&S.starter,down:was2&&!S.starter}; }
 function trustStrip(){ if(S.trust==null) return ''; ensureComp(); const gu=S.guaranteed&&!S.loan; const st=!isBenched();
@@ -2133,7 +2133,7 @@ function renderResult(r,g){
   if(g.trust&&(g.trust.up||g.trust.down)){ const cp=ensureComp(); col.append(h(`<div class="card tpromo ${g.trust.up?'up':'down'}"><div class="row" style="gap:12px;align-items:center">${por('coach',56)}<div style="min-width:0"><span class="label">${g.trust.up?'🎉 선발 확정':'⬇ 벤치로'} · 감독</span><b>${g.trust.up?`"좋아. 다음 경기부터 선발이다. ${esc(cp.name)} 대신 네가 뛴다."`:`"요즘 아쉽다. 다음 경기는 ${esc(cp.name)} 선수가 먼저 나간다. 다시 증명해라."`}</b></div></div></div>`)); }
   if(!r.injured){ const best=(()=>{ const L=[]; if(r.goals) L.push([`⚽ ${r.goals}골`,9]); if(r.assists) L.push([`🅰️ 도움 ${r.assists}개`,8]); if(r.keyPass) L.push([`🔑 기회 창출 ${r.keyPass}회`,6]); if(r.onT) L.push([`🎯 유효 슈팅 ${r.onT}회`,5]); if(r.tackles) L.push([`🛡️ 공 뺏기 ${r.tackles}회`,5]); if(r.passes>=4) L.push([`📐 패스 ${r.passOk}/${r.passes} 성공`,r.passOk/r.passes>0.8?4:2]); if(r.touches) L.push([`👟 터치 ${r.touches}회`,1]); return L.sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]); })();
     const nxt=nextEvent(); const story=nxt?matchStory(nxt):''; const benchNext=nxt&&nxt.type!=='nat'&&isBenched();
-    const nextLine=nxt?`${esc(nxt.home?'홈':'원정')} vs ${esc(nxt.opp.name)}${story?` · ${story}`:benchNext?' · 벤치 출발 예정 — 평점을 올려야 선발로 돌아갑니다':' · 선발 출전 예정'}`:'시즌 마무리';
+    const nextLine=nxt?`${esc(nxt.home?'홈':'원정')} vs ${esc(nxt.opp.name)}${story?` · ${story}`:benchNext?(S.trust!=null?` · 벤치 출발 예정 — 감독 신뢰 ${S.trust}/${TRUST_UP}`:' · 벤치 출발 예정 — 평점을 올려야 선발로 돌아갑니다'):' · 선발 출전 예정'}`:'시즌 마무리';
     const lvUp=g.lvls&&g.lvls.length;
     col.append(h(`<div class="card hi"><div class="row between"><div><span class="label">내 평점</span><div class="num" style="font-size:2.4rem;line-height:1;color:${ratingColor(r.rating)}">${r.rating.toFixed(1)}</div></div><div style="text-align:right">${best.map(b2=>`<div style="font-weight:800">${b2}</div>`).join('')||'<small class="muted">눈에 띄는 장면이 없었습니다</small>'}</div></div>
       <div class="row" style="gap:6px;margin-top:10px;flex-wrap:wrap"><span class="pill">경험치 +${g.xp}</span><span class="pill">명성 +${g.rep}</span><span class="pill acc">수입 +${fmtMoney(g.money)}</span>${g.endoPay?`<span class="pill">광고 +${fmtMoney(g.endoPay)}</span>`:''}${g.trust?`<span class="pill ${g.trust.d>=0?'good':'bad'}">감독 신뢰 ${g.trust.d>=0?'+':''}${g.trust.d} → ${g.trust.v}</span>`:''}${lvUp?`<span class="pill good">레벨 업! Lv.${g.lvls[g.lvls.length-1]} · 포인트 +${g.lvls.length*4}</span>`:''}</div>
@@ -3203,7 +3203,7 @@ function updatePossession(dt){
       if((d<reach&&b.z<1.8||chest)&&canTake){ b.speedAtTake=chest?Math.min(sp,10):sp; if(chest&&b.z>1.2&&pl.isUser) popup(pl.x,pl.y-2.6,'가슴 트래핑','#e8f4ff'); { const l=sp||1; b.driftX=b.vx/l; b.driftY=b.vy/l; }
         if(b.offside&&b.offside.includes(pl)){ callOffside(pl); return; }
         // 패스 성공 집계
-        if(b.lastKicker&&b.lastKicker.team===pl.team&&b.lastKicker!==pl){ { const dg=M.dbg||(M.dbg={}); dg['pc'+pl.team]=(dg['pc'+pl.team]||0)+1; } if(b.lastKicker.isUser){ M.stats.passOk++; passFeat(b,pl); if(M.lastPassFwd) M.stats.fwdPass=(M.stats.fwdPass||0)+1; if(pl.y<32) M.keyT=M.t; } M.lastPasser=b.lastKicker; M.lastPassT=M.t; }
+        if(b.lastKicker&&b.lastKicker.team===pl.team&&b.lastKicker!==pl){ { const dg=M.dbg||(M.dbg={}); dg['pc'+pl.team]=(dg['pc'+pl.team]||0)+1; } if(b.lastKicker.isUser&&!b.isShot&&M.stats.passOk<M.stats.passes){ M.stats.passOk++; passFeat(b,pl); if(M.lastPassFwd) M.stats.fwdPass=(M.stats.fwdPass||0)+1; if(pl.y<32) M.keyT=M.t; } M.lastPasser=b.lastKicker; M.lastPassT=M.t; }
         else if(b.lastKicker&&b.lastKicker.team!==pl.team&&pl.isUser&&pl.tackleT>0){ M.stats.tackles++; popup(pl.x,pl.y-1.5,'차단!','#9fd0ff'); }
         setOwner(pl); if(pl.boostT) pl.boostT=0; if(pl.isUser){ M.stats.touches++; M.lastUserTouchT=M.t; { const [,od]=nearest(M.players.filter(q=>q.team===1),pl); const pr=od<3; M.stats.recv=(M.stats.recv||0)+1; if(pr) M.stats.recvPress=(M.stats.recvPress||0)+1; M.recv={t:M.t,x:pl.x,y:pl.y,pr}; M.pendingRecv=pl; } if(M.lastHeaderT&&M.t-M.lastHeaderT<3&&M.lastHeaderTeam===0){ M.stats.second=(M.stats.second||0)+1; popup(pl.x,pl.y-1.5,'세컨드볼 회수','#bfe8c8'); M.lastHeaderT=0; } if(M.stats.firstTouch==null) M.stats.firstTouch=matchMinute(); }
       }
@@ -3970,7 +3970,7 @@ function cutPlay(scenes,done){ show('screen-cut'); const cv=el('cut-cv'), cap=el
   C.skip=()=>finish();
   el('cut-skip').onclick=e=>{ e.stopPropagation(); finish(); };
   el('screen-cut').onclick=()=>{ if(C.end) return; const sc=scenes[C.i]; const txt=sc.text||''; if(C.typed<txt.length){ C.typed=txt.length; return; } next(); };
-  const loop=now=>{ if(C.end) return; if(el('screen-cut').hidden){ finish(); return; } const sc=scenes[C.i]; const t=(now-C.t0)/1000; const W=cv.width, H=cv.height; const x=cv.getContext('2d');
+  const loop=now=>{ if(C.end) return; if(el('screen-cut').hidden){ C.end=true; window.removeEventListener('resize',fit); if(CUT===C) CUT=null; return; } const sc=scenes[C.i]; const t=(now-C.t0)/1000; const W=cv.width, H=cv.height; const x=cv.getContext('2d');
     x.fillStyle='#000'; x.fillRect(0,0,W,H);
     const port=W<H*0.9; const sw=port?W:Math.min(W,H*0.62*16/9), sh=port?Math.min(H*0.56,W):sw*9/16, sx=(W-sw)/2, sy=Math.max(0,(H-sh)/2-H*0.07);
     const cwv=Math.min(320,180*sw/sh), cx=clamp((sc.fx?sc.fx(t):160)-cwv/2,0,320-cwv);
@@ -4033,15 +4033,15 @@ function proFinish(r){ const p=S.player; const my=r.home?r.ga:r.gb, op=r.home?r.
 function showProOffers(){ const P=S.prologue, R=P.r; const col=el('pro-col'); show('screen-pro');
   col.innerHTML=`<div class="card pro-res"><span class="label">전국 고교대회 결승 · 경기 종료</span><h2>${R.win?'🏆 우승!':'준우승'}</h2><div class="pro-sc"><span>칠성고</span><b class="num">${R.my} - ${R.op}</b><span>서진고</span></div>${R.pk?`<small class="muted">승부차기 ${R.win?'승리':'패배'}</small>`:''}<div style="margin-top:6px">내 평점 <b style="color:${ratingColor(R.rating)}">${R.rating.toFixed(1)}</b>${R.goals?` · ⚽ ${R.goals}골`:''}${R.assists?` · 🅰️ 도움 ${R.assists}`:''}</div></div>
     <div class="pro-h">👀 결승을 지켜본 스카우트 ${P.offers.length}곳이 연락해 왔습니다<small>입단할 팀을 고르세요. 큰 팀일수록 주급은 높지만 주전 경쟁이 어렵습니다.</small></div>
-    ${P.offers.map((o,i)=>{ const c=CLUBS[o.club]; const role=roleAt(c); const st=o.trust0>=TRUST_UP; return `<div class="card pro-o" style="animation-delay:${0.25+i*0.3}s"><div class="row" style="gap:10px;align-items:center">${embHTML(c,44)}<div style="flex:1;min-width:0"><b style="font-size:1.05rem">${esc(c.name)}</b><br><small class="muted">${divName(divOf(c.id).id)} · 전력 ${c.str}</small></div><span class="pill ${role.c}">${role.t}</span></div>
+    ${P.offers.map((o,i)=>{ const c=CLUBS[o.club]; const role=roleAt(c); const pb0=clamp(Math.round(((R.rating||6.5)-6.5)*6)+(R.goals||0)*3,0,12); const st=o.trust0+pb0>=TRUST_UP; return `<div class="card pro-o" style="animation-delay:${0.25+i*0.3}s"><div class="row" style="gap:10px;align-items:center">${embHTML(c,44)}<div style="flex:1;min-width:0"><b style="font-size:1.05rem">${esc(c.name)}</b><br><small class="muted">${divName(divOf(c.id).id)} · 전력 ${c.str}</small></div><span class="pill ${role.c}">${role.t}</span></div>
       <div class="pro-kv"><span>주급<b>${fmtMoney(o.wage)}</b></span><span>계약<b>${o.years}년</b></span><span>시작<b>${st?'선발':'벤치'}</b></span></div>
-      <small class="muted">경쟁자 ${esc(o.comp.name)} (OVR ${o.comp.ovr}) · 감독 신뢰 ${o.trust0}에서 시작 — ${TRUST_UP}을 넘기면 선발</small>
+      <small class="muted">경쟁자 ${esc(o.comp.name)} (OVR ${o.comp.ovr}) · 감독 신뢰 ${o.trust0}${pb0?` +결승 활약 ${pb0}`:''}에서 시작 — ${TRUST_UP}을 넘기면 선발</small>
       <button class="btn ${i===0?'primary':''} block" data-pj="${i}" style="margin-top:8px">${esc(c.short||c.name)} 입단하기</button></div>`; }).join('')}`;
   col.onclick=e=>{ const b=e.target.closest('button[data-pj]'); if(b) proJoin(+b.dataset.pj); }; col.parentElement.scrollTop=0; }
 function proJoin(i){ const P=S.prologue; const o=P.offers[i]; const c=CLUBS[o.club];
-  S.clubId=c.id; S.wage=o.wage; S.contractEnd=S.season+o.years-1; S.role=roleAt(c).k; S.form=[]; S.trust=o.trust0; S.starter=S.trust>=TRUST_UP; S.comp=o.comp; S.compIntro=true; S.proDone={club:c.id,...P.r}; S.prologue=null;
+  S.clubId=c.id; S.wage=o.wage; S.contractEnd=S.season+o.years-1; S.role=roleAt(c).k; S.form=[]; const pb=clamp(Math.round((((P.r&&P.r.rating)||6.5)-6.5)*6)+((P.r&&P.r.goals)||0)*3,0,12); S.trust=o.trust0+pb; S.proBonus=pb; S.starter=S.trust>=TRUST_UP; S.comp=o.comp; S.compIntro=true; S.proDone={club:c.id,...P.r}; S.prologue=null;
   try{ S.rival=pickRival(); }catch(e){} save(); tab='home'; show('screen-hub'); renderHub(); toast(`${c.name} 입단! 주급 ${fmtMoney(o.wage)}`); }
-function proSkipAll(i=0){ if(CUT&&CUT.skip) CUT.skip(); if(typeof M!=='undefined'&&M){ try{ cancelAnimationFrame(raf); ambience(false); }catch(e){} M=null; } S.prologue={stage:'offers',r:{my:2,op:1,win:true,pk:false,rating:6.8,goals:1,assists:0},offers:proOffers({rating:6.8,goals:1,assists:0})}; proJoin(Math.min(i,S.prologue.offers.length-1)); }
+function proSkipAll(i=0){ if(CUT){ CUT.end=true; CUT=null; } if(typeof M!=='undefined'&&M){ try{ cancelAnimationFrame(raf); ambience(false); }catch(e){} M=null; } S.prologue={stage:'offers',r:{my:2,op:1,win:true,pk:false,rating:6.8,goals:1,assists:0},offers:proOffers({rating:6.8,goals:1,assists:0})}; proJoin(Math.min(i,S.prologue.offers.length-1)); }
 function startNewCareer(){ const name=el('in-name').value.trim()||'선수'; newGame(name,pos); proStart(); }
 el('btn-new').addEventListener('click',()=>{ const sv=load(); if(!(sv&&sv.player)) return startNewCareer();
   const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card"><h2>기존 커리어가 있습니다</h2><p style="margin:8px 0 12px">${esc(sv.player.name)} · Lv.${sv.player.level} · 시즌 ${sv.season}<br><small class="muted">새로 시작하면 이 커리어는 지워집니다. (2시즌 이상 뛰었다면 요약은 명예의 전당에 남습니다)</small></p><div class="list"><button class="btn primary" id="nw-bk">백업 받고 새로 시작</button><button class="btn danger" id="nw-go">지우고 새로 시작</button><button class="btn" id="nw-x">취소</button></div></div>`;

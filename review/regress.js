@@ -8,7 +8,21 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const ctx=await b.newContext({...devices['iPhone 13']}); const pg=await ctx.newPage();
   const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
   await pg.goto(FILE); await pg.click('#btn-new'); await pg.waitForTimeout(700);
-  await pg.evaluate(()=>{ S.tutSeen=true; S.noReplay=true; save(); renderHub(); });
+  // 프롤로그: 오프닝 애니메이션 → 건너뛰기 → 고교 결승 → 스카우트 제안 → 입단 → 주전 경쟁
+  { const p0=await pg.evaluate(()=>({cut:!el('screen-cut').hidden,skip:!!el('cut-skip'),stage:S.prologue&&S.prologue.stage}));
+    await pg.click('#cut-skip'); await pg.waitForTimeout(500);
+    const p1=await pg.evaluate(()=>({match:!el('screen-match').hidden,pro:!!(M&&M.ev.pro),me:M&&M.me.name,bench:!!(M&&M.bench)}));
+    await pg.evaluate(()=>{ if(el('tut-go')) el('tut-go').click(); M.score=[2,1]; M.stats.goals=1; M.min=90; M.over=true; concludeMatch(); }); await pg.waitForTimeout(400);
+    const p2=await pg.evaluate(()=>({pro:!el('screen-pro').hidden,offers:document.querySelectorAll('#pro-col [data-pj]').length,kr:S.prologue.offers.every(o=>CLUBS[o.club].country==='kr')}));
+    await pg.click('#pro-col [data-pj="0"]'); await pg.waitForTimeout(500);
+    const p3=await pg.evaluate(()=>{ const o=S.proDone; return {hub:!el('screen-hub').hidden,club:S.clubId,trust:S.trust,comp:!!(S.comp&&S.comp.name),modal:!!document.querySelector('.ci-card'),strip:!!document.querySelector('#tab-home .tstrip'),pro:S.prologue}; });
+    ok('프롤로그: 오프닝 애니메이션(건너뛰기) → 고교 결승 → 국내 스카우트 제안 → 입단 → 주전 경쟁 안내', p0.cut&&p0.skip&&p0.stage==='intro'&&p1.match&&p1.pro&&p1.me==='칠성고'&&!p1.bench&&p2.pro&&p2.offers>=2&&p2.kr&&p3.hub&&p3.trust>0&&p3.comp&&p3.modal&&p3.strip&&p3.pro==null, JSON.stringify({p0,p1,p2,p3}));
+    await pg.evaluate(()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); }); }
+  // 감독 신뢰: 활약하면 선발 확정, 부진하면 벤치
+  { const tr=await pg.evaluate(()=>{ S.trust=55; S.starter=false; const a=trustAfterMatch({rating:7.6,goals:1,assists:0,objRes:[{done:true}]},{type:'league'}); const b0=isBenched(); let n=0, d=null; while(S.starter&&n<8){ d=trustAfterMatch({rating:4.8,goals:0,assists:0},{type:'league'}); n++; } const b1=isBenched();
+      S.weekAct=null; S.player.injury=0; const t0=S.trust; doWeekAct('shot'); const tTrain=S.trust-t0; S.weekAct=null; S.player.rep=Math.max(S.player.rep,200); const t1=S.trust; doWeekAct('ad'); const tAd=S.trust-t1; S.weekAct=null; return {up:a.up,b0,down:d&&d.down,b1,n,tTrain,tAd}; });
+    ok('감독 신뢰: 활약 → 선발 확정, 연속 부진 → 벤치, 훈련 +2 · 광고 −2', tr.up&&!tr.b0&&tr.down&&tr.b1&&tr.tTrain===2&&tr.tAd===-2, JSON.stringify(tr)); }
+  await pg.evaluate(()=>{ S.trust=70; S.starter=true; S.tutSeen=true; S.noReplay=true; save(); renderHub(); });
 
   // 1) 능력치 배분 → 취소 → 적용
   await pg.evaluate(()=>{ S.player.points=4; save(); renderHub(); });
@@ -134,7 +148,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); await pg.waitForTimeout(200);
   await pg.click('#btn-new'); await pg.waitForTimeout(250);
   const warn=await pg.$('#nw-x'); ok('저장 있을 때 새 커리어 → 덮어쓰기 경고', !!warn);
-  if(warn){ await pg.click('#nw-go'); await pg.waitForTimeout(400); }
+  if(warn){ await pg.click('#nw-go'); await pg.waitForTimeout(400); await pg.evaluate(()=>{ proSkipAll(); }); await pg.waitForTimeout(400); await pg.evaluate(()=>document.querySelectorAll('.hub-modal').forEach(m=>m.remove())); }
   if(bkPath){ await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const [fc]=await Promise.all([pg.waitForEvent('filechooser'), pg.click('#btn-import')]); await fc.setFiles(bkPath); await pg.waitForTimeout(500);
     const back=await pg.evaluate(()=>{ const o=load(); return o&&o.player&&o.player.level; }); ok('백업 불러오기: 이전 커리어 복원', back===6, 'Lv.'+back); }
   { await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const c2=await pg.$('#btn-continue'); if(c2) await c2.click(); await pg.waitForTimeout(600); }
@@ -180,7 +194,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('주간 광고 촬영: 돈 +, 컨디션 -8', ad.btn&&ad.act==='ad'&&ad.dm>0&&ad.dc<=0, JSON.stringify(ad)); }
   // 첫 경기 조작법: 작은 아이폰(사파리 툴바 포함 높이)에서도 킥오프 버튼이 눌림
   { const c2=await b.newContext({...devices['iPhone SE'],viewport:{width:375,height:548}}); const p2=await c2.newPage(); await p2.goto(FILE); await p2.click('#btn-new'); await p2.waitForTimeout(600);
-    await p2.evaluate(()=>{ S.tutSeen=false; S.noReplay=true; startMatch(false); }); await p2.waitForTimeout(300);
+    await p2.evaluate(()=>{ proSkipAll(); S.compIntro=false; S.trust=70; S.starter=true; S.tutSeen=false; S.noReplay=true; startMatch(false); }); await p2.waitForTimeout(300);
     const box=await p2.evaluate(()=>{ const c=el('m-overlay').querySelector('.card').getBoundingClientRect(); const g=el('tut-go').getBoundingClientRect(); return {top:Math.round(c.top),h:Math.round(c.height),btnB:Math.round(g.bottom),vh:innerHeight}; });
     let clicked=true; try{ await p2.click('#tut-go',{timeout:3000}); }catch(e){ clicked=false; } await p2.waitForTimeout(150);
     const st=await p2.evaluate(()=>({paused:M.paused,seen:S.tutSeen}));

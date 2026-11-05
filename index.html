@@ -2680,6 +2680,13 @@ function updateAI(dt){
     const ub=team===0?H-b.y:b.y;
     const sts=mine.filter(q=>!q.isUser&&q.role==='FW'&&subRole(q)==='ST'); const dropper=sts.length>=2?sts.slice().sort((a,c)=>dist(a,b)-dist(c,b))[0]:null;
     const marked=new Set();
+    if(team===0&&own&&own.isUser&&decide){ // 내 선수 지원 역할 배정
+      const att0=ub>40; const cand=field.filter(q=>subRole(q)!=='CB'&&!(att0&&subRole(q)==='ST')&&!(q.runT>M.t)&&dist(q,own)<34).sort((a,c)=>dist(a,own)-dist(c,own)); M.uSup=cand.slice(0,2); M.uSpots=[];
+      M.uSup.forEach(q=>{ let best=null,bs=-1e9; for(let k=0;k<14;k++){ const a=k/14*Math.PI*2; for(const r of [9,12.5,16]){ const P={x:own.x+Math.cos(a)*r,y:own.y+Math.sin(a)*r}; if(P.x<2.5||P.x>W-2.5||P.y<3||P.y>H-3) continue; const fwd=(P.y-own.y)*dir; if(fwd<-9) continue;
+          const [,od]=nearest(theirs,P); let crowd=0; mine.forEach(m=>{ if(m===q||m.isUser) return; const dd=Math.hypot(m.x-P.x,m.y-P.y); if(dd<8) crowd+=(8-dd)*0.5; }); M.uSpots.forEach(S2=>{ const dd=Math.hypot(S2.x-P.x,S2.y-P.y); if(dd<10) crowd+=(10-dd)*0.8; });
+          const sc=Math.min(od,9)*1.3-laneRisk(own,P,theirs)*10-crowd-Math.hypot(P.x-q.x,P.y-q.y)*0.12+clamp(fwd,-4,8)*0.25; if(sc>bs){ bs=sc; best=P; } } } M.uSpots.push(best||{x:q.x,y:q.y}); });
+}
+    else if(team===0&&!(own&&own.isUser)) M.uSup=null;
     mine.forEach(pl=>{
       pl.pressing=chasers.has(pl)&&!hasBall;
       if(pl.isUser) return;
@@ -2707,6 +2714,7 @@ function updateAI(dt){
               // 침투: 공격수가 타이밍 맞춰 수비 뒤로
               if((sr==='ST'&&pl!==dropper||sr==='WF')&&ub>30&&own.role!=='GK'&&(pl.runCd||0)<M.t&&nearest(theirs,own)[1]>2.6&&Math.random()<(decide?0.1:0)){ pl.runT=M.t+1.8; pl.runCd=M.t+5; }
               if(pl.runT>M.t){ const line=secondLastY(1-team); P={x:W/2+(pl.x-W/2)*0.55,y:line+dir*9}; urgent=true; }
+              else if(own.isUser&&M.uSup&&M.uSup.includes(pl)&&M.uSpots){ const S2=M.uSpots[M.uSup.indexOf(pl)]; if(S2){ P=S2; urgent=dist(pl,S2)>4; } }
               else if(dist(pl,own)<28) P=bestSupport(pl,own,(sr==='CM'&&isNearestCM(pl,mine,own))?{x:own.x+(W/2-own.x>0?1:-1)*7,y:own.y-dir*6}:P,mine,theirs);
             }
           } else if(!inPoss){
@@ -2752,10 +2760,10 @@ function shapePoint(pl,team,inPoss,ub,bx,dropper){ // 팀 블록 안 내 자리 
   }
   u=clamp(u,3,H-3); return {x:clamp(x,2,W-2),y:team===0?H-u:u}; }
 function isNearestCM(pl,mine,own){ let best=null,bd=1e9; mine.forEach(q=>{ if(q.isUser||q===own||subRole(q)!=='CM') return; const d=dist(q,own); if(d<bd){bd=d;best=q;} }); return best===pl; }
-function bestSupport(pl,own,T0,mine,theirs){ // 받을 수 있는 각도: 상대와 멀고, 패스길 열리고, 동료와 겹치지 않는 곳
-  let best=T0,bs=-1e9; const cands=[T0]; for(let k=0;k<8;k++){ const a=k*Math.PI/4+(pl.i%2)*0.39; cands.push({x:T0.x+Math.cos(a)*4.5,y:T0.y+Math.sin(a)*4.5}); }
+function bestSupport(pl,own,T0,mine,theirs,wide){ // 받을 수 있는 각도: 상대와 멀고, 패스길 열리고, 동료와 겹치지 않는 곳
+  let best=T0,bs=-1e9; const cands=[T0]; for(let k=0;k<8;k++){ const a=k*Math.PI/4+(pl.i%2)*0.39; cands.push({x:T0.x+Math.cos(a)*4.5,y:T0.y+Math.sin(a)*4.5}); if(wide) cands.push({x:T0.x+Math.cos(a+0.39)*8,y:T0.y+Math.sin(a+0.39)*8}); }
   cands.forEach(P=>{ if(P.x<2||P.x>W-2||P.y<2||P.y>H-2) return; const [,od]=nearest(theirs,P); let crowd=0; mine.forEach(q=>{ if(q===pl) return; const d=Math.hypot(q.x-P.x,q.y-P.y); if(d<9) crowd+=(9-d)*0.6; });
-    const dO=Math.hypot(P.x-own.x,P.y-own.y); const sc=Math.min(od,8)-laneRisk(own,P,theirs)*7-crowd-Math.hypot(P.x-T0.x,P.y-T0.y)*0.25-(dO<7?(7-dO)*0.8:0); if(sc>bs){bs=sc;best=P;} });
+    const dO=Math.hypot(P.x-own.x,P.y-own.y); const sc=Math.min(od,8)-laneRisk(own,P,theirs)*(wide?10:7)-crowd-Math.hypot(P.x-T0.x,P.y-T0.y)*0.25-(dO<7?(7-dO)*0.8:0); if(sc>bs){bs=sc;best=P;} });
   return best; }
 function steer(pl,tx,ty,dt,jog){
   let dx=tx-pl.x, dy=ty-pl.y; const d=Math.hypot(dx,dy);

@@ -11,7 +11,10 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // 프롤로그: 오프닝 애니메이션 → 건너뛰기 → 고교 결승 → 스카우트 제안 → 입단 → 주전 경쟁
   { const p0=await pg.evaluate(()=>({cut:!el('screen-cut').hidden,skip:!!el('cut-skip'),stage:S.prologue&&S.prologue.stage}));
     await pg.click('#cut-skip'); await pg.waitForTimeout(500);
-    const p1=await pg.evaluate(()=>({match:!el('screen-match').hidden,pro:!!(M&&M.ev.pro),me:M&&M.me.name,bench:!!(M&&M.bench)}));
+    const pw=await pg.evaluate(()=>({warm:!!(M&&M.practice&&M.chal&&M.chal.id==='warm'),defs:M?M.players.filter(q=>q.team===1&&q.role!=='GK').length:-1,me:M&&M.me.name,mateHas:!!(M&&M.ball.owner&&M.ball.owner.team===0&&!M.ball.owner.isUser)}));
+    await pg.evaluate(()=>warmDone()); await pg.waitForTimeout(500);
+    const p1=await pg.evaluate(()=>({match:!el('screen-match').hidden,pro:!!(M&&M.ev.pro),me:M&&M.me.name,bench:!!(M&&M.bench),warmDone:S.warmDone}));
+    ok('프롤로그 워밍업: 컷신 뒤 수비 없는 연습(동료 패스 → 슛) → 결승전으로', pw.warm&&pw.defs===0&&pw.me==='칠성고'&&pw.mateHas&&p1.warmDone===true, JSON.stringify(pw));
     await pg.evaluate(()=>{ if(el('tut-go')) el('tut-go').click(); M.score=[2,1]; M.stats.goals=1; M.min=90; M.over=true; concludeMatch(); }); await pg.waitForTimeout(400);
     const p2=await pg.evaluate(()=>({pro:!el('screen-pro').hidden,offers:document.querySelectorAll('#pro-col [data-pj]').length,kr:S.prologue.offers.every(o=>CLUBS[o.club].country==='kr')}));
     await pg.click('#pro-col [data-pj="0"]'); await pg.waitForTimeout(500);
@@ -118,7 +121,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await pg.evaluate(()=>{ M.freeze=0; M.paused=false; M.players.filter(q=>q.team===1).forEach(q=>{ q.x=5; q.y=50; q.catchT=0; }); const u=M.user,b=M.ball; b.owner=null; u.x=W/2; u.y=8; b.x=W/2; b.y=1; b.vx=0; b.vy=-30; b.z=0.2; b.lastKicker=u; b.isShot=true; const m0=S.player.money; window.__m0=m0; }); await pg.waitForTimeout(1800);
     const c2=await pg.evaluate(()=>({over:M&&M.chal.over,ov:!el('m-overlay').hidden,txt:el('m-overlay').textContent,gain:S.player.money-window.__m0,cl:S.chal&&S.chal.last}));
     await pg.evaluate(()=>endPractice()); await pg.waitForTimeout(200);
-    ok('상황 도전(마지막 공격): 수비 3·타이머 HUD → 골 → 성공 오버레이 + 첫 클리어 +300만', c1.id==='last'&&c1.defs===3&&/초/.test(c1.hud)&&c2.over&&c2.ov&&/도전 성공/.test(c2.txt)&&c2.gain===300&&c2.cl===1, JSON.stringify([c1,c2])); }
+    ok('상황 도전(마지막 공격): 수비 3·타이머 HUD → 골 → 성공 오버레이 + 첫 클리어 +150만', c1.id==='last'&&c1.defs===3&&/초/.test(c1.hud)&&c2.over&&c2.ov&&/도전 성공/.test(c2.txt)&&c2.gain===150&&c2.cl===1, JSON.stringify([c1,c2])); }
   // 7) 연습장: 들어가서 슛 → 공 다시 받기 → 나와도 기록·라운드 그대로
   await pg.click('#tabs button[data-tab="home"]'); await pg.waitForTimeout(200);
   const pre=await pg.evaluate(()=>JSON.stringify({r:S.round,h:(S.history||[]).length,xp:S.player.xp,apps:S.player.career.apps}));

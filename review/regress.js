@@ -94,9 +94,12 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   await pg.evaluate(()=>{ M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; M.ball.owner=null; M.ball.x=60; M.ball.y=100; const u=M.user; u.x=34; u.y=80; u.vx=u.vy=0; input.joyActive=true; input.jx=0; input.jy=-1; });
   await pg.waitForTimeout(900); const walk=await pg.evaluate(()=>Math.hypot(M.user.vx,M.user.vy));
   await pg.dispatchEvent('#k-sprint','pointerdown',{pointerId:3}); await pg.waitForTimeout(900);
-  const run=await pg.evaluate(()=>({v:Math.hypot(M.user.vx,M.user.vy),on:M.sprinting,sta:M.sta,mp:M.mp}));
+  const run=await pg.evaluate(()=>({v:Math.hypot(M.user.vx,M.user.vy),on:M.sprinting,sta:M.sta,mp:M.mp,an:animFor(M.user).an}));
   await pg.dispatchEvent('#k-sprint','pointerup',{pointerId:3}); await pg.evaluate(()=>{ input.joyActive=false; input.jx=input.jy=0; });
-  ok('달리기 버튼: 속도 30% 이상 증가', run.on&&run.v>walk*1.3, `${walk.toFixed(1)}→${run.v.toFixed(1)}m/s`);
+  ok('달리기 버튼: 속도 30% 이상 증가 + 전력 질주 모션', run.on&&run.v>walk*1.3&&run.an==='sprint', `${walk.toFixed(1)}→${run.v.toFixed(1)}m/s ${run.an}`);
+  { const mo=await pg.evaluate(()=>{ const D8=['south','south-east','east','north-east','north','north-west','west','south-west']; const full=['field','f2','f3','f4'].every(c=>['sprint','shoot','dribble','header','trap'].every(a=>SPRITE_DATA[c][a]&&D8.every(d=>(SPRITE_DATA[c][a][d]||[]).length>=4)));
+      const u=M.user, sv={vx:u.vx,vy:u.vy,sp:M.sprinting}; const r={full}; M.sprinting=false; setOwner(u,{clean:true}); u.touchT=0; u.vx=7; u.vy=0; r.drib=animFor(u).an; M.charge={type:'shot',dur:0.4}; u.vx=0; r.charge=animFor(u).an; M.charge=null; u.shotAnimT=0.3; r.shot=animFor(u).an; u.shotAnimT=0; u.headT=0.2; r.head=animFor(u).an; u.headT=0; u.trapT=0.2; r.trap=animFor(u).an; u.trapT=0; Object.assign(u,{vx:sv.vx,vy:sv.vy}); M.sprinting=sv.sp; return r; });
+    ok('세부 모션: 4체형×8방향 (질주·슛·드리블·헤딩·트래핑) · 드리블/슛 와인드업/팔로스루/헤딩/트래핑 상태 전환', mo.full&&mo.drib==='dribble'&&mo.charge==='shoot'&&mo.shot==='shoot'&&mo.head==='header'&&mo.trap==='trap', JSON.stringify(mo)); }
   ok('체력·기력 숫자 정상(NaN 아님)·달리면 체력 감소', Number.isFinite(run.sta)&&Number.isFinite(run.mp)&&run.sta<100, `체력 ${run.sta&&run.sta.toFixed(0)} 기력 ${run.mp&&run.mp.toFixed(0)}`);
   await pg.evaluate(()=>{ M.paused=true; });
 

@@ -1,0 +1,12 @@
+const {chromium,devices}=require('playwright'); const fs=require('fs');
+const bot=fs.readFileSync('/tmp/claude-0/-home-claude/99dc0c2a-f95d-5557-84c3-47562decaedf/scratchpad/selftest/bot.js','utf8');
+(async()=>{ const b=await chromium.launch(); const pg=await (await b.newContext({...devices['iPhone 13'],viewport:{width:390,height:664}})).newPage();
+  const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
+  await pg.goto('file:///home/claude/star-player/index.html'); await pg.click('#btn-new'); await pg.waitForTimeout(500);
+  await pg.evaluate(()=>{ proSkipAll(0); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.tutSeen=true; document.getElementById('btn-go').click(); });
+  await pg.waitForTimeout(800); await pg.evaluate(()=>{ const g=document.getElementById('lu-go'); if(g) g.click(); });
+  await pg.evaluate(bot+';botStep.s=null; window.__bot=setInterval(()=>{ try{ botStep(); }catch(e){} },33); window.__an={}; window.__fr=0; (function f(){ window.__fr++; if(M){ M.players.forEach(p=>{ const a=animFor(p).an; window.__an[a]=(window.__an[a]||0)+1; }); } requestAnimationFrame(f); })();');
+  const t0=Date.now(); await pg.waitForTimeout(20000);
+  const r=await pg.evaluate(()=>({fps:Math.round(window.__fr/20),an:window.__an,min:M&&Math.round(M.min)}));
+  await pg.screenshot({path:'/tmp/claude-0/-home-claude/99dc0c2a-f95d-5557-84c3-47562decaedf/scratchpad/mo/live.png'});
+  console.log(JSON.stringify(r),errs); await b.close(); })();

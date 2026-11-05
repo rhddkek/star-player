@@ -479,6 +479,12 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:700}
 .wk-home .wk-quick .btn small{font-weight:600;color:var(--muted);font-size:.72rem;white-space:normal;line-height:1.25}@media(max-width:420px){.wk-home .wk-quick{grid-template-columns:1fr 1fr}}
 .res3{display:grid;gap:8px;margin-top:10px}.res3 .r3{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:start;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.55)}.res3 .r3 .l{font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:.02em;padding-top:2px}.res3 .r3 .b{font-size:.92rem}.res3 .r3 .b>div{margin-top:2px}.res3 .r3.n{background:rgba(255,214,90,.25)}
 .res-go #res-next{flex:1 1 100%}.res-go #res-grow,.res-go #res-skill,.res-go #res-chal{flex:1 1 45%;font-size:.86rem;padding:10px 8px}
+.pc-mini{padding:10px 12px!important}.pc-mini .pc3-r{grid-template-columns:62px 1fr auto;gap:10px}.pc-mini canvas{width:62px!important}.pc-mini .pc-name{font-size:1.15rem}.pc-mini .ovrbox{min-width:54px;padding:2px 8px 4px}.pc-mini .ovrbox b{font-size:1.6rem}
+.prep2{padding:8px 12px!important}.prep2 summary{list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:6px;cursor:pointer}.prep2 summary::-webkit-details-marker{display:none}.prep2 .label{margin-right:2px}.prep2 .prep-m{display:flex;flex-wrap:wrap;gap:6px;margin:0}.prep2 .prep-role{margin-left:auto;font-size:.78rem;color:var(--muted);font-weight:700}
+.stadium canvas{height:96px!important}
+.wk-home .wk-quick .btn{min-height:50px!important}.wk-home .wk-quick{grid-template-columns:repeat(3,1fr)!important}
+.wk-h{margin-bottom:6px}
+.wk-o.r1{display:grid;grid-template-columns:1fr 64px;gap:10px;align-items:center}.wk-o.r1 .wk-h{display:block;margin:0;text-align:left}.wk-o.r1 .wk-h *{text-align:left!important}.wk-o.r1 .wk-h>span{display:block;font-size:.84rem;margin-top:2px}.wk-o.r1 .wk-h em{display:inline;text-align:left;margin-left:4px}.wk-o.r1 .btn{padding:8px 4px;min-height:40px}
 .sk-sit.lim{background:#fff1e6;border-left-color:#e2862b;margin-top:6px;font-weight:700}
 .sk-sit{margin:10px 0 0;padding:8px 10px;border-radius:8px;background:#e6f7ef;border-left:4px solid #3cb48c;font-weight:800;font-size:.92rem;color:#14304a}
 .sk-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.sk-meta span{padding:3px 10px;border-radius:8px;background:#efe8d6;font-size:.82rem}
@@ -1188,11 +1194,11 @@ function renderHome(){
   const grid=h(`<div class="home-grid"></div>`); box.append(grid);
   const cond=Math.round(p.cond); const cw=condWord(cond);
   // ① 선수 카드 (상태만)
-  const pc=h(`<div class="card pcard2 pc3"><div class="sec">${esc(club.name)} ${starHTML(club)}<span class="pill">${divName(d.id)} ${myRank}위</span></div>
+  const pc=h(`<div class="card pcard2 pc3 pc-mini">
     <div class="pc3-r"><canvas width="168" height="150"></canvas>
       <div class="pc3-m"><div class="pc-name">${esc(p.name)}</div><div class="pos">${p.pos} · Lv.${p.level}${S.captain?' · Ⓒ 주장':''}${titleOf()?` · ${titleOf().ic} ${titleOf().name}`:''}</div>
-        <div class="pc3-c"><span style="color:#d4524a">❤</span> 컨디션 <b class="cw ${cw[1]}">${cw[0]}</b> <small class="muted">${cond}</small>${p.injury>0?` <span class="pill bad">부상 ${p.injury}주</span>`:''}</div>
-        <div class="bar m" style="margin-top:6px"><i style="width:${Math.min(100,p.xp/xpNeed(p.level)*100)}%;background:linear-gradient(90deg,#f3b43a,#ffd25a)"></i></div><small class="muted">경험치 Lv.${p.level} → ${p.level+1}</small></div>
+        <div class="pc3-c"><span style="color:#d4524a">❤</span> <b class="cw ${cw[1]}">${cw[0]}</b> <small class="muted">${cond}</small> · <small class="muted">${divName(d.id)} ${myRank}위</small>${p.injury>0?` <span class="pill bad">부상 ${p.injury}주</span>`:''}</div>
+        <div class="bar m" style="margin-top:5px" title="경험치"><i style="width:${Math.min(100,p.xp/xpNeed(p.level)*100)}%;background:linear-gradient(90deg,#f3b43a,#ffd25a)"></i></div></div>
       <div class="ovrbox"><span>OVR</span><b class="num">${ovr()}</b></div></div></div>`);
   grid.append(pc); drawLocker(pc.querySelector('canvas'),club);
   // ② 다음 경기 → 경기 준비 → 경기 시작
@@ -1203,9 +1209,9 @@ function renderHome(){
     if(ev.type!=='nat'&&S.trust==null&&isBenched()) chips.push(`<span class="pill bad">벤치 출발 · 60분 투입</span>`);
     if(S.echo&&S.echo.left>0) chips.push(`<span class="pill ${S.echo.neg?'bad':'good'}">${S.echo.neg?'감독 냉랭':'팬 응원'}</span>`);
     if(S.rival&&S.rival.club===opp.id) chips.push(`<span class="pill info">라이벌전 · ${esc(S.rival.name)}</span>`);
-    if(ev.type!=='nat'&&ensureBuddy()) chips.push(`<span class="pill ${buddyStage()>=2?'good':''}">🤝 ${esc(S.buddy.name)} · ${BUDDY_ST[buddyStage()]} ${S.buddy.chem}</span>`);
+    if(ev.type!=='nat') ensureBuddy();
     const scv=ev.type!=='nat'&&S.scout&&S.scout.visit&&CLUBS[S.scout.visit];
-    if(opp.str>ovr()+8) chips.push(`<span class="pill bad">강팀</span>`); else if(opp.str<ovr()-8) chips.push(`<span class="pill good">약팀</span>`);
+
     const du=ev.type!=='nat'?((DUTIES[p.pos]||DUTIES.FW)[tacticOf(ev.me).id]||DUTIES.FW.counter):null;
     const mode=renderHome.mode||'play';
     const benchNow=ev.type!=='nat'&&isBenched(); const MODES=[['play','일반',benchNow?'오늘은 후반 60분 교체 투입 · 보상 100%':'직접 90분 · 보상 100%'],['hl','짧게','주요 장면만 직접 · 보상 최대 85%'],['auto','자동','결과만 보기 · 보상 45%']].concat(isL?[['batch','5경기','5경기 연속 자동 · 보상 45%']]:[]);
@@ -1215,11 +1221,9 @@ function renderHome(){
         <div class="tm">${crestSVG(left,58)}<b>${esc(left.name)}</b>${left.nat?'':starHTML(left)}</div><div class="vsx">VS<small>${home?'홈 경기':'원정 경기'}</small></div><div class="tm">${crestSVG(right,58)}<b>${esc(right.name)}</b>${right.nat?'':starHTML(right)}</div></div></div>
       <div class="nm-meta">${isL?`상대 ${oppRank}위 · `:''}전력 ${opp.str} · ${tacticOf(opp).name}${v?` · 🏟 ${esc(v.name)}`:''}</div>
       ${chips.length?`<div class="row" style="justify-content:center;gap:6px;margin-top:4px">${chips.join('')}</div>`:''}
-      ${(()=>{ const st2=matchStory(ev); return st2?`<div class="story">${st2}</div>`:''; })()}
       ${scv?`<details class="scv"><summary>👀 ${esc(scv.name)} 스카우트 방문 <small class="muted">관심도 ${S.scout.f[scv.id]||0}</small></summary><div class="row" style="gap:10px;align-items:center;margin-top:6px">${por('scout',40)}<small>${divName(divOf(scv.id).id)} · ${scoutLabel(S.scout.f[scv.id]||0)} · 감독 임무 달성과 평점 7.0 이상이면 관심이 크게 오릅니다</small></div></details>`:''}
       ${ev.type!=='nat'?trustStrip():''}
-      ${du?`<div class="prep"><div class="prep-h">${por('coach',34)}<div style="min-width:0"><span class="label">경기 준비 · 오늘의 역할</span><b>${du.t}</b></div></div><div class="prep-d">${du.d}</div>
-        <div class="prep-m">${objView(dutyObjs(du)).map((o,i)=>`<span class="${i===0?'main':''}">${i===0?'⭐':'☆'} ${esc(o.t)}${o.merged?` <small>(${o.merged.n}회면 추가 보상)</small>`:''}</span>`).join('')}</div></div>`:''}
+      ${du?`<details class="prep prep2"><summary><span class="label">오늘 목표</span><span class="prep-m">${objView(dutyObjs(du)).map((o,i)=>`<span class="${i===0?'main':''}">${i===0?'⭐':'☆'} ${esc(o.t)}${o.merged?` <small>(${o.merged.n}회면 추가)</small>`:''}</span>`).join('')}</span><span class="prep-role">${du.t} ▾</span></summary><div class="prep-d">${du.d}${(()=>{ const st2=matchStory(ev); return st2?`<div class="story" style="margin-top:6px">${st2}</div>`:''; })()}</div></details>`:''}
       ${p.injury>0?`<button class="btn primary block big" style="margin-top:12px" id="btn-auto">자동 진행 · 부상 ${p.injury}주 결장</button>`:
         `<div class="segs mode4" id="sel-mode">${MODES.map(([k,t])=>`<button class="btn sm ${k===md[0]?'on':''}" data-mode="${k}">${t}</button>`).join('')}</div><div class="mode-d">${md[2]}</div><button class="btn primary block big go-btn" id="btn-go">▶ 경기 시작</button>`}
     </div>`);
@@ -1234,13 +1238,13 @@ function renderHome(){
   }
   // ③-0 이번 주 준비 (선택, 안 고르면 휴식)
   if(ev&&!S.weekAct&&p.injury<=0&&ev.type!=='nat'){ const bd=buddyOk()?S.buddy:null; const tg=trainGain(); const c0=Math.round(p.cond);
-    const wkc=h(`<div class="card wk-home"><div class="sec">이번 주 준비<span class="pill">하나만 · 안 고르면 휴식</span></div>
+    const wkc=h(`<div class="card wk-home"><div class="sec">이번 주 준비<span class="pill">안 고르면 휴식</span></div>
       <div class="wk-quick">
-        <button class="btn" data-q="train"><b>🏋 개인 훈련</b><small>게이지 +${tg} · 컨디션 ${c0} → ${Math.max(0,c0-12)}</small></button>
-        ${bd?`<button class="btn" data-q="buddy" ${bd.chem>=100?'disabled':''}><b>🤝 ${esc(josa(bd.name,'과','와'))} 연계</b><small>호흡 ${bd.chem} → ${Math.min(100,bd.chem+10)} · 컨디션 ${c0} → ${Math.max(0,c0-8)}</small></button>`:''}
-        <button class="btn" data-q="rest"><b>😴 휴식</b><small>경기 후 컨디션 +15</small></button>
-        ${(()=>{ const q=weekReq(); return q?`<button class="btn req" data-q="req"><b>📩 ${q.ic} ${esc(q.t)}</b><small>${esc(q.who)} · ${esc(q.d)}<br>${reqDesc(q)}</small></button>`:''; })()}
-      </div><small class="muted" style="display:block;margin-top:6px">요청은 거절해도 손해가 없습니다. 고른 것 하나만 적용됩니다.</small></div>`);
+        <button class="btn" data-q="train"><b>🏋 훈련</b><small>능력치 게이지 +${tg}</small></button>
+        ${bd?`<button class="btn" data-q="buddy" ${bd.chem>=100?'disabled':''}><b>🤝 연계</b><small>${esc(bd.name)} 호흡 +10</small></button>`:''}
+        <button class="btn" data-q="rest"><b>😴 휴식</b><small>컨디션 +15</small></button>
+        ${(()=>{ const q=weekReq(); return q?`<button class="btn req" data-q="req"><b>📩 ${q.ic} ${esc(q.t)}</b><small>${reqDesc(q)}</small></button>`:''; })()}
+      </div></div>`);
     wkc.addEventListener('click',e=>{ const b=e.target.closest('button[data-q]'); if(!b) return; const q=b.dataset.q; if(q==='train'){ tab='player'; renderPlayer.sub='stat'; renderHub(); setTimeout(()=>{ const t=el('wk-card'); if(t) t.scrollIntoView({behavior:'smooth',block:'center'}); },60); return; } if(doWeekAct(q)){ toast(S.weekMsg); renderHub(); } });
     grid.append(wkc); }
   // ③ 보조 행동: 훈련 · 포인트 · 연습장 (선택)
@@ -1407,7 +1411,7 @@ function trustAfterMatch(r,ev){ if(S.trust==null||ev.type==='nat'||ev.pro||r.inj
   if(r.auto) d*=0.6; d=Math.round(clamp(d,-15,18)); S.trust=clamp(S.trust+d,0,100); updStarter();
   return {d,v:S.trust,up:!was2&&S.starter,down:was2&&!S.starter}; }
 function trustStrip(){ if(S.trust==null) return ''; ensureComp(); const gu=S.guaranteed&&!S.loan; const st=!isBenched();
-  return `<div class="tstrip ${st?'on':''}"><div class="row between"><b>${st?'✅ 선발 출전':'🪑 벤치 출발 · 60분 교체 투입'}</b><span class="tv">감독 신뢰 <b>${S.trust}</b></span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${TRUST_UP}%"></u></div><small>${gu?'출전 보장 계약 · ':''}경쟁자 ${esc(S.comp.name)} (${S.comp.num}번) OVR ${S.comp.ovr} · 나 ${ovr()} — ${gu?'감독 신뢰 25 아래면 벤치':st?`감독 신뢰가 ${TRUST_DOWN} 아래로 떨어지면 벤치`:`감독 신뢰 ${TRUST_UP}을 넘기면 선발`}</small></div>`; }
+  return `<div class="tstrip ${st?'on':''}"><div class="row between"><b>${st?'✅ 선발 출전':'🪑 벤치 출발 · 60분 교체 투입'}</b><span class="tv">감독 신뢰 <b>${S.trust}</b></span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${TRUST_UP}%"></u></div><small>${gu?'출전 보장 · ':''}경쟁자 ${esc(S.comp.name)} OVR ${S.comp.ovr} · ${gu?'신뢰 25 아래면 벤치':st?`신뢰 ${TRUST_DOWN} 아래면 벤치`:`신뢰 ${TRUST_UP} 넘으면 선발`}</small></div>`; }
 function compIntroModal(){ const c=CLUBS[S.clubId], cp=ensureComp(); const st=!isBenched();
   const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card ci-card"><div class="row" style="gap:12px;align-items:center">${por('coach',64)}<div><span class="label">${esc(c.name)} 감독</span><h2 style="margin:2px 0 0">주전 경쟁 시작</h2></div>${embHTML(c,40,'margin-left:auto')}</div>
     <p class="ci-q">"${esc(S.player.name)}, 환영한다. ${st?`처음부터 선발로 쓰겠다. 하지만 ${esc(cp.name)} 선수(${cp.num}번)가 네 자리를 노린다.`:`지금 네 자리엔 ${esc(cp.name)} 선수(${cp.num}번, OVR ${cp.ovr})가 있다. 경기에서 보여줘라.`}"</p>
@@ -1473,7 +1477,7 @@ function renderPlayer(){
   // 능력치 배분
   const selK=renderPlayer.selK||'shot'; const w=OVR_W[p.pos];
   const selN=STATS.find(x=>x[0]===selK)[1], selA=pend[selK]||0, selV=p.stats[selK];
-  const card=h(`<div class="card"><div class="sec">레벨 포인트<span class="pill">레벨업마다 +4</span></div><p class="muted" style="margin:-4px 0 8px;font-size:.84rem">모은 포인트로 원하는 능력치를 직접 올립니다. +로 미리 나눈 뒤 적용하세요.</p><div id="srows"></div>
+  const card=h(`<div class="card"><div class="sec">레벨 포인트<span class="pill">레벨업마다 +4</span></div><p class="muted" style="margin:-4px 0 8px;font-size:.84rem">+로 나눈 뒤 적용하세요.</p><div id="srows"></div>
     <div class="sinfo">${icon('info',18)} <span>${selA?`<b>${selN} ${selV} → ${Math.min(99,selV+selA)}</b> · `:`<b>${selN}</b> · `}${STAT_DESC[selK]}${w[selK]?' · <b style="color:#0e7c62">포지션 주력</b>':''}</span></div>
     <div class="sapply"><button class="btn" id="pt-undo" ${used?'':'disabled'}>${icon('undo',18)} 되돌리기</button><button class="btn primary" id="pt-apply" ${used?'':'disabled'}>${used?`${used}포인트 적용 · 남은 ${left}`:'+를 눌러 배분'}</button></div></div>`);
   const rows=card.querySelector('#srows');
@@ -1495,15 +1499,15 @@ function renderPlayer(){
     renderPlayer._tc=tc; }
   // 이번 주 활동
   const cw2=condWord(p.cond); const tg=trainGain(); const tgOf=k=>(p.tg&&p.tg[k])||0; const after=c=>{ const v=Math.max(0,Math.round(p.cond)-c); const w=condWord(v); return `훈련 후 컨디션 <b>${v}</b> (${w[0]})`; }; const bd=buddyOk()?S.buddy:null;
-  const wk=h(`<div class="card" id="wk-card"><div class="sec">이번 주 활동<span class="pill">하나만 고르기</span></div>
-    <p class="muted" style="margin:-4px 0 8px;font-size:.84rem">지금 컨디션 <b style="color:var(--fg)">${Math.round(p.cond)} · ${cw2[0]}</b> — 활동은 일주일(라운드)에 한 번입니다.</p>
+  const wk=h(`<div class="card" id="wk-card"><div class="sec">이번 주 활동<span class="pill">컨디션 ${Math.round(p.cond)} · ${cw2[0]}</span></div>
+
     ${p.injury>0?`<p style="margin:0"><span class="pill bad">부상 ${p.injury}주</span> 회복 중에는 활동할 수 없습니다.</p>`:S.weekAct?`<p style="margin:0;font-size:.92rem"><span class="pill info">${S.weekAct==='rest'?'휴식':S.weekAct==='ad'?'광고 촬영':S.weekAct==='buddy'?'연계 훈련':S.weekAct==='req'?'요청':'훈련'}</span> ${esc(S.weekMsg)}</p><small class="muted">다음 경기가 끝나면 다시 고를 수 있습니다.</small>`:
-    `<div class="wk-o"><div class="wk-h"><b>🏋 개인 훈련</b><span>게이지 <b>+${tg}</b> · 100이 차면 <b>+1 확정</b></span><em>확정 성장 · 컨디션 −12 → ${after(12)}${S.trust!=null?' · 감독 신뢰 +2':''}</em></div><div class="wk-btns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${STATS.map(([k,n])=>`<button class="btn sm ${tgOf(k)+tg>=100?'primary':''}" data-tr="${k}">${n}<small>${p.stats[k]}${tgOf(k)+tg>=100?' · 다음 +1':` · ${tgOf(k)}%`}</small></button>`).join('')}</div></div>
-     ${bd?`<div class="wk-o"><div class="wk-h"><b>🤝 연계 훈련 · ${esc(bd.name)}</b><span>호흡 <b>${bd.chem} → ${Math.min(100,bd.chem+10)}</b> · ${BUDDY_ST[buddyStage(bd)]}</span><em>컨디션 −8 → ${after(8)} · 호흡이 좋을수록 원투 리턴·패스 응답이 빨라집니다${S.trust!=null?' · 감독 신뢰 +1':''}</em></div><button class="btn sm block" data-tr="buddy" ${bd.chem>=100?'disabled':''}>${bd.chem>=100?'호흡 최대':'연계 훈련하기'}</button></div>`:''}
-     <div class="wk-o"><div class="wk-h"><b>🧘 기력 수련</b><span>게이지 <b>${p.tgMp||0}% +${tg}</b> · 100이 차면 최대 기력 <b>${p.mpMax||100} → ${Math.min(200,(p.mpMax||100)+4)}</b></span><em>확정 성장 · 컨디션 −10 → ${after(10)} · 경기 중 기력은 거의 안 차니 최대치가 곧 스킬 횟수입니다</em></div><button class="btn sm block" data-tr="mp" ${(p.mpMax||100)>=200?'disabled':''}>${(p.mpMax||100)>=200?'최대치 도달 (200)':'기력 수련하기'}</button></div>
-     <div class="wk-o"><div class="wk-h"><b>😴 휴식</b><span>컨디션 <b>+15</b></span><em>다음 경기가 끝난 뒤 적용</em></div><button class="btn sm block" data-tr="rest">휴식하기</button></div>
-     ${(()=>{ const q=weekReq(); return q?`<div class="wk-o"><div class="wk-h"><b>📩 ${q.ic} ${esc(q.t)}</b><span>${reqDesc(q)}</span><em>${esc(q.who)} · ${esc(q.d)} · 거절해도 손해 없음</em></div><button class="btn sm block" data-tr="req">수락하기</button></div>`:''; })()}
-     <div class="wk-o"><div class="wk-h"><b>📸 광고 촬영</b><span><b>+${fmtMoney(adShootPay())}</b> · 명성 +${adRepGain()}</span><em>컨디션 −8 · 훈련 대신${S.trust!=null?' · 감독 신뢰 −2':''}</em></div>${p.rep>=100?`<button class="btn sm block" data-tr="ad">촬영하기 · +${fmtMoney(adShootPay())}</button>`:`<button class="btn sm block" disabled>명성 100부터 (현재 ${Math.round(p.rep)})</button>`}</div>`}</div>`);
+    `<div class="wk-o"><div class="wk-h"><b>🏋 개인 훈련</b><span>게이지 <b>+${tg}</b> · 100이 차면 <b>+1 확정</b></span><em>컨디션 −12</em></div><div class="wk-btns" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${STATS.map(([k,n])=>`<button class="btn sm ${tgOf(k)+tg>=100?'primary':''}" data-tr="${k}">${n}<small>${p.stats[k]}${tgOf(k)+tg>=100?' · 다음 +1':` · ${tgOf(k)}%`}</small></button>`).join('')}</div></div>
+     ${bd?`<div class="wk-o r1"><div class="wk-h"><b>🤝 연계 훈련 · ${esc(bd.name)}</b><span>호흡 <b>${bd.chem} → ${Math.min(100,bd.chem+10)}</b> · ${BUDDY_ST[buddyStage(bd)]}</span><em>컨디션 −8</em></div><button class="btn sm block" data-tr="buddy" ${bd.chem>=100?'disabled':''}>${bd.chem>=100?'최대':'선택'}</button></div>`:''}
+     <div class="wk-o r1"><div class="wk-h"><b>🧘 기력 수련</b><span>최대 기력 <b>${p.mpMax||100}</b> · 게이지 ${p.tgMp||0}% +${tg}</span><em>컨디션 −10</em></div><button class="btn sm block" data-tr="mp" ${(p.mpMax||100)>=200?'disabled':''}>${(p.mpMax||100)>=200?'최대':'선택'}</button></div>
+     <div class="wk-o r1"><div class="wk-h"><b>😴 휴식</b><span>컨디션 <b>+15</b> (경기 후)</span></div><button class="btn sm block" data-tr="rest">선택</button></div>
+     ${(()=>{ const q=weekReq(); return q?`<div class="wk-o r1"><div class="wk-h"><b>📩 ${q.ic} ${esc(q.t)}</b><span>${reqDesc(q)}</span><em>거절해도 손해 없음</em></div><button class="btn sm block" data-tr="req">수락</button></div>`:''; })()}
+     <div class="wk-o r1"><div class="wk-h"><b>📸 광고 촬영</b><span><b>+${fmtMoney(adShootPay())}</b> · 명성 +${adRepGain()}</span><em>컨디션 −8${S.trust!=null?' · 신뢰 −2':''}</em></div>${p.rep>=100?`<button class="btn sm block" data-tr="ad">선택</button>`:`<button class="btn sm block" disabled>명성 100부터</button>`}</div>`}</div>`);
   box.append(wk);
   wk.addEventListener('click',e=>{ const b=e.target.closest('button[data-tr]'); if(!b) return; if(doWeekAct(b.dataset.tr)){ toast(S.weekMsg); renderHub(); } });
   // 개인 훈련 (돈)
@@ -1551,7 +1555,7 @@ function renderSkill(){
   if(S.introSk==='pending'){ const G=SKILLS.filter(s=>s.lvl<=2&&!p.skills.includes(s.id)&&!s.ult).slice(0,3); if(G.length){ const gc=h(`<div class="card hi"><div class="sec">🎁 입문 스킬 선물<span class="pill acc">한 번만 · 무료</span></div><p style="margin:-2px 0 8px;font-size:.9rem">첫 레벨업 기념. 아래 중 하나를 바로 배워 다음 경기에서 써 보세요.</p><div class="list" style="gap:6px">${G.map(s=>`<button class="btn block" data-gift="${s.id}" style="justify-content:flex-start;text-align:left;gap:8px"><span class="sic" style="width:34px;height:34px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:${SK_COL[s.type]}">${pxi(s.id,26)||icon(s.id,20)}</span><span style="min-width:0"><b>${s.icon} ${s.name}</b><br><small class="muted" style="white-space:normal">${SK_EX[s.id]||s.desc.slice(0,40)}</small></span></button>`).join('')}</div></div>`);
       gc.addEventListener('click',e=>{ const b=e.target.closest('button[data-gift]'); if(!b) return; const sk2=SKILLS.find(s=>s.id===b.dataset.gift); p.skills.push(sk2.id); const empty=p.equip.findIndex((x,i)=>!x&&i<slotCount()); if(empty>=0) p.equip[empty]=sk2.id; S.introSk=sk2.id; save(); sfx('levelup'); toast(`${sk2.name} 습득!${empty>=0?` ${empty+1}번 칸에 장착`:''}`); renderSkill.sel=sk2.id; renderHub(); }); box.append(gc); } else S.introSk='none'; }
   const card=h(`<div class="card"><div class="sec">◆ 장착 스킬 (${slotCount()}칸)<span class="pill">경기 중 C·V·B·N</span></div>
-    <p class="mpinfo">⚡ 최대 기력 <b>${mpMaxOf()}</b> — 경기 중엔 거의 차지 않습니다 (골 +25 · 도움 +15 · 태클·기회 창출 +6 · 하프타임 +25). 성장 › 이번 주 활동의 <b>🧘 기력 수련</b>으로 최대치를 올리세요.</p>
+    <p class="mpinfo">⚡ 기력 <b>${mpMaxOf()}</b> · 골·도움·하프타임에 회복 · 성장 탭 <b>기력 수련</b>으로 최대치 ↑</p>
     <div class="slots4">${slots}</div>
     <div class="skl"><div><div class="ftabs">${FT.map(([k,t])=>`<button data-f="${k}" class="${F===k?'on':''}">${t}</button>`).join('')}</div>
     <div class="skgrid">${tiles||'<small class="muted">이 분류의 스킬이 없습니다</small>'}</div>${F==='all'?`<button class="btn sm block" id="sk-full" style="margin-top:8px">${renderSkill.full?'▲ 지금 쓸 수 있는 것만 보기':`🔒 전체 스킬 보기 (잠긴 ${hiddenN}개 더)`}</button>`:''}</div>
@@ -3777,7 +3781,7 @@ function draw(){
   // 화면 밖 상대 골문 방향 화살표
   { const gx=(W/2-camx)*ppm+cw/2, gy=(0-camy)*ppm+ch/2; const ux=(u.x-camx)*ppm+cw/2, uy=(u.y-camy)*ppm+ch/2;
     if(gy<60){ const ang=Math.atan2(gy-uy,gx-ux); const ax=clamp(gx,160,cw-110), ay=92; ctx.save(); ctx.translate(ax,ay); ctx.rotate(ang+Math.PI/2); ctx.fillStyle='rgba(243,180,58,.9)'; ctx.beginPath(); ctx.moveTo(0,-12); ctx.lineTo(9,6); ctx.lineTo(-9,6); ctx.closePath(); ctx.fill(); ctx.restore();
-      ctx.font='bold 11px "Noto Sans KR",sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#f3b43a'; ctx.shadowColor='#000'; ctx.shadowBlur=4; ctx.fillText('상대 골문 '+Math.round(dist(u,{x:W/2,y:0}))+'m',ax,ay+22); ctx.shadowBlur=0; } }
+      } }
   { const b=M.ball; const bx=(b.x-camx)*ppm+cw/2, by=(b.y-b.z*0.5-camy)*ppm+ch/2; const top=74, bot=ch-(ch>600?226:170), lft=10, rgt=cw-10;
     if((bx<lft||bx>rgt||by<top||by>bot)&&!M.cutin&&!M.replay){ const ex=clamp(bx,lft+14,rgt-14), ey=clamp(by,top+14,bot-14); const ang=Math.atan2(by-ey,bx-ex);
       ctx.save(); ctx.translate(ex,ey); ctx.fillStyle='rgba(8,16,28,.8)'; ctx.beginPath(); ctx.arc(0,0,12,0,7); ctx.fill(); ctx.rotate(ang); ctx.fillStyle='#ffe066'; ctx.beginPath(); ctx.moveTo(19,0); ctx.lineTo(10,-6.5); ctx.lineTo(10,6.5); ctx.closePath(); ctx.fill(); ctx.restore();
@@ -3983,7 +3987,7 @@ function buildStands(){ // 관중석·광고판을 한 번만 그려 둠 (월드
 function drawStands(ctx){ const V=M.vgfx; if(V){ const f=M.cheerT>0?((M.t*9|0)%2?2:1):((M.t*1.6|0)%2?1:0); ctx.drawImage(V.frames[f],-V.PAD,-V.PAD,W+V.PAD*2,H+V.PAD*2);
     if(V.tier>=2&&(M.cheerT>0||(M.night&&Math.random()<0.25))){ const n=M.cheerT>0?10:1; ctx.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<n;i++){ const side=Math.random()<0.5; const fx=side?(Math.random()<0.5?rnd(-V.PAD+1,-4):rnd(W+4,W+V.PAD-1)):rnd(-4,W+4), fy=side?rnd(-4,H+4):(Math.random()<0.5?rnd(-V.PAD+1,-5):rnd(H+5,H+V.PAD-1)); ctx.fillRect(fx,fy,0.35,0.35); } } return; }
   if(!STANDS){ try{ buildStands(); }catch(e){ return; } } const st=STANDS; ctx.drawImage(st.c,-st.PAD,-st.PAD,W+st.PAD*2,H+st.PAD*2); }
-function venueIntro(){ if(!M||!M.venue) return; if(M.practice){ M.introT=1.4; M.freeze=Math.max(M.freeze||0,1.4); banner('⚽ 연습장','슛·스킬 마음껏 연습 — 보상·기록 없음'); return; } M.introT=2.6; M.freeze=Math.max(M.freeze||0,2.6); banner(M.venue.name,`${M.venue.kind} · 관중 ${M.venue.att.toLocaleString()}명`); const sv=M.ev.type!=='nat'&&S.scout&&S.scout.visit&&CLUBS[S.scout.visit]; if(sv){ const chip=el('scout-chip'); chip.textContent=`👀 ${sv.name} 스카우트 관전 중`; chip.hidden=false; setTimeout(()=>{ chip.hidden=true; },25000); } }
+function venueIntro(){ if(!M||!M.venue) return; if(M.practice){ M.introT=1.4; M.freeze=Math.max(M.freeze||0,1.4); banner('⚽ 연습장','슛·스킬 마음껏 연습 — 보상·기록 없음'); return; } M.introT=2.6; M.freeze=Math.max(M.freeze||0,2.6); banner(M.venue.name,`${M.venue.kind} · 관중 ${M.venue.att.toLocaleString()}명`); const sv=M.ev.type!=='nat'&&S.scout&&S.scout.visit&&CLUBS[S.scout.visit]; if(sv){ const chip=el('scout-chip'); chip.textContent=`👀 ${sv.name} 스카우트 관전 중`; chip.hidden=false; setTimeout(()=>{ chip.hidden=true; },6000); } }
 function actHintOn(){ return !(S&&S.noActHint); }
 function actHint(){ // 지금 가장 쓸모 있는 행동 하나만
   const u=M.user, b=M.ball, has=b.owner===u; const pc=actHint.pc!=null?actHint.pc:(actHint.pc=typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches); const K=(m,k)=>pc?`${k} ${m}`:m;
@@ -4026,7 +4030,7 @@ function setupHUD(){
   const eq=S.player.equip;
   for(let i=0;i<4;i++){ const btn=el('k-s'+i); const sk=SKILLS.find(s=>s.id===eq[i]); const locked=i>=slotCount();
     btn.querySelector('span').innerHTML=(!locked&&sk&&pxi(sk.id,26))||icon(locked?'lock':sk?sk.id:'plus',20); btn.querySelector('small').textContent=locked?`Lv.${slotLockLv(i)}`:sk?(sk.short||sk.name.split(' ')[0]):'빈칸'; btn.dataset.nm=sk?(sk.short||sk.name.split(' ')[0]):'';
-    btn.classList.toggle('lock',locked||!sk); btn.classList.toggle('ult',!locked&&!!(sk&&sk.ult)); btn.disabled=locked||!sk; btn.title=sk?sk.name:''; }
+    btn.classList.toggle('lock',locked||!sk); btn.classList.toggle('ult',!locked&&!!(sk&&sk.ult)); btn.disabled=locked||!sk; btn.title=sk?sk.name:''; btn.style.display=(locked||!sk)?'none':''; }
   el('hint').textContent='왼쪽 드래그: 이동 · 달리기 버튼을 누르고 있으면 질주 (체력 소모)';
   applyBtnPrefs();
 }

@@ -112,12 +112,19 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const t2=await pg.evaluate(()=>({t:S.player.trait,m:S.player.money}));
   ok('특성: 첫 선택 무료, 변경 시 300만 차감', t1.t==='soft'&&t1.m===1000&&t2.t==='runner'&&t2.m===700, JSON.stringify([t1,t2]));
 
+  // 6b) 상황 도전: 마지막 공격 진입 → 수비 3 + 타이머 → 골 → 성공 오버레이·보상
+  { await pg.click('#tabs button[data-tab="home"]'); await pg.waitForTimeout(200); await pg.evaluate(()=>{ S.tutSeen=true; startPractice('last'); }); await pg.waitForTimeout(1500);
+    const c1=await pg.evaluate(()=>({id:M.chal&&M.chal.id,defs:M.players.filter(q=>q.team===1&&q.role!=='GK').length,hud:el('sc-t').textContent}));
+    await pg.evaluate(()=>{ M.freeze=0; M.paused=false; M.players.filter(q=>q.team===1).forEach(q=>{ q.x=5; q.y=50; q.catchT=0; }); const u=M.user,b=M.ball; b.owner=null; u.x=W/2; u.y=8; b.x=W/2; b.y=1; b.vx=0; b.vy=-30; b.z=0.2; b.lastKicker=u; b.isShot=true; const m0=S.player.money; window.__m0=m0; }); await pg.waitForTimeout(1800);
+    const c2=await pg.evaluate(()=>({over:M&&M.chal.over,ov:!el('m-overlay').hidden,txt:el('m-overlay').textContent,gain:S.player.money-window.__m0,cl:S.chal&&S.chal.last}));
+    await pg.evaluate(()=>endPractice()); await pg.waitForTimeout(200);
+    ok('상황 도전(마지막 공격): 수비 3·타이머 HUD → 골 → 성공 오버레이 + 첫 클리어 +300만', c1.id==='last'&&c1.defs===3&&/초/.test(c1.hud)&&c2.over&&c2.ov&&/도전 성공/.test(c2.txt)&&c2.gain===300&&c2.cl===1, JSON.stringify([c1,c2])); }
   // 7) 연습장: 들어가서 슛 → 공 다시 받기 → 나와도 기록·라운드 그대로
   await pg.click('#tabs button[data-tab="home"]'); await pg.waitForTimeout(200);
   const pre=await pg.evaluate(()=>JSON.stringify({r:S.round,h:(S.history||[]).length,xp:S.player.xp,apps:S.player.career.apps}));
-  await pg.click('#btn-practice'); await pg.waitForTimeout(1500);
+  await pg.click('#btn-practice'); await pg.waitForTimeout(300); const pmN=await pg.evaluate(()=>document.querySelectorAll('.hub-modal [data-pm]').length); await pg.click('.hub-modal [data-pm=free]'); await pg.waitForTimeout(1500);
   const pr1=await pg.evaluate(()=>({practice:!!(M&&M.practice),n:M.players.length,own:M.ball.owner===M.user}));
-  ok('연습장 입장: 소수 인원·내 공으로 시작', pr1.practice&&pr1.n<=6&&pr1.own, JSON.stringify(pr1));
+  ok('연습장 입장(메뉴: 자유+도전 3): 소수 인원·내 공으로 시작', pmN===4&&pr1.practice&&pr1.n<=6&&pr1.own, JSON.stringify(pr1)+' menu='+pmN);
   await pg.evaluate(()=>{ el('banner').classList.remove('show'); M.freeze=0; const u=M.user; u.x=34; u.y=16; setOwner(u); u.touchT=0; u.protT=2; input.shotHold=true; });
   await pg.waitForTimeout(400); await pg.evaluate(()=>{ input.shotRelease=true; }); await pg.waitForTimeout(4500);
   const pr2=await pg.evaluate(()=>({own:M.ball.owner===M.user,resets:M.prResets||0,shots:M.stats.shots,min:M.min,over:M.over}));

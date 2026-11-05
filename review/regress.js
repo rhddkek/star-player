@@ -242,7 +242,14 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       let got=0; for(let i=0;i<10;i++){ const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role==='MF'); q.x=20; q.y=70; u.x=40; u.y=60; u.vx=u.vy=0; M.players.forEach(z=>{ if(z.team===1){ z.x=60; z.y=100; } }); M.freeze=0; M.restart=null; M.setPiece=null; M.over=false; setOwner(q,{clean:true}); q.touchT=0; q.st={...q.st,pass:35}; passTo(q,u,{power:0.5}); for(let f=0;f<120;f++){ updateBall(1/60); updatePossession&&updatePossession(1/60); if(M.ball.owner===u){ got++; break; } } }
       r.passGot=got;
       // 원투 침투
-      const mt=M.players.find(p=>p.team===0&&!p.isUser&&p.role==='MF'); u.x=30; u.y=60; mt.x=36; mt.y=56; setOwner(u,{clean:true}); u.touchT=0; passTo(u,mt,{power:0.5}); r.gg=!!M.giveGo; setOwner(mt,{clean:true}); mt.touchT=0; u.vy=-7; u.vx=0; M.decisionT=0; M.freeze=0; M.restart=null; M.t+=0.5; updateAI(1/60); r.ggBall=!!(M.ball.passTarget===u&&M.ball.thru);
+      const mt=M.players.find(p=>p.team===0&&!p.isUser&&p.role==='MF'); u.x=30; u.y=60; mt.x=36; mt.y=56; setOwner(u,{clean:true}); u.touchT=0; passTo(u,mt,{power:0.5}); r.gg=!!M.giveGo; setOwner(mt,{clean:true}); mt.touchT=0; u.vy=-7; u.vx=0; M.decisionT=0; M.freeze=0; M.restart=null; M.t+=0.5; M.reqThru=1.5; updateAI(1/60); r.ggBall=!!(M.ball.passTarget===u&&M.ball.thru);
+      { const opp=M.players.filter(q=>q.team===1&&q.role!=='GK'), th=M.players.filter(q=>q.team===1); const save=opp.map(q=>[q.x,q.y]); const R0=Math.random; const P=(setup)=>{ setup(); let k=0; for(let i=0;i<400;i++){ M.lastGG=0; M.reqThru=0; M.request=0; if(ggDecide(mt,th).ok) k++; } return k/400; };
+        opp.forEach(q=>{ q.x=2; q.y=100; });
+        r.ggPress=P(()=>{ mt.x=36; mt.y=56; u.x=34; u.y=46; opp[0].x=37.2; opp[0].y=55; opp[1].x=36; opp[1].y=52; });
+        r.ggFree=P(()=>{ opp.forEach(q=>{ q.x=2; q.y=100; }); mt.x=36; mt.y=56; u.x=34; u.y=62; });
+        r.ggMarked=P(()=>{ opp.forEach(q=>{ q.x=2; q.y=100; }); mt.x=36; mt.y=56; u.x=34; u.y=46; opp[0].x=34.8; opp[0].y=46.5; opp[1].x=36.5; opp[1].y=53; });
+        opp.forEach(q=>{ q.x=2; q.y=100; }); mt.x=36; mt.y=56; u.x=34; u.y=46; M.reqThru=1; r.ggReq=(()=>{ let k=0; for(let i=0;i<200;i++){ M.lastGG=0; M.reqThru=1; if(ggDecide(mt,th).ok) k++; } return k/200; })(); M.reqThru=0;
+        opp.forEach((q,i)=>{ q.x=save[i][0]; q.y=save[i][1]; }); }
       // 스루 강약
       const q2=M.players.find(p=>p.team===0&&p.role==='FW'); q2.x=30; q2.y=40; q2.vx=0; q2.vy=-3; const a=thruPoint(q2,0.45), b2=thruPoint(q2,1); r.thruSpan=+Math.hypot(a.x-b2.x,a.y-b2.y).toFixed(1);
       // 스킬 연출 + 새 필살기
@@ -250,7 +257,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       M.mp=100; M.dashT=0; const ds=M.players.filter(p=>p.team===1&&p.role!=='GK').slice(0,3); ds.forEach((d,i)=>{ d.x=u.x+[2,-2,0][i]; d.y=u.y+[0,0,2][i]; d.stun=0; }); setOwner(u,{clean:true}); useSkill(1,true,0,-1); for(let f=0;f<80;f++) updateUser(1/60); r.torn=ds.filter(d=>d.stun>0.2||d.tornHit).length; r.tornBall=M.ball.owner===u; r.tornDash=M.dashT>0;
       M.mp=100; M.cds=[0,0,0,0]; u.x=34; u.y=24; setOwner(u,{clean:true}); u.touchT=0; useSkill(2,true,0,-1); r.triple=!!M.ball.triple&&!M.ball.owner;
       ambience(false); M=null; show('screen-hub'); renderHub(); return r; });
-    ok('골키퍼 정면 슛 캐치·안고 있는 동작 · 동료 패스 정확도 · 원투 침투 · 스루 강약 · 스킬 발동 연출 · 토네이도 드리블 · 분신 슛', g2.sprites&&g2.caught>=2&&g2.hold>=g2.caught-1&&g2.passGot>=8&&g2.gg&&g2.ggBall&&g2.thruSpan>=7&&g2.ban&&g2.torn>=2&&g2.tornBall&&g2.tornDash&&g2.triple, JSON.stringify(g2)); }
+    ok('골키퍼 정면 슛 캐치·안고 있는 동작 · 동료 패스 정확도 · 원투 침투(상황 판단: 압박받으면 리턴·앞이 비면 직접 전진·내가 마크당하면 안 줌·요청하면 줌) · 스루 강약 · 스킬 발동 연출 · 토네이도 드리블 · 분신 슛', g2.sprites&&g2.caught>=2&&g2.hold>=g2.caught-1&&g2.passGot>=8&&g2.gg&&g2.ggBall&&g2.ggPress>0.6&&g2.ggFree<0.15&&g2.ggMarked<0.25&&g2.ggReq>0.85&&g2.thruSpan>=7&&g2.ban&&g2.torn>=2&&g2.tornBall&&g2.tornDash&&g2.triple, JSON.stringify(g2)); }
   // 기력 한도·수련 · 만화풍 연출 · 택배 크로스 · 대지 균열
   { const mp=await pg.evaluate(()=>{ const r={}; S.player.mpMax=100; S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf);
       const u=M.user; M.mp=40; for(let f=0;f<600;f++) updateUser(1/60); r.regen10s=+(M.mp-40).toFixed(1); M.stats.goals++; updateUser(1/60); r.goalGain=Math.round(M.mp-40-r.regen10s); r.max=M.mpMax;

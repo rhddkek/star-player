@@ -2773,8 +2773,11 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
   const sp=M.setPiece; if(sp&&sp.taker===pl){ if(M.t-sp.t0<0.9) return; aiSetPiece(pl,team,mine,theirs,goal,sp); return; }
   if(pl.kickoffPassT!=null&&team===0){ pl.kickoffPassT=null; const uu=M.user; if(uu!==pl&&dist(uu,pl)<30){ passTo(pl,uu,{sure:true,power:0.5}); return; } }
   if(team===0&&pl.deliveryT>0){ pl.deliveryT=0; const air=M.ball.z>0.6||(M.t-(pl.gotT||M.t))<0.3; shoot(pl,goal.x+rnd(-2.4,2.4),goal.y,{power:0.9,hard:true,header:air,force:true}); M.ball.pHead=true; M.ball.delFin=pl.delP||1; comicPop(pl.x,pl.y-2,air?'택배 헤딩!!':'택배 발리!!','#ffe27a',true); return; }
-  if(team===0&&M.giveGo&&M.giveGo.mate===pl){ const bs=pl.buddy?(M.buddySt||0):0; if(M.t-M.giveGo.t>3.4+bs*0.8) M.giveGo=null; else if(pl.touchT<=0.05&&!M.setPiece){ const u2=M.user; const run=(-u2.vy)>(bs>=1?2.4:3.2)||M.reqThru>0; if(run&&u2.y<pl.y+8&&dist(pl,u2)<34&&!u2.sentOff){ M.giveGo=null; M.reqThru=0; pl.wallT=0; const pw=clamp(0.5+((-u2.vy)-3)/22,0.5,0.85); throughBall(pl,u2,pw); M.ball.nolook=true; feat(pl.buddy?'원투 침투! (호흡)':'원투 침투!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+1; if(pl.buddy) chemAdd('combo',3); return; } } }
-  if(pl.wallT>0){ const from=pl.wallFrom; if(from&&from.team===team){ const moving=(from.vy*(team===0?-1:1))>2.5; const laneOk=!theirs.some(q=>pointSegDist(q,pl,from)<1.2); const ahead=team===0?from.y<pl.y-1:from.y>pl.y+1; if(moving&&ahead&&laneOk&&dist(pl,from)<18&&(from.isUser||Math.random()<0.5)){ pl.wallT=0; passTo(pl,from,{sure:true,lead:0.9,power:0.5}); if(from.isUser) popup(from.x,from.y-2.4,'벽패스 리턴!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+(from.isUser?1:0); if(from.isUser&&pl.buddy) chemAdd('combo',3); return; } } }
+  if(team===0&&M.giveGo&&M.giveGo.mate===pl&&M.giveGo.dec==null&&M.ball.owner===pl){ const g=ggDecide(pl,theirs); M.giveGo.dec=g.ok; M.giveGo.why=g.why; const dg=M.dbg||(M.dbg={}); dg[g.ok?'ggYes':'ggNo']=(dg[g.ok?'ggYes':'ggNo']||0)+1; if(!g.ok){ M.giveGo.noT=M.t; pl.wallT=0; } }
+  if(team===0&&M.giveGo&&M.giveGo.mate===pl&&M.giveGo.dec===false&&M.reqThru>0){ M.giveGo.dec=true; M.giveGo.why='요청'; } /* 리턴을 직접 요청하면 들어줌 */
+  if(team===0&&M.giveGo&&M.giveGo.mate===pl&&M.giveGo.dec===false){ if(M.t-M.giveGo.t>3.4) M.giveGo=null; }
+  else if(team===0&&M.giveGo&&M.giveGo.mate===pl){ const bs=pl.buddy?(M.buddySt||0):0; if(M.t-M.giveGo.t>3.4+bs*0.8) M.giveGo=null; else if(pl.touchT<=0.05&&!M.setPiece){ const u2=M.user; const run=(-u2.vy)>(bs>=1?2.4:3.2)||M.reqThru>0; const [,uo]=nearest(theirs.filter(q=>q.role!=='GK'),u2); const tp=thruPoint(u2,0.6); if(run&&u2.y<pl.y+8&&dist(pl,u2)<34&&!u2.sentOff&&(uo>1.5||M.reqThru>0)&&(laneRisk(pl,tp,theirs)<0.6||M.reqThru>0)){ M.lastGG=M.t; M.giveGo=null; M.reqThru=0; pl.wallT=0; const pw=clamp(0.5+((-u2.vy)-3)/22,0.5,0.85); throughBall(pl,u2,pw); M.ball.nolook=true; feat(pl.buddy?'원투 침투! (호흡)':'원투 침투!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+1; if(pl.buddy) chemAdd('combo',3); return; } } }
+  if(pl.wallT>0){ const from=pl.wallFrom; if(from&&from.team===team){ const moving=(from.vy*(team===0?-1:1))>2.5; const laneOk=!theirs.some(q=>pointSegDist(q,pl,from)<1.2); const ahead=team===0?from.y<pl.y-1:from.y>pl.y+1; if(moving&&ahead&&laneOk&&dist(pl,from)<18&&(from.isUser?!!(M.giveGo&&M.giveGo.mate===pl&&M.giveGo.dec===true):Math.random()<0.5)){ if(from.isUser) M.lastGG=M.t; pl.wallT=0; passTo(pl,from,{sure:true,lead:0.9,power:0.5}); if(from.isUser) popup(from.x,from.y-2.4,'벽패스 리턴!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+(from.isUser?1:0); if(from.isUser&&pl.buddy) chemAdd('combo',3); return; } } }
   if(pl.returnT>0&&team===0&&pl.touchT>0.05) return; // 트래핑 끝나면 바로 리턴
   if(pl.returnT>0&&team===0){ const u2=M.user; const laneOk=!theirs.some(q=>pointSegDist(q,pl,u2)<1.3); if((laneOk||pl.oneTwo)&&dist(pl,u2)<32){ pl.returnT=0; const ot=pl.oneTwo; pl.oneTwo=false; passTo(pl,u2,{sure:true,lead:ot?1.15:0.8,power:ot?0.62:0.55,lift:ot&&!laneOk}); if(ot&&!M.ball.owner){ M.ball.nolook=true; M.stats.walls=(M.stats.walls||0)+1; feat('원투 완성!','#9fd0ff'); if(pl.buddy) chemAdd('combo',3); } popup(u2.x,u2.y-2.4,ot?'원투 리턴!':'리턴 패스!','#9fd0ff'); return; } }
   if(M.penalty===pl){ M.penalty=null; shoot(pl,goal.x+rnd(-3,3),goal.y,{power:0.8}); return; }
@@ -2861,6 +2864,17 @@ function aiSetPiece(pl,team,mine,theirs,goal,sp){
     let best=null,bs=-1e9; mine.forEach(q=>{ if(q===pl||q.role==='GK') return; const d=dist(q,pl); if(d<4||d>35) return; const sc=open(q)*1.4+(pl.y-q.y)*(team===0?1:-1)*0.4-d*0.1; if(sc>bs){bs=sc;best=q;} });
     if(best) passTo(pl,best,{power:0.55}); else kick(pl,0,team===0?-1:1,22,5); return; }
 }
+// 원투 리턴을 할지: 받은 동료가 상황을 보고 판단 (무조건 돌려주지 않음)
+function ggDecide(pl,theirs){ const u=M.user, opp=theirs.filter(q=>q.role!=='GK'); const [,od]=nearest(opp,pl); let s=0, why='';
+  if(od<2.6){ s+=0.4; } else if(od<4.5) s+=0.2; else { s-=0.15; }                                   // 받은 선수가 압박받으면 바로 돌려줌
+  const fwd=opp.filter(q=>q.y<pl.y&&q.y>pl.y-9&&Math.abs(q.x-pl.x)<5).length; if(!fwd&&od>4){ s-=0.3; why=why||'전진 공간'; }  // 앞이 비었으면 직접 몰고 감
+  if(u.y<pl.y-2) s+=0.15; else if(u.y>pl.y+4) s-=0.25;                                                            // 내가 앞서 있어야 의미 있음
+  const [,uo]=nearest(opp,u); if(uo>3.5) s+=0.15; else if(uo<1.8){ s-=0.5; why=why||'마크당함'; }               // 내가 마크당하면 안 줌
+  const better=M.players.find(q=>q.team===0&&q!==pl&&!q.isUser&&q.role!=='GK'&&q.y<pl.y-8&&q.y<u.y-3&&nearest(opp,q)[1]>5&&laneRisk(pl,q,theirs)<0.4); if(better){ s-=0.25; why=why||'더 좋은 동료'; }
+  if(M.reqThru>0||M.request>0) s+=0.9;                                                                             // 요청하면 거의 줌
+  if(pl.buddy) s+=0.08*(M.buddySt||0);
+  if(M.lastGG&&M.t-M.lastGG<10) s-=0.2;                                                                           // 매번 같은 패턴은 안 함
+  const p=clamp(0.3+s,0.06,0.95); const ok=Math.random()<p; return {ok,p,why:ok?'':(why||'동료 판단')}; }
 function laneRisk(from,to,theirs,vb){ // 패스 차단 위험: 공이 그 지점에 닿는 시간 vs 수비수가 뛰어오는 시간
   const dx=to.x-from.x, dy=to.y-from.y, L=Math.hypot(dx,dy)||1; const v=vb||clamp(8.5+0.85*L,9,30); const tEnd=Math.max(0.45,1-1.9/L); let r=0;
   theirs.forEach(q=>{ if(q.role==='GK'&&Math.hypot(q.x-to.x,q.y-to.y)>7) return; const t=((q.x-from.x)*dx+(q.y-from.y)*dy)/(L*L); const nd=Math.hypot(q.x-from.x,q.y-from.y);
@@ -3974,7 +3988,7 @@ function actHint(){ // 지금 가장 쓸모 있는 행동 하나만
     return {t:K('패스','Z')+' (위로 밀면 롱패스) · '+K('스루','F')+' · 달리며 돌파'}; }
   if(incomingU()){ const ot=M.oneTouch&&M.t-M.oneTouch.t<2.5?M.oneTouch:null; const nb=!S.player.career||S.player.career.apps<6; return {t:ot?(ot.type==='shot'?'원터치 슛 준비됨':'원터치 패스 준비됨'):'공 받는 중'+(nb?' · 미리 누르면 원터치':''),c:'rgba(20,90,60,.9)',pri:1}; }
   const o=b.owner;
-  if(o&&o.team===0&&M.giveGo&&M.giveGo.mate===o&&M.t-M.giveGo.t<3.4) return {t:'앞으로 달리면 원투 리턴!',c:'rgba(20,70,130,.9)'};
+  if(o&&o.team===0&&M.giveGo&&M.giveGo.mate===o&&M.t-M.giveGo.t<3.4){ if(M.giveGo.dec===true) return {t:'앞으로 달리면 원투 리턴!',c:'rgba(20,70,130,.9)'}; if(M.giveGo.dec===false) return {t:(M.giveGo.why?M.giveGo.why+' — ':'')+(actHint.pc?'F ':'')+'스루 = 리턴 요청',c:'rgba(60,60,80,.88)'}; }
   if(o&&o.team===0){ if(M.request>0) return {t:M.reqState==='ok'?'요청함 — 곧 패스 옵니다':'요청함 — 비어 있는 곳으로 움직이기'}; const lr=laneRisk(o,u,M.players.filter(q=>q.team===1)); if(lr>0.6&&dist(o,u)<35) return {t:'↔ 옆으로 움직여 패스길 열기'}; return {t:K('슛','X')+' = 패스 요청'}; }
   if(o&&o.team===1&&dist(o,u)<7) return {t:K('패스','Z')+' = 태클 (정면에서)',c:'rgba(30,50,120,.9)'};
   const newbie=!S.player.career||S.player.career.apps<6;

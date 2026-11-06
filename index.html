@@ -524,6 +524,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:700}
 .ultb{display:inline-block;font-style:normal;font-size:.62rem;font-weight:900;background:linear-gradient(135deg,#ffd54a,#ff7a1a);color:#3a1600;border-radius:4px;padding:0 4px;margin-right:4px;vertical-align:1px}
 button.ult[id^="k-s"]{box-shadow:0 0 0 2px #f3b43a,0 0 14px rgba(243,180,58,.6)}
 .eff-line{font-size:.88rem;line-height:1.35}.lg-next{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:.86rem}.lg-me-card{border-left:4px solid var(--mint,#2ee6d6)}.tr-goal .eff-line{margin-bottom:4px}
+@keyframes skpop{0%{transform:scale(.8);opacity:0}100%{transform:none;opacity:1}}.sk-un-card{max-width:360px;width:100%;text-align:center;animation:skpop .35s ease-out}.sk-un-ic{font-size:2.4rem;line-height:1}.sk-un-list{display:grid;gap:6px;margin:12px 0}.sk-un-it{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:8px;text-align:left;align-items:center;background:var(--panel2,#efe7d6);border-radius:10px;padding:8px 10px}.sk-un-e{grid-row:1/3;font-size:1.6rem;text-align:center}.sk-un-it small{font-size:.8rem}
 </style>
 
 <!-- ============ TITLE / NEW PLAYER ============ -->
@@ -2217,6 +2218,7 @@ function newspaperHTML(r,g){
       <div class="rw"><span>경험치 <b>+${g.xp}</b></span><span>명성 <b>+${g.rep}</b></span><span>수입 <b>+${fmtMoney(g.money)}</b>${g.gearPay?` <small>(장비 계약 +${fmtMoney(g.gearPay)})</small>`:''}</span>${g.lvls.length?`<span><b style="color:#1f8a4c">레벨 업! Lv.${g.lvls[g.lvls.length-1]} · 포인트 +${g.lvls.length*4}</b></span>`:''}<span>보상 ${Math.round((r.auto?0.45:r.playedMult)*100)}%${r.playedFrac!=null&&r.playedFrac<0.98?' (넘김)':''}</span></div></div></div>`}
     <div class="motm"><span>⭐ 경기 최우수 선수</span><b>${esc(motm.name)} ${motm.r.toFixed(1)}</b></div>
     <details><summary>양 팀 선수 평점 보기 (22명)</summary><div class="cols">${col(homeC,homeL,r.ga)}${col(awayC,awayL,r.gb)}</div></details></div>`; }
+function resNotes(notes){ return (notes||[]).filter(n=>!/^🏅|🏆|⬆️|⬇️|특성 해금|부상|🎁|🤝|칭호|휴식으로 처리/.test(n)).map(n=>{ let s=String(n).split(' — ')[0]; const m=s.match(/^(.*?) 관심 상승 \((\d+)→(\d+)\)/); if(m) s=`${m[1]} 관심 ${m[2]}→${m[3]}`; const m2=s.match(/^👀 (.*?) 스카우트.*\((\d+)\)$/); if(m2) s=`👀 ${m2[1]} 관심 ${m2[2]}`; return s; }).slice(0,2); }
 function renderResult(r,g){
   const p=S.player, me=r.ev.me, col=el('result-col'); col.innerHTML='';
   const pe=pressEvent(r,g); const pressLater=[];
@@ -2229,21 +2231,20 @@ function renderResult(r,g){
     <h2 style="margin:6px 0 4px;color:${res.includes('승리')?'var(--good)':res.includes('패배')?'var(--bad)':'var(--fg)'}">${res}</h2>
     <div class="row" style="justify-content:center;gap:14px">${crestHTML(me,'width:48px;height:48px')}<span class="num" style="font-size:2.8rem;line-height:1">${g.myG} - ${g.oppG}</span>${crestHTML(r.opp,'width:48px;height:48px')}</div>
     <div class="row" style="justify-content:center;gap:40px;margin-top:4px;font-size:.84rem;font-weight:800"><span>${esc(me.short||me.name)}</span><span class="muted">${esc(r.opp.short||r.opp.name)}</span></div>
-    ${g.notes.filter(n=>!/^🏅|🏆|⬆️|⬇️|특성 해금|부상|🎁|🤝|칭호/.test(n)).length?`<div class="row" style="justify-content:center;margin-top:8px">${g.notes.filter(n=>!/^🏅|🏆|⬆️|⬇️|특성 해금|부상|🎁|🤝|칭호/.test(n)).map(n=>`<span class="pill acc">${esc(n)}</span>`).join('')}</div>`:''}
+    ${(()=>{ const ns=resNotes(g.notes); return ns.length?`<div class="row" style="justify-content:center;margin-top:8px;gap:6px">${ns.map(n=>`<span class="pill acc">${esc(n)}</span>`).join('')}</div>`:''; })()}
   </div>`));
   if(g.trust&&(g.trust.up||g.trust.down)){ const cp=ensureComp(); col.append(h(`<div class="card tpromo ${g.trust.up?'up':'down'}"><div class="row" style="gap:12px;align-items:center">${por('coach',56)}<div style="min-width:0"><span class="label">${g.trust.up?'🎉 선발 확정':'⬇ 벤치로'} · 감독</span><b>${g.trust.up?`"좋아. 다음 경기부터 선발이다. ${esc(cp.name)} 대신 네가 뛴다."`:`"요즘 아쉽다. 다음 경기는 ${esc(cp.name)} 선수가 먼저 나간다. 다시 증명해라."`}</b></div></div></div>`)); }
   if(!r.injured){ const best=(()=>{ const L=[]; if(r.goals) L.push([`⚽ ${r.goals}골`,9]); if(r.assists) L.push([`🅰️ 도움 ${r.assists}개`,8]); if(r.keyPass) L.push([`🔑 기회 창출 ${r.keyPass}회`,6]); if(r.onT) L.push([`🎯 유효 슈팅 ${r.onT}회`,5]); if(r.tackles) L.push([`🛡️ 공 뺏기 ${r.tackles}회`,5]); if(r.passes>=4) L.push([`📐 패스 ${r.passOk}/${r.passes} 성공`,r.passOk/r.passes>0.8?4:2]); if(r.touches) L.push([`👟 터치 ${r.touches}회`,1]); return L.sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]); })();
     const nxt=nextEvent(); const story=nxt?matchStory(nxt):''; const benchNext=nxt&&nxt.type!=='nat'&&isBenched();
-    const nextLine=nxt?`${esc(nxt.home?'홈':'원정')} vs ${esc(nxt.opp.name)}${story?` · ${story}`:benchNext?(S.trust!=null?` · 벤치 출발 예정 — 감독 신뢰 ${S.trust}/${TRUST_UP}`:' · 벤치 출발 예정 — 평점을 올려야 선발로 돌아갑니다'):' · 선발 출전 예정'}`:'시즌 마무리';
+    const nextLine=nxt?`${esc(nxt.home?'홈':'원정')} vs ${esc(nxt.opp.short||nxt.opp.name)} · ${benchNext?(S.trust!=null?`벤치 출발 (선발까지 신뢰 ${Math.max(0,TRUST_UP-S.trust)})`:'벤치 출발'):'선발'}`:'시즌 마무리';
     const lvUp=g.lvls&&g.lvls.length;
     // ② 달라진 것 — 오늘 경기로 실제로 바뀐 것만
     const chg=[]; if(g.buddy&&g.buddy.first) chg.push(`🤝 <b>${esc(josa(g.buddy.name,'과','와'))}</b> 첫 합작골`); if(g.buddy&&g.buddy.up) chg.push(`🤝 ${esc(g.buddy.name)} · <b>${BUDDY_ST[g.buddy.st1]}</b> 달성 (호흡 ${g.buddy.v})`); else if(g.buddy&&g.buddy.d>0) chg.push(`🤝 ${esc(g.buddy.name)} 호흡 +${g.buddy.d} → ${g.buddy.v}`);
     (g.titles||[]).forEach(t=>chg.push(`${t.ic} 칭호 <b>${t.name}</b> 획득`));
-    if(g.trust&&g.trust.up) chg.push('🎉 다음 경기부터 <b>선발</b>'); else if(g.trust&&g.trust.down) chg.push('⬇ 다음 경기는 <b>벤치</b>에서 출발'); else if(g.trust&&g.trust.d) chg.push(`감독 신뢰 ${g.trust.d>0?'+':''}${g.trust.d} → ${g.trust.v}${S.starter===false&&S.trust!=null?` (선발까지 ${Math.max(0,TRUST_UP-S.trust)})`:''}`);
-    if(lvUp){ const nl=g.lvls[g.lvls.length-1]; const unl=SKILLS.filter(s=>s.lvl===nl&&!p.skills.includes(s.id)); chg.push(`⬆ <b>Lv.${nl}</b> · 포인트 +${g.lvls.length*4}${unl.length?` · ${unl.map(s=>s.icon+' '+s.name).join(', ')} 레벨 조건 달성${unl.some(s=>p.money>=s.price)?' (지금 습득 가능)':''}`:''}`); }
-    if(S.introSk==='pending') chg.push('🎁 <b>입문 스킬 선물</b> — 스킬 탭에서 하나를 무료로 고르세요');
+    if(g.trust&&(g.trust.up||g.trust.down)){} /* 감독 카드에서 이미 보여 줌 */ else if(g.trust&&g.trust.d) chg.push(`🧑‍💼 감독 신뢰 ${g.trust.d>0?'+':''}${g.trust.d} → ${g.trust.v}`);
+    if(lvUp){ const nl=g.lvls[g.lvls.length-1]; chg.push(`⬆ <b>Lv.${nl}</b> · 포인트 +${g.lvls.length*4}`); }
     (g.notes||[]).filter(n=>/^🏅|🏆|⬆️|⬇️|특성 해금|부상/.test(n)).forEach(n=>chg.push(esc(n)));
-    const goals=nextGoals(2);
+    const goals=nextGoals(3).filter(x=>!/습득 가능|첫 선발까지/.test(x)).slice(0,1); chg.splice(3);
     col.append(h(`<div class="card hi"><div class="row between"><div><span class="label">내 평점</span><div class="num" style="font-size:2.4rem;line-height:1;color:${ratingColor(r.rating)}">${r.rating.toFixed(1)}</div></div><div class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end"><span class="pill">경험치 +${g.xp}</span><span class="pill">명성 +${g.rep}</span><span class="pill acc">+${fmtMoney(g.money)}</span>${g.endoPay?`<span class="pill">광고 +${fmtMoney(g.endoPay)}</span>`:''}</div></div>
       <div class="res3">
         <div class="r3"><span class="l">오늘 한 일</span><div class="b">${best.map(b2=>`<div><b>${b2}</b></div>`).join('')||((r.touches||0)<6?'<span>오늘은 공을 받는 기회가 적었습니다.<br><small class="muted">다음 경기에는 동료 가까이에서 패스를 요청해 보세요 (동료 공일 때 슛 버튼).</small></span>':'<span class="muted">눈에 띄는 장면은 없었지만 꾸준함이 쌓이는 중</span>')}${r.objRes?`<div class="row" style="margin-top:4px;gap:4px;flex-wrap:wrap">${objPills(r.objRes)}</div>`:''}</div></div>
@@ -2274,14 +2275,21 @@ function renderResult(r,g){
   pressLater.forEach(x=>col.append(x));
   const hasPts=S.player.points>0;
   const af=S.introSk==='pending'?null:SKILLS.filter(s=>!s.ult&&!p.skills.includes(s.id)&&s.lvl<=p.level&&p.money>=s.price)[0]; const rc=(r.ev.type!=='nat'&&nextEvent())?recChal(r):null;
-  const b=h(`<div class="res-go"><button class="btn primary" id="res-next">다음 경기 준비</button>${hasPts?`<button class="btn" id="res-grow">⬆ 성장하기 (포인트 ${S.player.points})</button>`:''}${af?`<button class="btn" id="res-skill">${af.icon} ${esc(af.name)} 습득하러 가기</button>`:S.introSk==='pending'?`<button class="btn" id="res-skill">🎁 입문 스킬 고르기</button>`:''}${rc?`<button class="btn" id="res-chal">${rc.ic} 연습장 · ${rc.name} 도전${chalCleared(rc.id)?'':' (첫 클리어 +'+fmtMoney(rc.rew)+')'}</button>`:''}</div>`);
+  const b=h(`<div class="res-go"><button class="btn primary" id="res-next">다음 경기 준비</button>${hasPts?`<button class="btn" id="res-grow">⬆ 성장하기 (포인트 ${S.player.points})</button>`:''}${af?`<button class="btn" id="res-skill">${af.icon} ${esc(af.name)} 습득하러 가기</button>`:S.introSk==='pending'?`<button class="btn" id="res-skill">🎁 입문 스킬 고르기</button>`:''}${rc&&!(hasPts&&(af||S.introSk==='pending'))?`<button class="btn" id="res-chal">${rc.ic} 연습장 · ${rc.name} 도전${chalCleared(rc.id)?'':' (첫 클리어 +'+fmtMoney(rc.rew)+')'}</button>`:''}</div>`);
   const go=(t)=>{ show('screen-hub'); if(r.ev.type==='nat'&&!myFixture()&&!S.pendingNat){ endSeason(); return; } tab=t||(S.offers.length?'transfer':'home'); if(t==='player') renderPlayer.sub='stat'; if(t==='skill'&&af){ renderSkill.sel=af.id; } renderHub(); };
   if(!af&&S.introSk==='pending'){ /* 선물 버튼 */ }
   b.querySelector('#res-next').addEventListener('click',()=>go()); const gb=b.querySelector('#res-grow'); if(gb) gb.addEventListener('click',()=>go('player'));
   const sb=b.querySelector('#res-skill'); if(sb) sb.addEventListener('click',()=>go('skill')); const cb=b.querySelector('#res-chal'); if(cb) cb.addEventListener('click',()=>{ go(); startPractice(rc.id); });
   col.append(b);
   show('screen-result');
+  { const gained=(g.lvls||[]); const unl=gained.length?SKILLS.filter(s=>!s.ult&&!p.skills.includes(s.id)&&gained.includes(s.lvl)):[]; if(unl.length&&!r.injured) setTimeout(()=>skillUnlockPop(unl,gained[gained.length-1],id=>{ if(id) renderSkill.sel=id; go('skill'); }),450); }
 }
+function skillUnlockPop(list,lv,onGo){ document.querySelectorAll('.sk-unlock').forEach(m=>m.remove()); const p=S.player; const buy=list.find(s=>p.money>=s.price);
+  const m=h(`<div class="hub-modal sk-unlock"><div class="card sk-un-card"><div class="sk-un-ic">🔓</div><h2 style="margin:2px 0">새 스킬 해금!</h2><small class="muted">Lv.${lv} 달성</small>
+    <div class="sk-un-list">${list.slice(0,4).map(s=>`<div class="sk-un-it"><span class="sk-un-e">${s.icon}</span><b>${esc(s.name)}</b><small>${p.money>=s.price?`<span style="color:var(--good)">지금 습득 가능</span> · ${fmtMoney(s.price)}`:`${fmtMoney(s.price-p.money)} 더 모으면`}</small></div>`).join('')}</div>
+    <button class="btn primary block" data-go="1">${buy?`${buy.icon} ${esc(buy.name)} 보러 가기`:'스킬 보러 가기'}</button><button class="btn ghost block" data-x="1" style="margin-top:6px">나중에</button></div></div>`);
+  m.addEventListener('click',e=>{ if(e.target.closest('[data-go]')){ m.remove(); onGo(buy?buy.id:list[0].id); } else if(e.target.closest('[data-x]')||e.target===m) m.remove(); });
+  document.body.append(m); sfx&&sfx('whistle'); return m; }
 
 /* ---------- 픽셀랩 선수 스프라이트 ---------- */
 /* SPRITE_DATA = { field:{ run:{south:[dataURL...], ...}, idle, kick, slide, stun, celebrate }, gk:{ idle, dive } }  비어 있으면 원형 말로 그림 */
@@ -2618,9 +2626,9 @@ function kickoff(team){
   setOwner(fw,{clean:true}); if(team===0&&!fw.isUser){ fw.kickoffPassT=M.t; } M.freeze=1.0; M.state='play'; sfx('whistle');
   if(M.t===0&&!M.bench){ const tn=TACTICS.find(t=>t.id===M.tactic[1]); banner('킥오프',`상대 ${M.opp.short}: ${tn.name} — ${tn.desc}`); }
 }
-function setOwner(pl,opts={}){ const b=M.ball; b.knock=null; b.longP=b.split=b.laser=b.curlP=false; b.curlTo=null; b.thunder=b.meteor=b.bike=false; b.knuckle=b.flick=b.nolook=b.pHead=b.lift=b.triple=b.delivery=false; const inSp=b.speedAtTake||0; b.owner=pl; if(pl){ pl.protT=pl.isUser?0.8:0.45; pl.gotT=M.t; } if(pl&&pl.team===1&&M.recv){ if(M.t-M.recv.t<1.2){ M.stats.quickLoss=(M.stats.quickLoss||0)+1; } M.recv=null; } if(pl&&pl.team===0&&!pl.isUser&&M.recv&&M.t-M.recv.t>0.3) M.recv=null; // 잡은 직후 잠깐은 뺏기지 않음
+function setOwner(pl,opts={}){ const b=M.ball; b.knock=null; b.longP=b.split=b.laser=b.curlP=false; b.curlTo=null; b.thunder=b.meteor=b.bike=false; b.knuckle=b.flick=b.nolook=b.pHead=b.lift=b.triple=b.delivery=false; const inSp=b.speedAtTake||0; if(pl&&pl.role==='GK'&&b.lastKicker&&b.lastKicker.team!==pl.team&&!M.setPiece){ const hd=rnd(1.3,2.1); pl.gkHoldUntil=M.t+hd; pl.catchT=Math.max(pl.catchT||0,0.5); if(!M.practice) popup(pl.x,pl.y-1.9,'잡았다!','#fff'); } b.owner=pl; if(pl){ pl.protT=pl.isUser?0.8:0.45; pl.gotT=M.t; if(pl.gkHoldUntil>M.t) pl.protT=pl.gkHoldUntil-M.t+0.2; } if(pl&&pl.team===1&&M.recv){ if(M.t-M.recv.t<1.2){ M.stats.quickLoss=(M.stats.quickLoss||0)+1; } M.recv=null; } if(pl&&pl.team===0&&!pl.isUser&&M.recv&&M.t-M.recv.t>0.3) M.recv=null; // 잡은 직후 잠깐은 뺏기지 않음
   b.vx=b.vy=b.vz=0; b.z=0; b.curve=0; b.fire=false; b.saveChecked=false; b.passTarget=null; if(pl){ pl.recvFrom=(b.lastKicker&&b.lastKicker!==pl&&b.lastKicker.team===pl.team)?b.lastKicker:null; pl.composeT=null; b.lastKicker=pl; }
-  if(pl&&!opts.clean&&pl.role!=='GK'){ const ctl=pl.isUser?ustat('ctrl'):pl.st.ctrl; const t=clamp((inSp-8)/30,0,1)*(1.15-ctl/100)*0.5*(pl.isUser&&trait('soft')?0.45:1); pl.touchT=t; pl.touchDrift=t>0.12?{x:b.driftX||0,y:b.driftY||0}:null; if(inSp>5) pl.trapT=0.34; } }
+  if(pl&&!opts.clean&&pl.role!=='GK'){ const ctl=pl.isUser?ustat('ctrl'):pl.st.ctrl; const t=clamp((inSp-11)/36,0,1)*(1.15-ctl/100)*0.5*(pl.isUser&&trait('soft')?0.45:1); pl.touchT=t; pl.touchDrift=t>0.12?{x:b.driftX||0,y:b.driftY||0}:null; if(inSp>5) pl.trapT=0.34; } }
 function dist(a,b){ const dx=a.x-b.x,dy=a.y-b.y; return Math.hypot(dx,dy); }
 function goalOf(team){ return {x:W/2,y:team===0?0:H}; } // 공격 목표 골
 function nearest(list,pt){ let best=null,bd=1e9; list.forEach(p=>{ const d=dist(p,pt); if(d<bd){bd=d;best=p;} }); return [best,bd]; }
@@ -2647,7 +2655,7 @@ function passTo(pl,target,opts={}){
   const air=opts.air||pw>0.8||opts.long; let vz=air?6+pw*3:0; const lift=!!opts.lift&&!air&&!opts.cross;
   // 땅볼: 도착 속도(6~12m/s)가 남도록 구름 저항(초당 0.85)만큼 더 세게 / 로빙: 체공 시간에 맞춘 속도
   const fr=M.weather==='rain'?0.55:0.85;
-  let sp=air?clamp(d/(2*vz/22)*0.85,10,30):clamp(5.5+pw*6+fr*d,9,30); if(target.isUser&&!pl.isUser&&!air) sp=Math.min(32,sp*1.22);
+  let sp=air?clamp(d/(2*vz/22)*0.85,10,30):clamp(6.8+pw*7+fr*d*1.04,11,32); if(target.isUser&&!pl.isUser&&!air) sp=Math.min(33,sp*1.18);
   if(lift){ vz=clamp(6.5+d*0.07,7,8.6); sp=clamp(d/(2*vz/22)*0.86,9,26); }
   let LT=null, lAng=null; if(air&&!opts.cross&&!lift){ LT=clamp(0.62+d*0.023,0.9,1.95); const lx=target.x+target.vx*LT*0.65, ly=target.y+target.vy*LT*0.65; const dl=Math.hypot(lx-pl.x,ly-pl.y); const k=loftKick(LT,dl); vz=k.vz; sp=k.sp*(1+rnd(-1,1)*(1-acc/100)*(opts.sure?0.03:0.1)); lAng=Math.atan2(ly-pl.y,lx-pl.x)+rnd(-err,err)*0.6; }
   let curlA=0, curlC=0, curlT=null; if(opts.curl&&!air&&!lift&&!opts.cross){ const nx=-Math.sin(ang); const sd=Math.sign(nx*opts.curl)||(Math.abs(nx)<0.2?opts.curl:1); curlA=sd*0.42; sp=Math.min(32,sp*1.07); curlT=3; }
@@ -2702,16 +2710,17 @@ function updateAI(dt){
     const tacT=M.tactic[team]; const gpI=GP_I[tacT]!=null?GP_I[tacT]:0.5; // 전술별 압박 강도
     const counterPress=M.t-M.lostT[team]<2+gpI*3; // 게겐프레싱: 공 잃은 직후 2~5초
     const trap=!!own&&!hasBall&&Math.abs(own.x-W/2)>W/2-8; // 측면 함정: 터치라인 쪽이면 한 명 더
-    let nPress=own===null?1:hasBall?0:Math.min(3,1+(tacT==='press'||counterPress?1:0)+(counterPress&&gpI>=0.7?1:0)+(trap?1:0))+(team===0&&!userHelps?1:0); // 내 선수가 수비에 안 붙으면 동료가 한 명 더 압박
+    const ubB=team===0?H-b.y:b.y; // 우리 골문에서 공까지 거리
+    let nPress=own===null?1:hasBall?0:Math.min(2,1+((counterPress&&gpI>=0.45)||trap||(tacT==='press'&&ubB>H*0.55)||ubB<H*0.5?1:0)); // 우리 진영에선 압박+협력 2명 // 압박은 1명, 상황이 맞을 때만 2명 — 나머지는 블록 유지
     M.gegen=M.gegen||[0,0]; M.gegen[team]=counterPress&&!!own&&!hasBall?1:0;
     if(own===null&&team===0&&!M.sentOff&&tta(M.user)<tta(sorted[0]||M.user)*0.8&&!(M.helpPress>0)) nPress=0; // 내가 더 가까우면 맡김
     const chasers=new Set(sorted.slice(0,Math.max(0,nPress)));
     if(team===0&&M.helpPress>0&&M.helper&&ownTeam!==0&&!M.helper.isUser) chasers.add(M.helper); // 협력 압박
     const coverP=!hasBall&&own?sorted.find(q=>!chasers.has(q)):null; // 커버: 공과 골 사이
     const laneBlock=new Map(); // 패스길 차단: 공 가진 상대의 가까운 패스 대상 앞을 막음
-    if(!hasBall&&own&&own.team!==team){ const nB=own.isUser?(counterPress?2:1):(counterPress?3:2); const opts=theirs.filter(q=>q!==own&&q.role!=='GK'&&dist(q,own)>4&&dist(q,own)<24).sort((a,c)=>((a.y-ownGoal.y)**2+(a.x-ownGoal.x)**2)*0.002+dist(a,own)-(((c.y-ownGoal.y)**2+(c.x-ownGoal.x)**2)*0.002+dist(c,own))).slice(0,nB);
+    if(!hasBall&&own&&own.team!==team){ const nB=counterPress&&!own.isUser?2:1; const opts=theirs.filter(q=>q!==own&&q.role!=='GK'&&dist(q,own)>4&&dist(q,own)<24).sort((a,c)=>((a.y-ownGoal.y)**2+(a.x-ownGoal.x)**2)*0.002+dist(a,own)-(((c.y-ownGoal.y)**2+(c.x-ownGoal.x)**2)*0.002+dist(c,own))).slice(0,nB);
       const free=field.filter(q=>!chasers.has(q)&&q!==coverP&&subRole(q)!=='CB');
-      opts.forEach(o2=>{ let best=null,bd=1e9; free.forEach(q=>{ if(laneBlock.has(q)) return; const t=0.55; const P={x:own.x+(o2.x-own.x)*t,y:own.y+(o2.y-own.y)*t}; const d=Math.hypot(q.x-P.x,q.y-P.y); if(d<bd&&d<16){ bd=d; best=[q,P]; } }); if(best) laneBlock.set(best[0],best[1]); }); }
+      opts.forEach(o2=>{ let best=null,bd=1e9; free.forEach(q=>{ if(laneBlock.has(q)) return; const t=0.55; const P={x:own.x+(o2.x-own.x)*t,y:own.y+(o2.y-own.y)*t}; const d=Math.hypot(q.x-P.x,q.y-P.y); if(d<bd&&d<11){ bd=d; best=[q,P]; } }); if(best) laneBlock.set(best[0],best[1]); }); }
     M.hiLine=M.hiLine||[0,0]; M.hiLine[team]=counterPress&&!hasBall?gpI:0;
     const inPoss=hasBall||(own===null&&b.lastKicker&&b.lastKicker.team===team);
     const ub=team===0?H-b.y:b.y;
@@ -2738,7 +2747,7 @@ function updateAI(dt){
       else if(own===null&&chasers.has(pl)){ if(b.z>1.5||b.vz>3){ const L=landPt(b); tx=L.x; ty=L.y; } else { const lead=clamp(dist(pl,b)/12,0.15,0.6); tx=b.x+b.vx*lead; ty=b.y+b.vy*lead; } pl.chase=true; jog=false; }
       else if(!inPoss&&own&&chasers.has(pl)){ tx=own.x+own.vx*0.2; ty=own.y+own.vy*0.2; jog=false; }
       else if(!inPoss&&own&&laneBlock.has(pl)){ const P=laneBlock.get(pl); tx=P.x; ty=P.y; jog=false; }
-      else if(!inPoss&&own&&pl===coverP&&dist(pl,own)<22){ const gx=ownGoal.x-own.x, gy=ownGoal.y-own.y, gl=Math.hypot(gx,gy)||1; tx=own.x+gx/gl*6; ty=own.y+gy/gl*6; jog=false; }
+      else if(!inPoss&&own&&pl===coverP&&dist(pl,own)<16){ const gx=ownGoal.x-own.x, gy=ownGoal.y-own.y, gl=Math.hypot(gx,gy)||1; tx=own.x+gx/gl*6; ty=own.y+gy/gl*6; jog=false; }
       else if(pl.thruT>0&&pl.thruP&&own!==pl){ pl.thruT-=dt; tx=pl.thruP.x; ty=pl.thruP.y; jog=false; }
       else {
         if(decide||!pl.ai.shapeT||M.t-pl.ai.shapeT>0.3){ pl.ai.shapeT=M.t;
@@ -2882,7 +2891,7 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
     if(q.isUser) sc+=3+(M.t-(M.lastUserTouchT||0)>10?3:0);
     if(sc>bs){bs=sc;best=q;best._risk=risk;} });
   const bRisk=best?best._risk:9;
-  const wantPass=pressured||stale||Math.random()<(tac==='poss'?0.1:0.07)||pl.role==='GK'||(!spaceAhead&&Math.random()<0.25);
+  const wantPass=pressured||stale||Math.random()<(tac==='poss'?0.1:0.07)||pl.role==='GK'||(!spaceAhead&&Math.random()<0.25)||(best&&bs>9&&bRisk<0.3&&Math.random()<(tac==='poss'?0.45:0.32))||(held2>1.4&&Math.random()<0.25); // 좋은 패스길이 열리면 끌지 않고 바로 연결
   M.thruCd=M.thruCd||[0,0]; if(best&&!best.isUser&&best.role==='FW'&&(best.vy*dir)>2.5&&M.t>M.thruCd[team]&&Math.random()<0.3){ M.thruCd[team]=M.t+7; const P=thruPoint(best,0.55); const [,po]=nearest(theirs.filter(q=>q.role!=='GK'),P); if(po>3.5&&laneRisk(pl,P,theirs)<0.45){ throughBall(pl,best,0.55); return; } } // 침투하는 공격수에게 스루
   const doPass=(t)=>{ const tv=Math.hypot(t.vx,t.vy), running=tv>4&&(t.vy*dir)>1.5; const d=dist(pl,t);
     // 3자 연계 예약: 짧은 패스를 받는 동료가 침투 공격수에게 원터치로 넘겨주게
@@ -2938,6 +2947,7 @@ function gkAI(pl,team,dt,decide){
   const b=M.ball; const gy=team===0?H-1.5:1.5; const own=b.owner;
   if(own===pl){ // 골킥/패스
     if(M.setPiece&&M.setPiece.taker===pl&&M.t-M.setPiece.t0<0.9) return;
+    if(pl.gkHoldUntil>M.t){ pl.vx*=0.8; pl.vy*=0.8; return; } // 잡은 공은 1~2초 품에 안고 있다가 배급
     if(decide){ const mine=M.players.filter(p=>p.team===team&&p.role!=='GK'); const theirs=M.players.filter(p=>p.team!==team); let best=null,bs=-1e9;
       mine.forEach(q=>{ const d=dist(q,pl); if(d<8||d>48) return; const [,od]=nearest(theirs,q); const risk=laneRisk(pl,q,theirs); let sc=od*1.5-risk*14-Math.abs(d-22)*0.12+(q.isUser&&team===0?2:0); if(sc>bs){bs=sc;best=q;} });
       if(best&&bs>3){ passTo(pl,best,{air:dist(best,pl)>26,power:dist(best,pl)>26?0.8:0.55,sure:true}); return; }
@@ -3300,7 +3310,7 @@ function updateBall(dt){
 function gkSave(gk,b,sp){ if(b.lastKicker&&b.lastKicker.isUser) prShotDone('유효 — 선방'); // 선방 결과: 잡기 / 옆으로 쳐내기 / 펀칭 / 골대 밖으로 쳐내 코너
   const out=gk.team===0?-1:1; const gkv=gk.st.gk||60; const special=b.fire||b.thunder||b.meteor||b.bike||b.knuckle||b.pHead||b.triple;
   const reachX=Math.abs(b.x-gk.x); const high=b.z>1.55;
-  const pc=clamp(0.8-(sp-15)/24+(gkv-60)/130-(special?0.35:0)-(high?0.14:0)-(reachX>1.1?0.2:0)-(b.finesse?0.1:0)+(gk.catchT>0?0.24:0),0.06,0.93);
+  const pc=clamp(0.92-(sp-15)/24+(gkv-60)/130-(special?0.35:0)-(high?0.14:0)-(reachX>1.1?0.2:0)-(b.finesse?0.1:0)+(gk.catchT>0?0.24:0),0.06,0.93);
   playFx('impact',b.x,b.y-b.z*0.5,{size:2.2}); sfx('save'); if(!(gk.catchT>0)) gk.diveDir=b.x<gk.x?'west':'east';
   if(Math.random()<pc){ setOwner(gk); popup(gk.x,gk.y-1.5,'캐치!','#fff'); M.freeze=0.2; M.lastSave='catch'; return; }
   b.fire=b.thunder=b.meteor=b.bike=b.knuckle=b.pHead=b.finesse=b.hard=b.chipLob=b.thru=b.flick=b.nolook=b.triple=false; b.curve=0; b.passTarget=null; b.offside=null; b.lastKicker=gk; b.saveChecked=true; b.owner=null; gk.kickCd=0.8; M.slow=Math.max(M.slow||0,0.22);
@@ -4230,16 +4240,16 @@ function proOffers(r){ const sc=(r.rating||6)+(r.goals||0)*0.5+(r.assists||0)*0.
   if(sc>=6.2) L.push(mk(pick(k1,0,0.45),130,'1부',42));
   if(sc>=7.0) L.push(mk(pick(k1,0.6,1),170,'1부 명문',36));
   return L; }
-const PRO_TAG={'출전 기회':['빨리 뛰며 배우는 길','작은 팀 · 바로 선발 · 주급은 낮음'],'2부 상위':['주전 경쟁의 길','더 강한 팀 · 벤치에서 시작 · 주급 높음'],'1부':['큰 무대의 길','1부 리그 · 벤치 경쟁이 치열 · 주급 높음'],'1부 명문':['명문의 길','최고 무대 · 선발까지 오래 걸림 · 최고 주급']};
+const PRO_TAG={'출전 기회':['빨리 뛰며 배우는 길','작은 팀 · 주급은 낮음'],'2부 상위':['주전 경쟁의 길','더 강한 팀 · 주급 높음'],'1부':['큰 무대의 길','1부 리그 · 경쟁 치열'],'1부 명문':['명문의 길','최고 무대 · 최고 주급']};
 function proFinish(r){ const p=S.player; const my=r.home?r.ga:r.gb, op=r.home?r.gb:r.ga; const pk=my===op; const win=my>op||(pk&&Math.random()<0.5);
   p.xp+=Math.round(20+r.rating*4); p.rep+=Math.round(10+Math.max(0,r.rating-6)*15+(r.goals||0)*8);
   S.prologue={stage:'offers',r:{my,op,win,pk,rating:+r.rating.toFixed(1),goals:r.goals||0,assists:r.assists||0},offers:proOffers(r)}; S.tutSeen=true; save(); showProOffers(); }
 function showProOffers(){ const P=S.prologue, R=P.r; const col=el('pro-col'); show('screen-pro');
   col.innerHTML=`<div class="card pro-res"><span class="label">전국 고교대회 결승 · 경기 종료</span><h2>${R.win?'🏆 우승!':'준우승'}</h2><div class="pro-sc"><span>칠성고</span><b class="num">${R.my} - ${R.op}</b><span>서진고</span></div>${R.pk?`<small class="muted">승부차기 ${R.win?'승리':'패배'}</small>`:''}<div style="margin-top:6px">내 평점 <b style="color:${ratingColor(R.rating)}">${R.rating.toFixed(1)}</b>${R.goals?` · ⚽ ${R.goals}골`:''}${R.assists?` · 🅰️ 도움 ${R.assists}`:''}</div></div>
-    <div class="pro-h">👀 결승을 지켜본 스카우트 ${P.offers.length}곳이 연락해 왔습니다<small>입단할 팀을 고르세요. 작은 팀은 바로 뛰고, 큰 팀은 벤치에서 증명해야 합니다.</small></div>
-    ${P.offers.map((o,i)=>{ const c=CLUBS[o.club]; const role=roleAt(c); const pb0=clamp(Math.round(((R.rating||6.5)-6.5)*6)+(R.goals||0)*3,0,12); const st=o.trust0+pb0>=TRUST_UP; return `<div class="card pro-o" style="animation-delay:${0.25+i*0.3}s"><div class="row" style="gap:10px;align-items:center">${embHTML(c,44)}<div style="flex:1;min-width:0"><b style="font-size:1.05rem">${esc(c.name)}</b><br><small class="muted">${divName(divOf(c.id).id)} · 전력 ${c.str}</small></div><span class="pill ${st?'good':''}">${st?'바로 선발':'벤치 시작'}</span></div>
+    <div class="pro-h">👀 결승을 지켜본 스카우트 ${P.offers.length}곳이 연락해 왔습니다<small>입단할 팀을 고르세요</small></div>
+    ${P.offers.map((o,i)=>{ const c=CLUBS[o.club]; const role=roleAt(c); const pb0=clamp(Math.round(((R.rating||6.5)-6.5)*6)+(R.goals||0)*3,0,12); const st=o.trust0+pb0>=TRUST_UP; return `<div class="card pro-o" style="animation-delay:${0.25+i*0.3}s"><div class="row" style="gap:10px;align-items:center">${embHTML(c,44)}<div style="flex:1;min-width:0"><b style="font-size:1.05rem">${esc(c.name)}</b><br><small class="muted">${divName(divOf(c.id).id)} · 전력 ${c.str}</small></div></div>
       ${PRO_TAG[o.tag]?`<div style="margin:6px 0 2px"><b>${PRO_TAG[o.tag][0]}</b> <small class="muted">· ${PRO_TAG[o.tag][1]}</small></div>`:''}<div class="pro-kv"><span>주급<b>${fmtMoney(o.wage)}</b></span><span>계약<b>${o.years}년</b></span><span>시작<b style="color:${st?'var(--good)':'inherit'}">${st?'선발':'벤치'}</b></span></div>
-      <small class="muted">경쟁자 ${esc(o.comp.name)} (OVR ${o.comp.ovr}) · 감독 신뢰 ${o.trust0}${pb0?` +결승 활약 ${pb0}`:''}에서 시작 — ${TRUST_UP}을 넘기면 선발</small>
+      <small class="muted">${st?(pb0?'결승 활약 덕분에 바로 선발':'바로 선발'):`선발까지 감독 신뢰 ${TRUST_UP-o.trust0-pb0} 더 필요`}</small>
       <button class="btn ${i===0?'primary':''} block" data-pj="${i}" style="margin-top:8px">${esc(c.short||c.name)} 입단하기</button></div>`; }).join('')}`;
   col.onclick=e=>{ const b=e.target.closest('button[data-pj]'); if(b) proJoin(+b.dataset.pj); }; col.parentElement.scrollTop=0; }
 function proJoin(i){ const P=S.prologue; const o=P.offers[i]; const c=CLUBS[o.club];

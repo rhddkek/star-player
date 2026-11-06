@@ -279,6 +279,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const ys={}; for(const tb of ['shop','league','transfer']){ tab=tb; renderHub(); ys[tb]=[...document.querySelectorAll('#tab-'+tb+' .btn.primary')].filter(b=>b.offsetParent).length; } r.ys=ys; tab='league'; renderHub(); r.lgCard=!!leagueStatus(); r.need=/✓|부족/.test(needTxt(nextTargets()[0]));
       tab='home'; renderHub(); return r; });
     ok('실전 전술: 공 잃은 직후 게겐프레싱(라인 올림)·시간 지나면 해제 · 측면 공격 때 풀백 오버래핑 · 프로 리그는 잔디 구장(흙은 고교만) · 스타숍/리그/이적 노란 버튼 1개 이하 · 리그 내 순위 카드 · 이적 조건 ✓/부족 표시', t.gegen===1&&t.hi>0&&t.gegenOff===0&&t.ov>=4&&t.minTier>=1&&t.proTier===0&&Object.values(t.ys).every(n=>n<=1)&&t.lgCard&&t.need, JSON.stringify(t)); }
+  // 골키퍼 캐치 후 안고 있기 · 패스 속도 · 압박 인원 제한 · 결과 알림 짧게 · 스킬 해금 팝업
+  { const k=await pg.evaluate(()=>{ const r={}; S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf);
+      const gk=M.players.find(q=>q.team===0&&q.role==='GK'), fw=M.players.find(q=>q.team===1&&q.role==='FW'); M.ball.lastKicker=fw; setOwner(gk,{clean:true}); r.hold=+(gk.gkHoldUntil-M.t).toFixed(2);
+      for(let i=0;i<30;i++){ M.t+=1/30; updateAI(1/30); } r.still=M.ball.owner===gk; for(let i=0;i<90;i++){ M.t+=1/30; M.decisionT=0; updateAI(1/30); } r.released=M.ball.owner!==gk;
+      const a=M.players.find(q=>q.team===0&&q.role==='MF'&&!q.isUser), t2=M.players.find(q=>q.team===0&&q.role==='FW'&&!q.isUser); a.x=30; a.y=60; t2.x=30; t2.y=45; t2.vx=t2.vy=0; setOwner(a,{clean:true}); a.touchT=0; M.weather='clear'; passTo(a,t2,{power:0.5}); r.passSp=+Math.hypot(M.ball.vx,M.ball.vy).toFixed(1);
+      const o=M.players.find(q=>q.team===1&&q.role==='MF'); o.x=W/2; o.y=H*0.3; setOwner(o,{clean:true}); M.lostT=[-99,-99]; M.prevOwnTeam=1; M.tactic[0]='poss'; M.setPiece=null; M.restart=null; M.freeze=0; M.players.forEach(q=>q.pressing=false); M.ball.vx=M.ball.vy=M.ball.vz=0; M.ball.z=0; M.ball.x=o.x; M.ball.y=o.y; M.user.x=5; M.user.y=H-5; for(let i=0;i<5;i++){ M.t+=1/30; updateAI(1/30); } r.press=M.players.filter(q=>q.team===0&&!q.isUser&&q.pressing).length;
+      ambience(false); M=null; show('screen-hub');
+      r.notes=resNotes(['👀 부산 갈매기 FC 스카우트: 무난했다는 평가 (34)','이번 주 활동을 고르지 않아 휴식으로 처리 (컨디션 +15)','📨 광고 제안 1건 도착 — 스타숍에서 확인','👀 전주 비빔 FC 관심 상승 (10→28) — 이번 시즌 한 번 더 지켜볼 예정']);
+      const pop=skillUnlockPop(SKILLS.filter(s=>s.lvl===4).slice(0,2),4,()=>{}); r.pop=!!document.querySelector('.sk-unlock .btn.primary'); pop.remove(); return r; });
+    ok('골키퍼가 잡은 공을 1~2초 안고 있다가 배급 · 땅볼 패스 15m 22m/s 이상 · 상대 진영 공은 압박 1명만 · 결과 알림 짧게(휴식 처리 숨김·관심 n→m) · 스킬 해금 팝업', k.hold>=1.2&&k.still&&k.released&&k.passSp>=22&&k.press<=1&&k.notes.length===2&&!k.notes.some(n=>/휴식|—/.test(n))&&k.pop, JSON.stringify(k)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));

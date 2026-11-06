@@ -1,0 +1,12 @@
+const {chromium,devices}=require('playwright');
+const D='/tmp/claude-0/-home-claude/99dc0c2a-f95d-5557-84c3-47562decaedf/scratchpad/ui3/'+(process.argv[3]||'R')+'_';
+(async()=>{ const b=await chromium.launch(); const pg=await (await b.newContext({...devices['iPhone 13']})).newPage();
+  const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
+  await pg.goto('file://'+process.argv[2]); await pg.click('#btn-new'); await pg.waitForTimeout(500);
+  await pg.evaluate(()=>{ S.prologue={stage:'offers',r:{my:2,op:1,win:true,pk:false,rating:7.4,goals:1,assists:0},offers:proOffers({rating:7.4,goals:1,assists:0})}; showProOffers(); });
+  await pg.waitForTimeout(2600); await pg.screenshot({path:D+'offers.png'});
+  await pg.evaluate(()=>{ proJoin(1); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.tutSeen=true; S.compIntro=false; S.player.money=900; S.player.xp=xpNeed(S.player.level)-5; S.player.level=3; S.player.xp=xpNeed(3)-5; S.weekAct=null; autoMatch(false); });
+  await pg.waitForTimeout(1200); await pg.screenshot({path:D+'pop.png'});
+  await pg.evaluate(()=>document.querySelectorAll('.sk-unlock').forEach(m=>m.remove())); await pg.waitForTimeout(200); await pg.screenshot({path:D+'result.png'});
+  await pg.evaluate(()=>{ const s=document.querySelector('#screen-result'); const sc=[s,...s.querySelectorAll('*')].find(e=>e.scrollHeight>e.clientHeight+20&&/auto|scroll/.test(getComputedStyle(e).overflowY)); if(sc) sc.scrollTop=300; }); await pg.waitForTimeout(200); await pg.screenshot({path:D+'result2.png'});
+  console.log(errs); await b.close(); })();

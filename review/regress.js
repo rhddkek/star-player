@@ -270,6 +270,15 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       ambience(false); M=null; show('screen-hub'); renderHub();
       S.weekAct=null; S.player.injury=0; const b0=S.player.mpMax||100; S.player.tgMp=0; doWeekAct('mp'); S.weekAct=null; doWeekAct('mp'); r.train=(S.player.mpMax||100)-b0; r.gauge=S.player.tgMp; S.weekAct=null; return r; });
     ok('기력: 경기 중 거의 안 참(10초 +2 미만) · 골 +25 · 기력 수련으로 최대치 +4 · 택배 크로스(박스 안 동료) · 대지를 가르는 패스 균열 · 의성어 연출', mp.regen10s<2&&mp.goalGain===25&&mp.max===100&&mp.train===4&&mp.del&&mp.comic&&mp.crack, JSON.stringify(mp)); }
+  // 실전 전술: 게겐프레싱·윙백 오버래핑 · 경기장 등급 · 탭별 노란 버튼 하나
+  { const t=await pg.evaluate(()=>{ const r={}; S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf);
+      const own=M.players.find(q=>q.team===0&&!q.isUser&&q.role==='MF'); own.x=W/2; own.y=H/2; setOwner(own,{clean:true}); M.lostT=M.lostT||[-99,-99]; M.lostT[1]=M.t; updateAI(1/60); r.gegen=M.gegen&&M.gegen[1]; r.hi=(M.hiLine&&M.hiLine[1])||0; M.lostT[1]=M.t-20; updateAI(1/60); r.gegenOff=M.gegen[1];
+      let ov=0; for(let k=0;k<40;k++){ const fb=M.players.filter(q=>q.team===0&&subRole(q)==='FB'); if(!fb.length) break; const wm=M.players.filter(q=>q.team===0&&!q.isUser&&['WM','WF'].includes(subRole(q)))[0]||own; const f=fb[0]; const side=f.x<W/2?-1:1; wm.x=W/2+side*(W/2-4); wm.y=H*0.35; f.x=W/2+side*(W/2-10); f.y=H*0.5; f.ovCd=0; f.ovT=0; setOwner(wm,{clean:true}); for(let i=0;i<30;i++){ M.t+=1/60; updateAI(1/60); } if(fb.some(q=>q.ovT>M.t)) ov++; }
+      r.ov=ov; ambience(false); M=null; show('screen-hub');
+      const lg=Object.values(CLUBS).filter(c=>!c.nat&&divOf(c.id)); r.minTier=Math.min(...lg.map(c=>venueOf({type:'league',home:true,me:c,opp:c}).tier)); r.proTier=venueOf({type:'pro',pro:true,home:true,me:HS_ME,opp:HS_OPP}).tier;
+      const ys={}; for(const tb of ['shop','league','transfer']){ tab=tb; renderHub(); ys[tb]=[...document.querySelectorAll('#tab-'+tb+' .btn.primary')].filter(b=>b.offsetParent).length; } r.ys=ys; tab='league'; renderHub(); r.lgCard=!!leagueStatus(); r.need=/✓|부족/.test(needTxt(nextTargets()[0]));
+      tab='home'; renderHub(); return r; });
+    ok('실전 전술: 공 잃은 직후 게겐프레싱(라인 올림)·시간 지나면 해제 · 측면 공격 때 풀백 오버래핑 · 프로 리그는 잔디 구장(흙은 고교만) · 스타숍/리그/이적 노란 버튼 1개 이하 · 리그 내 순위 카드 · 이적 조건 ✓/부족 표시', t.gegen===1&&t.hi>0&&t.gegenOff===0&&t.ov>=4&&t.minTier>=1&&t.proTier===0&&Object.values(t.ys).every(n=>n<=1)&&t.lgCard&&t.need, JSON.stringify(t)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));

@@ -208,6 +208,15 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const ad=await pg.evaluate(()=>{ S.weekAct=null; S.player.injury=0; S.player.cond=90; tab='home'; renderHub(); document.querySelector('[data-row=week]').click(); const b=document.querySelector('.wk-sheet button[data-tr="ad"]'); if(!b) return {btn:false}; const m0=S.player.money, c0=S.player.cond; b.click(); return {btn:true,act:S.weekAct,dm:S.player.money-m0,dc:S.player.cond-c0,gone:!document.querySelector('.wk-sheet')}; });
     ok('주간 광고 촬영(홈 › 이번 주 준비 시트): 돈 +, 컨디션 -8, 시트 닫힘', ad.btn&&ad.act==='ad'&&ad.dm>0&&ad.dc<=0&&ad.gone, JSON.stringify(ad)); }
   // 첫 경기 조작법: 작은 아이폰(사파리 툴바 포함 높이)에서도 킥오프 버튼이 눌림
+  // 가로 화면: 경기장 가로 렌더 · 조이스틱 오른쪽 = 공격 방향 · 그린 뒤 좌표 원상복구
+  { const c3=await b.newContext({...devices['iPhone 13 landscape']}); const p3=await c3.newPage(); const e3=[]; p3.on('pageerror',e=>e3.push(e.message)); await p3.goto(FILE); await p3.click('#btn-new'); await p3.waitForTimeout(500);
+    await p3.evaluate(()=>{ proSkipAll(1); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.tutSeen=true; S.noReplay=true; S.compIntro=false; save(); startMatch(false); }); await p3.waitForTimeout(700);
+    await p3.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await p3.waitForTimeout(3500);
+    const L0=await p3.evaluate(()=>{ const u=M.user; M.ball.owner=null; M.ball.x=5; M.ball.y=90; u.x=W/2; u.y=60; return {land:isLand(),y:u.y,x:u.x}; });
+    await p3.mouse.move(250,300); await p3.mouse.down(); await p3.mouse.move(310,300,{steps:4}); await p3.waitForTimeout(700); await p3.mouse.up();
+    const L1=await p3.evaluate(()=>({y:M.user.y,x:M.user.x,vl:VLAND,inb:M.players.every(q=>q.x>-3&&q.x<W+3&&q.y>-3&&q.y<H+3)}));
+    ok('가로 화면: 경기장 가로 · 조이스틱 오른쪽 → 앞(상대 골문)으로 이동 · 그린 뒤 좌표 원상복구 · 오류 없음', L0.land&&L1.y<L0.y-2&&Math.abs(L1.x-L0.x)<2.5&&!L1.vl&&L1.inb&&e3.length===0, JSON.stringify({L0,L1,e3:e3.slice(0,2)}));
+    await c3.close(); }
   { const c2=await b.newContext({...devices['iPhone SE'],viewport:{width:375,height:548}}); const p2=await c2.newPage(); await p2.goto(FILE); await p2.click('#btn-new'); await p2.waitForTimeout(600);
     await p2.evaluate(()=>{ proSkipAll(); S.compIntro=false; S.trust=70; S.starter=true; S.tutSeen=false; S.noReplay=true; startMatch(false); }); await p2.waitForTimeout(300);
     const box=await p2.evaluate(()=>{ const c=el('m-overlay').querySelector('.card').getBoundingClientRect(); const g=el('tut-go').getBoundingClientRect(); return {top:Math.round(c.top),h:Math.round(c.height),btnB:Math.round(g.bottom),vh:innerHeight}; });

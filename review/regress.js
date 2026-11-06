@@ -226,7 +226,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // UX 정리: 경기 안내 하나 · 버튼 상태 · 따라가기 잠금 · 평점 이유
   { const mu=await pg.evaluate(()=>{ S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; M.introT=0;
       const u=M.user; const r={};
-      popup(u.x,u.y-2.4,'패스 옵니다!','#fff'); r.dup=!M.upop; popup(u.x,u.y-1.5,'요청!','#fff'); popup(u.x,u.y-1.8,'좋은 침투','#fff'); r.one=!!M.upop&&M.upop.t==='좋은 침투'&&!M.popups.some(p=>Math.abs(p.x-u.x)<1.6);
+      popup(u.x,u.y-2.4,'패스 와요!','#fff'); r.dup=!M.upop; popup(u.x,u.y-1.5,'요청!','#fff'); popup(u.x,u.y-1.8,'좋은 침투','#fff'); r.one=!!M.upop&&M.upop.t==='좋은 침투'&&!M.popups.some(p=>Math.abs(p.x-u.x)<1.6);
       const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=1; updateHUD(); r.def=document.querySelector('.ctl .mainrow').dataset.st;
       const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); setOwner(q,{clean:true}); M._objT=1; updateHUD(); r.sup=document.querySelector('.ctl .mainrow').dataset.st; r.passDim=el('k-pass').classList.contains('dim');
       u.x=o.x+0.8; u.y=o.y+0.8; setOwner(o,{clean:true}); input.shotHold=true; updateUser(1/60); r.chase=M.chasing; r.noCharge=!M.charge;
@@ -282,7 +282,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // 실전 전술: 게겐프레싱·윙백 오버래핑 · 경기장 등급 · 탭별 노란 버튼 하나
   { const t=await pg.evaluate(()=>{ const r={}; S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf);
       const own=M.players.find(q=>q.team===0&&!q.isUser&&q.role==='MF'); own.x=W/2; own.y=H/2; setOwner(own,{clean:true}); M.lostT=M.lostT||[-99,-99]; M.lostT[1]=M.t; updateAI(1/60); r.gegen=M.gegen&&M.gegen[1]; r.hi=(M.hiLine&&M.hiLine[1])||0; M.lostT[1]=M.t-20; updateAI(1/60); r.gegenOff=M.gegen[1];
-      let ov=0; for(let k=0;k<40;k++){ const fb=M.players.filter(q=>q.team===0&&subRole(q)==='FB'); if(!fb.length) break; const wm=M.players.filter(q=>q.team===0&&!q.isUser&&['WM','WF'].includes(subRole(q)))[0]||own; const f=fb[0]; const side=f.x<W/2?-1:1; wm.x=W/2+side*(W/2-4); wm.y=H*0.35; f.x=W/2+side*(W/2-10); f.y=H*0.5; f.ovCd=0; f.ovT=0; setOwner(wm,{clean:true}); for(let i=0;i<30;i++){ M.t+=1/60; updateAI(1/60); } if(fb.some(q=>q.ovT>M.t)) ov++; }
+      let ov=0; for(let k=0;k<40;k++){ const fb=M.players.filter(q=>q.team===0&&subRole(q)==='FB'); if(!fb.length) break; const wm=M.players.filter(q=>q.team===0&&!q.isUser&&['WM','WF'].includes(subRole(q)))[0]||own; const f=fb[0]; f.style='overlap'; const side=f.x<W/2?-1:1; wm.x=W/2+side*(W/2-4); wm.y=H*0.35; f.x=W/2+side*(W/2-10); f.y=H*0.5; f.ovCd=0; f.ovT=0; setOwner(wm,{clean:true}); for(let i=0;i<30;i++){ M.t+=1/60; updateAI(1/60); } if(fb.some(q=>q.ovT>M.t)) ov++; }
       r.ov=ov; ambience(false); M=null; show('screen-hub');
       const lg=Object.values(CLUBS).filter(c=>!c.nat&&divOf(c.id)); r.minTier=Math.min(...lg.map(c=>venueOf({type:'league',home:true,me:c,opp:c}).tier)); r.proTier=venueOf({type:'pro',pro:true,home:true,me:HS_ME,opp:HS_OPP}).tier;
       const ys={}; for(const tb of ['shop','league','transfer']){ tab=tb; renderHub(); ys[tb]=[...document.querySelectorAll('#tab-'+tb+' .btn.primary')].filter(b=>b.offsetParent).length; } r.ys=ys; tab='league'; renderHub(); r.lgCard=!!leagueStatus(); r.need=/✓|부족/.test(needTxt(nextTargets()[0]));

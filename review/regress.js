@@ -302,14 +302,14 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const q=await pg.evaluate(()=>{ const r={}; S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf);
       tick('⚽ 테스트'); r.tl=M.tl.length===1&&el('ticker').classList.contains('show'); for(let i=0;i<60;i++) momTick(1/30); r.mom=typeof M.mom==='number';
       M.score=[0,1]; halftimeShow(); r.htOpts=el('m-overlay').querySelectorAll('[data-ht]').length; r.rec=!!el('m-overlay').querySelector('[data-ht="atk"] .pill'); el('m-overlay').querySelector('[data-ht="atk"]').click(); el('ht-go').click(); r.tac=M.tactic[0]; r.resumed=!M.paused;
-      el('btn-skip').click(); r.tabs=el('m-overlay').querySelectorAll('[data-pt]').length; el('m-overlay').querySelector('[data-tac="poss"]').click(); r.tac2=M.tactic[0]; r.ids=['pz-go','pz-help','pz-skip','pz-mute','pz-bs'].every(id=>!!el(id)); el('pz-go').click();
+      el('btn-skip').click(); r.tabs=el('m-overlay').querySelectorAll('[data-pt]').length; el('m-overlay').querySelector('[data-tac="poss"]').click(); r.tac2=M.tactic[0]; r.ids=['pz-go','pz-help','pz-skip','pz-mute','pz-bs','pz-ps'].every(id=>!!el(id)); const ps0=S.pSize; el('pz-ps').click(); r.ps=S.pSize===((ps0!=null?ps0:1)+1)%3; S.pSize=1; r.psz=psz(); el('pz-go').click();
       ambience(false); M=null; show('screen-hub');
       S.introSk='pending'; tab='skill'; renderSkill.sel=null; renderHub(); r.gift=!!el('sk-gift')&&!document.querySelector('#tab-skill [data-gift]'); S.introSk='none';
       tab='player'; renderHub(); r.noWeekDup=!document.querySelector('#tab-player [data-row="week"]');
       tab='transfer'; renderHub(); r.seg=S.offers.length?true:document.querySelectorAll('#tab-transfer [data-tt]').length===2;
       renderShop.sub='endo'; tab='shop'; renderHub(); r.oneSp=!/기본 후원/.test(el('tab-shop').innerText)&&/에이전시/.test(el('tab-shop').innerText);
       tab='home'; renderHub(); return r; });
-    ok('실전 요소: 중계 자막·타임라인 · 경기 흐름 바 · 하프타임 기록+감독 지시(지고 있으면 공격 추천→압박) · 일시정지 탭(경기/기록/설정)+경기 중 전술 · 입문 스킬 선물은 스킬 목록에 합침 · 이번 주 준비는 홈 한 곳 · 이적 탭 · 후원 한 카드', q.tl&&q.mom&&q.htOpts===3&&q.rec&&q.tac==='press'&&q.resumed&&q.tabs===3&&q.tac2==='poss'&&q.ids&&q.gift&&q.noWeekDup&&q.seg&&q.oneSp, JSON.stringify(q)); }
+    ok('실전 요소: 중계 자막·타임라인 · 경기 흐름 바 · 하프타임 기록+감독 지시(지고 있으면 공격 추천→압박) · 일시정지 탭(경기/기록/설정)+경기 중 전술 · 선수 크기 설정(기본 크게 1.2배) · 입문 스킬 선물은 스킬 목록에 합침 · 이번 주 준비는 홈 한 곳 · 이적 탭 · 후원 한 카드', q.tl&&q.mom&&q.htOpts===3&&q.rec&&q.tac==='press'&&q.resumed&&q.tabs===3&&q.tac2==='poss'&&q.ids&&q.ps&&q.psz===1.2&&q.gift&&q.noWeekDup&&q.seg&&q.oneSp, JSON.stringify(q)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));

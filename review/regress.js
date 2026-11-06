@@ -170,7 +170,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
 
   // 5) 모바일 각 탭: 가로 넘침·잘림
   for(const t of ['home','player','skill','shop','league','transfer']){ const btn=await pg.$(`#tabs button[data-tab="${t}"]`); if(!btn) continue; await btn.click(); await pg.waitForTimeout(250);
-    const r=await pg.evaluate(()=>{ const W=window.innerWidth; const bad=[]; document.querySelectorAll('.screen:not([hidden]) *').forEach(e=>{ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1&&getComputedStyle(e).position!=='fixed') bad.push((e.id||e.className||e.tagName).toString().slice(0,30)+':'+Math.round(b.right)); }); return {scroll:document.documentElement.scrollWidth>W,bad:bad.slice(0,4)}; });
+    const r=await pg.evaluate(()=>{ const W=window.innerWidth; const bad=[]; document.querySelectorAll('.screen:not([hidden]) *').forEach(e=>{ if(e.closest('.lg-co')) return; const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1&&getComputedStyle(e).position!=='fixed') bad.push((e.id||e.className||e.tagName).toString().slice(0,30)+':'+Math.round(b.right)); }); return {scroll:document.documentElement.scrollWidth>W,bad:bad.slice(0,4)}; });
     ok(`모바일 ${t} 탭: 가로 넘침 없음`, !r.scroll&&r.bad.length===0, r.bad.join(', ')); }
   { const ln=await pg.evaluate(()=>{ S.number=9; save(); M=null; startMatch(false); const nums=M.players.filter(p=>p.team===0).map(p=>p.isUser?S.number:shirtNo(p)); const dup=nums.filter((n,i)=>nums.indexOf(n)!==i); const sc=el('sc-h').querySelector('span').textContent; cancelAnimationFrame(raf); ambience(false); M=null; el('m-overlay').hidden=true; show('screen-hub'); renderHub(); return {dup,sc}; });
     ok('라인업 등번호 중복 없음 · 점수판 한글 약칭', ln.dup.length===0&&/[가-힣]/.test(ln.sc), JSON.stringify(ln)); }
@@ -179,7 +179,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const lg=await pg.evaluate(()=>({n:Object.keys(S.divs).length, it:S.divs['it-1'].clubs.length, fr:S.divs['fr-1'].clubs.length, star:clubStars(CLUBS['en-1-1']), low:clubStars(CLUBS['kr-2-0']), v:S.v}));
     ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===19&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v===4, JSON.stringify(lg)); }
   // 리그 화면: 나라 → 1·2부 → 팀/선수 순위 → 기록 종류
-  { const lg2=await pg.evaluate(()=>{ for(let i=0;i<3;i++) autoMatch(true); tab='league'; renderLeague.cur=null; renderLeague.view='players'; renderLeague.pf='kp'; renderHub(); const W=innerWidth; const bad=[]; document.querySelectorAll('#tab-league *').forEach(e=>{ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1) bad.push((e.className||e.tagName).toString().slice(0,20)); });
+  { const lg2=await pg.evaluate(()=>{ for(let i=0;i<3;i++) autoMatch(true); tab='league'; renderLeague.cur=null; renderLeague.view='players'; renderLeague.pf='kp'; renderHub(); const W=innerWidth; const bad=[]; document.querySelectorAll('#tab-league *').forEach(e=>{ if(e.closest('.lg-co')) return; /* 나라 줄은 의도된 가로 스크롤 */ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1) bad.push((e.className||e.tagName).toString().slice(0,20)); });
       const rows=document.querySelectorAll('#tab-league table tr').length; const kpN=Object.values(S.pstats).filter(v=>v.kp>0).length, csN=Object.values(S.pstats).filter(v=>v.cs>0).length; const co=document.querySelectorAll('.lg-co button').length; renderLeague.view='table'; renderHub(); return {bad,rows,kpN,csN,co}; });
     ok('리그 화면: 나라 8칸·선수 순위(기회창출·클린시트) · 가로 넘침 없음', lg2.bad.length===0&&lg2.rows>3&&lg2.kpN>20&&lg2.csN>3&&lg2.co===8, JSON.stringify(lg2)); }
   // 3부 · 한글 약칭 · 엠블럼 · 기존 세이브 변환
@@ -298,6 +298,18 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       r.notes=resNotes(['👀 부산 갈매기 FC 스카우트: 무난했다는 평가 (34)','이번 주 활동을 고르지 않아 휴식으로 처리 (컨디션 +15)','📨 광고 제안 1건 도착 — 스타숍에서 확인','👀 전주 비빔 FC 관심 상승 (10→28) — 이번 시즌 한 번 더 지켜볼 예정']);
       const pop=skillUnlockPop(SKILLS.filter(s=>s.lvl===4).slice(0,2),4,()=>{}); r.pop=!!document.querySelector('.sk-unlock .btn.primary'); pop.remove(); return r; });
     ok('골키퍼가 잡은 공을 1~2초 안고 있다가 배급 · 땅볼 패스 15m 22m/s 이상 · 상대 진영 공은 압박 1명만 · 결과 알림 짧게(휴식 처리 숨김·관심 n→m) · 스킬 해금 팝업', k.hold>=1.2&&k.still&&k.released&&k.passSp>=22&&k.press<=1&&k.notes.length===2&&!k.notes.some(n=>/휴식|—/.test(n))&&k.pop, JSON.stringify(k)); }
+  // 실전 요소: 중계 자막·타임라인·경기 흐름·하프타임 지시·경기 중 전술 / 중복 UI 정리
+  { const q=await pg.evaluate(()=>{ const r={}; S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf);
+      tick('⚽ 테스트'); r.tl=M.tl.length===1&&el('ticker').classList.contains('show'); for(let i=0;i<60;i++) momTick(1/30); r.mom=typeof M.mom==='number';
+      M.score=[0,1]; halftimeShow(); r.htOpts=el('m-overlay').querySelectorAll('[data-ht]').length; r.rec=!!el('m-overlay').querySelector('[data-ht="atk"] .pill'); el('m-overlay').querySelector('[data-ht="atk"]').click(); el('ht-go').click(); r.tac=M.tactic[0]; r.resumed=!M.paused;
+      el('btn-skip').click(); r.tabs=el('m-overlay').querySelectorAll('[data-pt]').length; el('m-overlay').querySelector('[data-tac="poss"]').click(); r.tac2=M.tactic[0]; r.ids=['pz-go','pz-help','pz-skip','pz-mute','pz-bs'].every(id=>!!el(id)); el('pz-go').click();
+      ambience(false); M=null; show('screen-hub');
+      S.introSk='pending'; tab='skill'; renderSkill.sel=null; renderHub(); r.gift=!!el('sk-gift')&&!document.querySelector('#tab-skill [data-gift]'); S.introSk='none';
+      tab='player'; renderHub(); r.noWeekDup=!document.querySelector('#tab-player [data-row="week"]');
+      tab='transfer'; renderHub(); r.seg=S.offers.length?true:document.querySelectorAll('#tab-transfer [data-tt]').length===2;
+      renderShop.sub='endo'; tab='shop'; renderHub(); r.oneSp=!/기본 후원/.test(el('tab-shop').innerText)&&/에이전시/.test(el('tab-shop').innerText);
+      tab='home'; renderHub(); return r; });
+    ok('실전 요소: 중계 자막·타임라인 · 경기 흐름 바 · 하프타임 기록+감독 지시(지고 있으면 공격 추천→압박) · 일시정지 탭(경기/기록/설정)+경기 중 전술 · 입문 스킬 선물은 스킬 목록에 합침 · 이번 주 준비는 홈 한 곳 · 이적 탭 · 후원 한 카드', q.tl&&q.mom&&q.htOpts===3&&q.rec&&q.tac==='press'&&q.resumed&&q.tabs===3&&q.tac2==='poss'&&q.ids&&q.gift&&q.noWeekDup&&q.seg&&q.oneSp, JSON.stringify(q)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));

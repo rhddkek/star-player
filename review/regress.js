@@ -7,7 +7,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const b=await chromium.launch();
   const ctx=await b.newContext({...devices['iPhone 13']}); const pg=await ctx.newPage();
   const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
-  await pg.goto(FILE); await pg.click('#btn-new'); await pg.waitForTimeout(700);
+  await pg.goto(FILE); await pg.click('#go-create'); await pg.click('#btn-new'); await pg.waitForTimeout(700);
   // 프롤로그: 오프닝 애니메이션 → 건너뛰기 → 고교 결승 → 스카우트 제안 → 입단 → 주전 경쟁
   { const p0=await pg.evaluate(()=>({cut:!el('screen-cut').hidden,skip:!!el('cut-skip'),stage:S.prologue&&S.prologue.stage}));
     await pg.click('#cut-skip'); await pg.waitForTimeout(500);
@@ -161,7 +161,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   ok('백업 내보내기: 파일 다운로드', !!dl, dl?dl.suggestedFilename():'다운로드 없음');
   const name0=await pg.evaluate(()=>S.player.name);
   await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); await pg.waitForTimeout(200);
-  await pg.click('#btn-new'); await pg.waitForTimeout(250);
+  await pg.click('#go-create'); await pg.click('#btn-new'); await pg.waitForTimeout(250);
   const warn=await pg.$('#nw-x'); ok('저장 있을 때 새 커리어 → 덮어쓰기 경고', !!warn);
   if(warn){ await pg.click('#nw-go'); await pg.waitForTimeout(400); await pg.evaluate(()=>{ proSkipAll(); }); await pg.waitForTimeout(400); await pg.evaluate(()=>document.querySelectorAll('.hub-modal').forEach(m=>m.remove())); }
   if(bkPath){ await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const [fc]=await Promise.all([pg.waitForEvent('filechooser'), pg.click('#btn-import')]); await fc.setFiles(bkPath); await pg.waitForTimeout(500);
@@ -169,7 +169,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const c2=await pg.$('#btn-continue'); if(c2) await c2.click(); await pg.waitForTimeout(600); }
 
   // 5) 모바일 각 탭: 가로 넘침·잘림
-  for(const t of ['home','player','skill','shop','league','transfer']){ const btn=await pg.$(`#tabs button[data-tab="${t}"]`); if(!btn) continue; await btn.click(); await pg.waitForTimeout(250);
+  for(const t of ['home','player','skill','league','career']){ const btn=await pg.$(`#tabs button[data-tab="${t}"]`); if(!btn) continue; await btn.click(); await pg.waitForTimeout(250);
     const r=await pg.evaluate(()=>{ const W=window.innerWidth; const bad=[]; document.querySelectorAll('.screen:not([hidden]) *').forEach(e=>{ if(e.closest('.lg-co')) return; const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1&&getComputedStyle(e).position!=='fixed') bad.push((e.id||e.className||e.tagName).toString().slice(0,30)+':'+Math.round(b.right)); }); return {scroll:document.documentElement.scrollWidth>W,bad:bad.slice(0,4)}; });
     ok(`모바일 ${t} 탭: 가로 넘침 없음`, !r.scroll&&r.bad.length===0, r.bad.join(', ')); }
   { const ln=await pg.evaluate(()=>{ S.number=9; save(); M=null; startMatch(false); const nums=M.players.filter(p=>p.team===0).map(p=>p.isUser?S.number:shirtNo(p)); const dup=nums.filter((n,i)=>nums.indexOf(n)!==i); const sc=el('sc-h').querySelector('span').textContent; cancelAnimationFrame(raf); ambience(false); M=null; el('m-overlay').hidden=true; show('screen-hub'); renderHub(); return {dup,sc}; });
@@ -209,7 +209,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('주간 광고 촬영(홈 › 이번 주 준비 시트): 돈 +, 컨디션 -8, 시트 닫힘', ad.btn&&ad.act==='ad'&&ad.dm>0&&ad.dc<=0&&ad.gone, JSON.stringify(ad)); }
   // 첫 경기 조작법: 작은 아이폰(사파리 툴바 포함 높이)에서도 킥오프 버튼이 눌림
   // 가로 화면: 경기장 가로 렌더 · 조이스틱 오른쪽 = 공격 방향 · 그린 뒤 좌표 원상복구
-  { const c3=await b.newContext({...devices['iPhone 13 landscape']}); const p3=await c3.newPage(); const e3=[]; p3.on('pageerror',e=>e3.push(e.message)); await p3.goto(FILE); await p3.click('#btn-new'); await p3.waitForTimeout(500);
+  { const c3=await b.newContext({...devices['iPhone 13 landscape']}); const p3=await c3.newPage(); const e3=[]; p3.on('pageerror',e=>e3.push(e.message)); await p3.goto(FILE); await p3.click('#go-create'); await p3.click('#btn-new'); await p3.waitForTimeout(500);
     await p3.evaluate(()=>{ proSkipAll(1); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.tutSeen=true; S.noReplay=true; S.compIntro=false; save(); startMatch(false); }); await p3.waitForTimeout(700);
     await p3.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await p3.waitForTimeout(3500);
     const L0=await p3.evaluate(()=>{ const u=M.user; M.ball.owner=null; M.ball.x=5; M.ball.y=90; u.x=W/2; u.y=60; return {land:isLand(),y:u.y,x:u.x}; });
@@ -217,7 +217,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const L1=await p3.evaluate(()=>({y:M.user.y,x:M.user.x,vl:VLAND,inb:M.players.every(q=>q.x>-3&&q.x<W+3&&q.y>-3&&q.y<H+3)}));
     ok('가로 화면: 경기장 가로 · 조이스틱 오른쪽 → 앞(상대 골문)으로 이동 · 그린 뒤 좌표 원상복구 · 오류 없음', L0.land&&L1.y<L0.y-2&&Math.abs(L1.x-L0.x)<2.5&&!L1.vl&&L1.inb&&e3.length===0, JSON.stringify({L0,L1,e3:e3.slice(0,2)}));
     await c3.close(); }
-  { const c2=await b.newContext({...devices['iPhone SE'],viewport:{width:375,height:548}}); const p2=await c2.newPage(); await p2.goto(FILE); await p2.click('#btn-new'); await p2.waitForTimeout(600);
+  { const c2=await b.newContext({...devices['iPhone SE'],viewport:{width:375,height:548}}); const p2=await c2.newPage(); await p2.goto(FILE); await p2.click('#go-create'); await p2.click('#btn-new'); await p2.waitForTimeout(600);
     await p2.evaluate(()=>{ proSkipAll(); S.compIntro=false; S.trust=70; S.starter=true; S.tutSeen=false; S.noReplay=true; startMatch(false); }); await p2.waitForTimeout(300);
     const box=await p2.evaluate(()=>{ const c=el('m-overlay').querySelector('.card').getBoundingClientRect(); const g=el('tut-go').getBoundingClientRect(); return {top:Math.round(c.top),h:Math.round(c.height),btnB:Math.round(g.bottom),vh:innerHeight}; });
     let clicked=true; try{ await p2.click('#tut-go',{timeout:3000}); }catch(e){ clicked=false; } await p2.waitForTimeout(150);
@@ -337,12 +337,37 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const mg0=(S.mgr&&S.mgr[S.clubId])||0; const rnd0=Math.random; Math.random=()=>0; const notes=[]; S.trust=80; mgrChangeCheck(myDiv,notes); Math.random=rnd0; r.mgr=((S.mgr&&S.mgr[S.clubId])||0)===mg0+1&&notes.length===1&&S.trust===56&&S.tacAdapt===3; S.tacAdapt=0;
       localStorage.setItem('sp_legacy',JSON.stringify({parent:'테스트',rep:150,money:999,pos:'FW'})); const sv=JSON.stringify(S); const m0=S.player.money, r0=S.player.rep; el('in-name').value='후계자'; newGame('후계자',S.player.pos); try{ const L=JSON.parse(localStorage.getItem('sp_legacy')||'null'); if(L){ localStorage.removeItem('sp_legacy'); S.player.rep+=L.rep; S.player.money+=L.money; S.legacy=L; } }catch(e){} r.legacy=S.legacy&&S.legacy.parent==='테스트'&&S.player.rep>=150&&!localStorage.getItem('sp_legacy'); S=JSON.parse(sv); save(); tab='home'; renderHub(); return r; });
     ok('벤치마크 2차: 헛다리·턴 · 하프타임 교체(2명 제시·1명 교체·자막) · 전술 적응 · 눈 감속 · 특성 달성 해금(무료 장착) · 훈련 드릴(주간 훈련→미니게임→게이지 +15) · 올해의 선수 레이스 · 감독 교체(신뢰 70%·적응 3경기) · 후계자 상속', Object.entries(q).filter(([k])=>!k.startsWith('_')).every(([,v])=>v===true), JSON.stringify(q)); }
+  // v66: 시안 UI · FMH식 커리어 (시즌 목표·감독 면담·신뢰 로그·소식함·마음 한 줄·스카우트·구단 프로필·이적 비교·협상·일정·챌린지)
+  { const q=await pg.evaluate(()=>{ const r={}; show('screen-hub'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      r.nav=document.querySelectorAll('#tabs button').length===5&&!!document.querySelector('#tabs [data-tab=career]');
+      tab='player'; renderPlayer.sub='stat'; renderHub(); r.seg=document.querySelectorAll('#tab-player .hub-seg [data-gk]').length===5; r.hero=!!document.querySelector('#tab-player canvas[data-hero]');
+      renderPlayer.sub='week'; S.weekAct=null; S.player.injury=0; renderHub(); r.wk3=document.querySelectorAll('#tab-player .wk-o.big').length===3; document.querySelector('#tab-player [data-wsel=rest]').click(); const ok2=document.querySelector('#tab-player #wk-ok'); r.wkSel=!!ok2&&ok2.dataset.tr==='rest'&&!ok2.disabled; ok2.click(); r.wkDone=S.weekAct==='rest';
+      S.sg=null; const G=sgEnsure(); r.sg=!!G&&G.goals.length===3&&G.goals.some(g=>g.team); const n0=G.goals[0].n; sgVow('bold'); r.vow=G.vow==='bold'&&G.goals[0].n>=Math.round(n0*1.25)-0;
+      tab='home'; renderHub(); r.homeSg=!!document.querySelector('#tab-home .sgoal')&&!!document.querySelector('#tab-home .inbox')&&!!document.querySelector('#tab-home .mood');
+      const hs0=S.history.length; for(let i=0;i<3;i++) S.history.push({season:S.season,round:S.round,type:'league',a:S.clubId,b:'x',opp:Object.keys(CLUBS).find(id=>id!==S.clubId&&!CLUBS[id].nat),ga:0,gb:1,goals:0,assists:0,rating:6,bench:true,injured:false});
+      S.talkCd=0; const tk=mgrTalk(); r.talk=!!tk&&tk.talk===1&&tk.opts.some(o=>o[1].startLock); S.weekEvt=tk; S.trust=30; renderHub(); document.querySelector('#tab-home [data-we="0"]').click(); r.lock=S.startLock===1&&isBenched()===false&&(S.trustLog||[])[0].why===tk.t; r.mood=moodLine()[1].includes('후보'); S.history.length=hs0; S.startLock=0;
+      const ib0=(S.inbox||[]).length; inboxFromNotes(['👀 테스트 구단 관심 상승','라이벌전 승리! 🔥']); r.inbox=(S.inbox||[]).length===Math.min(14,ib0+1)||((S.inbox||[])[0].t==='테스트 구단 관심 상승');
+      tab='career'; renderCareer.sub='record'; renderHub(); r.rec=!!el('cc-share')&&document.querySelectorAll('#tab-career .rec-t, #tab-career .rec-body p').length>0; renderRecord.v='path'; renderHub(); r.path=!!document.querySelector('#tab-career .path-l, #tab-career .rec-body p'); renderRecord.v='season';
+      renderCareer.sub='scout'; renderHub(); r.scout=document.querySelectorAll('#tab-career .sc-it').length>0&&!!el('sc-goal'); el('sc-goal').click(); r.goal=!!S.goalClub;
+      clubProfile(S.goalClub); r.prof=!!document.querySelector('.cprof')&&document.querySelectorAll('.cprof .kv3>div').length===3; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.goalClub=null;
+      S.offers=makeOffers(); S.offersFor='end'; tab='transfer'; renderHub(); r.ofc=document.querySelectorAll('#tab-transfer .ofc').length===S.offers.length&&document.querySelectorAll('#tab-transfer .ofc .fmp').length===S.offers.length&&document.querySelectorAll('#tab-transfer .btn.primary').length===1;
+      negotiate(0); const nm=document.querySelector('.neg-m'); r.neg=!!nm&&nm.querySelectorAll('.neg3 [data-v]').length===3; nm.querySelector('.neg3 [data-v="0"]').click(); r.negV=S.offers[0].v===0; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.offers=[]; S.offersFor=null;
+      tab='league'; renderLeague.cur=null; renderLeague.view='fix'; renderHub(); r.fix=document.querySelectorAll('#tab-league .fixs tr').length>5&&!!document.querySelector('#tab-league .lg-ban')&&!!el('lg-go'); renderLeague.view='table'; tab='home'; renderHub();
+      r.hof=hofPoints(S)>0;
+      return r; });
+    ok('시안 UI·FMH 커리어: 5탭·그룹 탭 · 일러스트 · 주간 준비 3카드 · 시즌 목표·각오 · 감독 면담(선발 약속)·신뢰 기록 · 소식함·마음 한 줄 · 커리어 기록·발자취 · 스카우트·목표 구단 · 구단 프로필 · 이적 비교·협상 3안 · 리그 일정 · 명예의 전당 점수', Object.values(q).every(v=>v===true), JSON.stringify(q)); }
+  // 챌린지 모드 (FMH 시나리오)
+  { const c=await pg.evaluate(()=>{ const r={}; const sv=JSON.stringify(S); show('screen-title'); initTitle(); el('go-create').click(); r.create=!el('tt-create').hidden; document.querySelector('#mode-segs [data-cm=chal]').click(); r.list=document.querySelectorAll('#chal-list [data-chl]').length===CHALLENGES.length;
+      const def=CHALLENGES.find(x=>x.id==='bench'); chalStart(def,'도전자','MF'); r.start=!!S.chal&&S.chal.id==='bench'&&CLUBS[S.clubId].homeDiv==='kr-2'&&S.player.age===25&&!S.prologue&&!el('screen-hub').hidden;
+      for(let i=0;i<16;i++) S.history.push({season:S.season,round:i+1,type:'league',a:S.clubId,b:'x',opp:S.clubId,ga:1,gb:0,goals:0,assists:0,rating:6.8,bench:false,injured:false}); const E=chalEval(); r.eval=!!E&&E.ok===true; const notes=[]; chalFinish(E,notes); r.done=S.chal.done&&S.chal.ok&&notes.some(n=>n.includes('챌린지 달성'))&&(S.trophies||[]).some(t=>t.kind==='chal');
+      S=JSON.parse(sv); save(); newMode='normal'; show('screen-hub'); tab='home'; renderHub(); return r; });
+    ok('챌린지 모드: 시작 화면 → 챌린지 6종 · 상황대로 시작(나이·구단·벤치) · 시즌 끝 판정 · 트로피', Object.values(c).every(v=>v===true), JSON.stringify(c)); }
   // 시즌 시상식 · 트로피 진열장 · 리그 역대 · 명예의 전당
   { await pg.evaluate(()=>{ show('screen-hub'); finishAllLeagues(); const me=S.pstats.me=S.pstats.me||{g:0,a:0,club:S.clubId}; me.g=40; me.a=15; me.kp=45; endSeason(); });
     await pg.waitForTimeout(300); const c1=await pg.evaluate(()=>({vis:!el('screen-cer').hidden,noms:document.querySelectorAll('.cer-nom').length}));
-    await pg.click('#cer-skip'); await pg.waitForTimeout(200); await pg.click('#cer-go'); await pg.waitForTimeout(400);
+    await pg.click('#cer-skip'); await pg.waitForTimeout(200); const srv=await pg.evaluate(()=>!!document.querySelector('.srv-h')&&!!document.querySelector('.srv-t')); await pg.click('#cer-go'); await pg.waitForTimeout(400);
     const c2=await pg.evaluate(()=>{ const r={hub:!el('screen-hub').hidden,tab,offers:S.offers.length,tro:(S.trophies||[]).length,top:(S.trophies||[]).some(t=>t.kind==='top'),hist:Object.keys(S.leagueHist||{}).length}; tab='player'; renderPlayer.sub='records'; renderHub(); r.cab=document.querySelectorAll('.cab-i').length; tab='league'; renderLeague.view='hist'; renderLeague.cur=null; renderHub(); r.histRows=document.querySelectorAll('#tab-league table tr').length; renderLeague.view='table'; S.player.career.apps=80; const n0=hofLoad().length; retire(true); r.hof=hofLoad().length-n0; return r; });
-    ok('시즌 시상식(후보·발표) → 트로피 진열장 · 리그 역대 · 명예의 전당', c1.vis&&c1.noms===3&&c2.hub&&c2.tab==='transfer'&&c2.offers>0&&c2.top&&c2.cab>=3&&c2.hist===19&&c2.histRows>=2&&c2.hof===1, JSON.stringify({c1,c2})); }
+    ok('시즌 시상식(후보·발표) → 시즌 회고 → 트로피 진열장 · 리그 역대 · 명예의 전당', srv&&c1.vis&&c1.noms===3&&c2.hub&&c2.tab==='transfer'&&c2.offers>0&&c2.top&&c2.cab>=3&&c2.hist===19&&c2.histRows>=2&&c2.hof===1, JSON.stringify({c1,c2})); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

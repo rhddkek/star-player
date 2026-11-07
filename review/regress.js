@@ -59,7 +59,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
 
   // 3) 경기 진행 → 결과 → 다음 경기, HUD 초기화
   await pg.click('#tabs button[data-tab="home"]'); await pg.waitForTimeout(200);
-  const round0=await pg.evaluate(()=>S.round||S.week||0);
+  const round0=await pg.evaluate(()=>{ S.lastMode='play'; renderHome.mode='play'; renderHub(); return S.round||S.week||0; }); await pg.waitForTimeout(200);
   await pg.click('#btn-go'); await pg.waitForTimeout(500); const lu=await pg.$('#lu-go'); if(lu) await lu.click(); await pg.waitForTimeout(1500);
   const live=await pg.evaluate(()=>!!M&&!M.over); ok('경기 시작', live);
   // 실제 조작 몇 가지: 스루·크로스·슛 버튼 누르기
@@ -410,6 +410,19 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
         return R; });
     ok('손맛 v68: 반대 방향 전환 0.2초 안 · 누른 방향 동료에게 패스(≥95%) · 패스하고 뛰면 원투 리턴 · 태클(!) 보고 꺾으면 제침 · 수비 성향 3종 차이(달려들면 태클·물러서면 거리 둠) · 달리며 슛은 부정확 · 10초 공격 10번 → 결과/최고 기록', V.rev<0.2&&V.passHit>=95&&V.gg&&V.lunge.n>=3&&V.lunge.esc>=V.lunge.n-1&&(V.sty.press.lun>=1||V.sty.press.lost)&&V.sty.drop.lun===0&&!V.sty.drop.lost&&V.sty.drop.med>V.sty.narrow.med+0.6&&V.ss.run>V.ss.calm*2&&V.a10.hud&&V.a10.done&&V.a10.ov&&V.a10.goals===4&&V.a10.best===4&&V.menu===3&&e4.length===0, JSON.stringify({V,e4:e4.slice(0,2)}));
     await c4.close(); }
+  // v69 찬스 모드: 기본 선택 → 빠른 중계(점 화면) → 찬스 직접 → 별점 → 결과 화면 요약
+  { const c5=await b.newContext({viewport:{width:430,height:900}}); const p5=await c5.newPage(); const e5=[]; p5.on('pageerror',e=>e5.push(e.message)); await p5.goto(FILE); await p5.click('#go-create'); await p5.click('#btn-new'); await p5.waitForTimeout(300);
+    await p5.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); renderHub(); }); await p5.waitForTimeout(300);
+    const def=await p5.evaluate(()=>{ const b=document.querySelector('#sel-mode [data-mode].on'); return b?b.dataset.mode:null; });
+    await p5.evaluate(()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); el('btn-go').click(); }); await p5.waitForTimeout(1200);
+    const R=await p5.evaluate(async()=>{ const wait=ms=>new Promise(r=>setTimeout(r,ms)); const ov=el('m-overlay'); if(ov&&!ov.hidden){ const bt=ov.querySelector('.btn.primary'); if(bt) bt.click(); }
+      const R={sim:false,chsim:false,live:0,feed:0}; const t0=Date.now();
+      while(Date.now()-t0<70000){ await wait(150); if(!M) break; const C=M.chance; if(!C) continue; if(M.paused){ const o=el('m-overlay'); const bt=o&&!o.hidden&&o.querySelector('.btn.primary'); if(bt) bt.click(); continue; }
+        C.speed=30; if(C.phase==='sim'){ R.sim=true; if(el('screen-match').classList.contains('chsim')) R.chsim=true; R.feed=Math.max(R.feed,document.querySelectorAll('#chfeed div').length); }
+        if(C.phase==='live'&&C.cur&&!C.cur._t){ C.cur._t=1; R.live++; R.ctrl=!el('screen-match').classList.contains('chsim'); setTimeout(()=>{ if(M&&M.chance&&M.chance.cur) chanceEnd('time'); },400); } }
+      const cr=document.querySelector('.chres'); R.res=!!document.querySelector('#screen-result:not([hidden])'); R.chres=cr?cr.innerText.split('\n')[0]:null; return R; });
+    ok('찬스 모드 v69: 기본 선택 · 빠른 중계(점 화면·해설) → 찬스는 직접 조작 → 별점 · 결과 화면 찬스 요약', def==='chance'&&R.sim&&R.chsim&&R.feed>=1&&R.live>=2&&R.ctrl&&R.res&&/찬스 \d+번/.test(R.chres||'')&&e5.length===0, JSON.stringify({def,...R,e5:e5.slice(0,2)}));
+    await c5.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

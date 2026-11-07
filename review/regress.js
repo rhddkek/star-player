@@ -216,6 +216,24 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await p3.mouse.move(250,300); await p3.mouse.down(); await p3.mouse.move(310,300,{steps:4}); await p3.waitForTimeout(700); await p3.mouse.up();
     const L1=await p3.evaluate(()=>({y:M.user.y,x:M.user.x,vl:VLAND,inb:M.players.every(q=>q.x>-3&&q.x<W+3&&q.y>-3&&q.y<H+3)}));
     ok('가로 화면: 경기장 가로 · 조이스틱 오른쪽 → 앞(상대 골문)으로 이동 · 그린 뒤 좌표 원상복구 · 오류 없음', L0.land&&L1.y<L0.y-2&&Math.abs(L1.x-L0.x)<2.5&&!L1.vl&&L1.inb&&e3.length===0, JSON.stringify({L0,L1,e3:e3.slice(0,2)}));
+    // v67: 원근 시점 · 중계 HUD · 프리킥 벽/조준 · 골 세리머니
+    const T0=await p3.evaluate(()=>{ const sm=el('screen-match'); const pj=PJ(cv._w/2,cv._h); const top=PJ(0,0); return {tilt:sm.classList.contains('tilt')&&cv._tilt,land:sm.classList.contains('land'),tall:cv.clientHeight>sm.clientHeight*1.1,ov:getComputedStyle(el('cv2')).display==='block',bot:Math.round(pj.y)===Math.round(sm.clientHeight),topIn:top.y<=2&&top.x>0,sit:el('sit').textContent.length>0,crest:!!el('sc-h').querySelector('.emb,.emb-x'),dej:!!(SPR.field&&SPR.field.dejected&&SPR.f3&&SPR.f3.walljump)}; });
+    ok('가로 원근 시점: 캔버스 기울임(아래 기준) · 덮개 캔버스 · 상황 칩 · 엠블럼 점수판 · 새 스프라이트', T0.tilt&&T0.land&&T0.tall&&T0.ov&&T0.bot&&T0.topIn&&T0.sit&&T0.crest&&T0.dej, JSON.stringify(T0));
+    const F0=await p3.evaluate(()=>{ const pts=[]; const R=fkSolve(W/2-6,22,W/2+2.5,2.1,0,1,0.66,80,pts); const last=pts[pts.length-1]; const R2=fkSolve(W/2+5,24,W/2-2,1.8,0,0,0.6,70,null); const pts2=[]; fkSolve(W/2+5,24,W/2-2,1.8,0,0,0.6,70,pts2); const l2=pts2[pts2.length-1];
+      M.freeze=0; M.restart=null; M.trans=null; const v=M.user; v.x=W/2-6; v.y=22; M.ball.x=v.x; M.ball.y=v.y; setOwner(v); startSetPiece('fk',0,{x:v.x,y:v.y},{taker:v,instant:true}); if(M.trans) transFinish(); M.freeze=0; if(M.restart){ const r=M.restart; M.restart=null; r(); }
+      return {dx:Math.abs(last[0]-(W/2+2.5)),dz:Math.abs(last[2]-2.1),dx2:Math.abs(l2[0]-(W/2-2)),dz2:Math.abs(l2[2]-1.8),fk:!!M.fk,wall:(M.wallPl||[]).length,sp:M.setPiece&&M.setPiece.type}; });
+    await p3.waitForTimeout(300);
+    const F1=await p3.evaluate(()=>({panel:!el('fkp').hidden,lab:el('k-shot').textContent.includes('프리킥'),sit:el('sit').textContent,bars:getComputedStyle(document.querySelector('#screen-match .bars')).visibility}));
+    await p3.evaluate(()=>{ M.fk.ax=0.8; M.fk.spin=1; input.shotHold=true; }); await p3.waitForTimeout(700); await p3.evaluate(()=>{ input.shotRelease=true; }); await p3.waitForTimeout(250);
+    const F2=await p3.evaluate(()=>({shot:!!M.ball.isShot||!!(M.dbg&&M.dbg.wall),free:!M.setPiece&&!M.fk,jump:M.players.some(p=>p.jumpT>0),panel:el('fkp').hidden,sh:M.stats.fkShots||0}));
+    await p3.waitForTimeout(1600);
+    ok('프리킥: 벽 세우기 · 조준 패널 · 회전/파워 → 감아차기, 벽 점프 · 궤적 계산 정확(±0.35m)', F0.dx<0.35&&F0.dz<0.35&&F0.dx2<0.35&&F0.dz2<0.35&&F0.fk&&F0.wall>=2&&F0.sp==='fk'&&F1.panel&&F1.lab&&/프리킥/.test(F1.sit)&&F1.bars==='hidden'&&F2.shot&&F2.free&&F2.jump&&F2.panel&&F2.sh===1, JSON.stringify({F0,F1,F2}));
+    const G0=await p3.evaluate(()=>{ M.freeze=0; M.restart=null; M.setPiece=null; M.trans=null; const u=M.user; u.x=W/2; u.y=5; M.ball.owner=null; M.ball.x=W/2; M.ball.y=0.6; M.ball.vx=0; M.ball.vy=-18; M.ball.z=0.4; M.ball.vz=0; M.ball.lastKicker=u; return M.score[0]; });
+    await p3.waitForTimeout(600);
+    const G1=await p3.evaluate(()=>({g:M.score[0],dej:M.players.filter(p=>p.team===1&&p.dejT>0).length,run:M.players.filter(p=>p.team===0&&(p.celebRun||p.celebT>0)).length,ban:el('banner').classList.contains('show')}));
+    ok('골 세리머니: 상대 낙담 · 동료가 달려와 함께 세리머니 · 골 배너', G1.g===G0+1&&G1.dej>=8&&G1.run>=2&&G1.ban, JSON.stringify({G0,G1}));
+    const T1=await p3.evaluate(()=>{ S.noTilt=true; resize(); const a=el('screen-match').classList.contains('tilt'); S.noTilt=false; resize(); const b2=el('screen-match').classList.contains('tilt'); return {off:!a,on:b2}; });
+    ok('원근 시점 끄기/켜기 설정 · 오류 없음', T1.off&&T1.on&&e3.length===0, JSON.stringify({T1,e3:e3.slice(0,3)}));
     await c3.close(); }
   { const c2=await b.newContext({...devices['iPhone SE'],viewport:{width:375,height:548}}); const p2=await c2.newPage(); await p2.goto(FILE); await p2.click('#go-create'); await p2.click('#btn-new'); await p2.waitForTimeout(600);
     await p2.evaluate(()=>{ proSkipAll(); S.compIntro=false; S.trust=70; S.starter=true; S.tutSeen=false; S.noReplay=true; startMatch(false); }); await p2.waitForTimeout(300);

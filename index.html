@@ -987,8 +987,11 @@ svg.emb-s{flex:0 0 auto}
   body.land-fit .fl-col>.fl-fill{flex:1 1 0!important;min-height:0;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
   body.land-fit .fl-fill .fl-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
   body.land-fit .fl-fill:has(.fl-scroll){overflow:hidden}
+  body.land-fit .fl-fill .fl-mid{display:flex!important;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden}
+  body.land-fit .fl-fill .fl-mid>*:not(.fl-scroll):not(.fl-mid){flex:none}
+  body.land-fit .fl-scroll .tbl{overflow:visible}
   body.land-fit .fl-fill .fl-scroll:not(table){display:block}
-  body.land-fit .fl-fill .fl-scroll thead th,body.land-fit .fl-fill .fl-scroll tr:first-child th{position:sticky;top:0;z-index:1;background:inherit}
+  body.land-fit .fl-fill .fl-scroll thead th,body.land-fit .fl-fill .fl-scroll tr:first-child th{position:sticky;top:0;z-index:1;background:var(--cream);box-shadow:0 1px 0 var(--line,#e0d6bf)}
 }
 
 @media (orientation:landscape) and (max-height:520px){
@@ -5805,9 +5808,10 @@ let fitBusy=false, fitMO=null;
 /* 한 칸에 카드가 넘치면: 카드마다 작은 탭을 달아 한 번에 하나씩 (스크롤 대신) */
 const FIT_TAB={};
 function fitLabel(c){ let q=null; for(const sl of ['.nm2-h span','.sec>b','.sec>span:not(.pill)','.sec','.sh b','.sh','h2','h3','summary b','summary','.label','b']){ q=c.querySelector(sl); if(q&&q.textContent.trim()) break; } let t=(q?q.textContent:c.textContent||'').replace(/[\u{1F000}-\u{1FFFF}☀-➿◆★☆⭐]/gu,'').replace(/\s+/g,' ').trim(); if(t.length>7) t=t.slice(0,6)+'…'; return t||'정보'; }
-function fitFill(col){ col.querySelectorAll('.fl-fill').forEach(x=>x.classList.remove('fl-fill')); col.querySelectorAll('.fl-scroll').forEach(x=>x.classList.remove('fl-scroll')); if(col.scrollHeight<=col.clientHeight+4) return;
+function fitFill(col){ col.querySelectorAll('.fl-fill').forEach(x=>x.classList.remove('fl-fill')); col.querySelectorAll('.fl-scroll').forEach(x=>x.classList.remove('fl-scroll')); col.querySelectorAll('.fl-mid').forEach(x=>x.classList.remove('fl-mid')); if(col.scrollHeight<=col.clientHeight+4) return;
   const vis=[...col.children].filter(k=>!k.classList.contains('fl-off')&&!k.classList.contains('fl-tabs')&&!k.classList.contains('hero')); const big=vis.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(!big) return; big.classList.add('fl-fill');
-  let t=big; for(let d=0;d<3;d++){ const kids=[...t.children]; if(!kids.length) break; const k=kids.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(k.offsetHeight<big.offsetHeight*0.45) break; t=k; if(k.matches('.list,.tbl,table,.skl,ul,#div-table,.jour-r,.wk3')||k.children.length>3) break; } if(t!==big) t.classList.add('fl-scroll'); }
+  let t=big; for(let d=0;d<3;d++){ const kids=[...t.children]; if(!kids.length) break; const k=kids.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(k.offsetHeight<big.offsetHeight*0.45) break; t=k; if(k.matches('.list,.tbl,table,.skl,ul,#div-table,.jour-r,.wk3')||k.children.length>3) break; } if(t!==big){ t.classList.add('fl-scroll'); for(let m=t.parentElement;m&&m!==big;m=m.parentElement) m.classList.add('fl-mid');
+    if(big.scrollHeight>big.clientHeight+4||(t.clientHeight<120&&t.scrollHeight>t.clientHeight+4)){ t.classList.remove('fl-scroll'); big.querySelectorAll('.fl-mid').forEach(x=>x.classList.remove('fl-mid')); } } } // 안쪽 목록만 넘기기가 안 맞는 칸(접는 카드, 다른 내용이 많은 칸)은 칸 전체를 넘김 // fl-fill과 fl-scroll 사이 칸도 세로 flex로 이어야 표 안 스크롤이 생김
 function fitTabs(col,id){ const old=col.querySelector(':scope>.fl-tabs'); if(old) old.remove(); [...col.children].forEach(k=>k.classList.remove('fl-off'));
   const kids=[...col.children].filter(k=>!k.classList.contains('hero')); if(kids.length<2||col.scrollHeight<=col.clientHeight+4) return;
   let cur=Math.min(FIT_TAB[id]||0,kids.length-1); const bar=document.createElement('div'); bar.className='fl-tabs';

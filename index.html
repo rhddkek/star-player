@@ -3757,9 +3757,9 @@ function recvAssist(u,b,jx,jy,ms){ if(b.owner||b.passTarget!==u||!b.lastKicker||
   const vl2=Math.hypot(vx,vy)||1; const al=(jx*vx+jy*vy)/(jl*vl2); const eta=Math.hypot(b.x-u.x,b.y-u.y)/Math.max(bv,4); if(eta>1.6&&al<0.3) return null; const w=al<-0.2?0.12:al<0.4?0.4:0.65; // 반대로 밀면 내 입력이 우선
   return {x:jx*ms*(1-w)+vx*w,y:jy*ms*(1-w)+vy*w}; }
 /* 크로스 존: 박스 안 동료 표시 (니어 노랑 · 파 하늘 · 컷백 초록) */
-function drawCrossTargets(ctx,ppm){ const u=M.user; if(!(M.ball.owner===u&&!M.setPiece&&!M.charge&&crossZone(u))) return; const s=Math.sign(u.x-W/2)||1;
-  const C=M.players.filter(q=>q.team===0&&!q.isUser&&q.role!=='GK'&&q.y<19&&Math.abs(q.x-W/2)<20.16); if(!C.length) return;
-  ctx.save(); ctx.shadowBlur=0; C.slice(0,4).forEach(q=>{ const cut=q.y>11.5; const near=!cut&&(q.x-W/2)*s>0; const col=cut?'#5fe0b5':near?'#ffd84d':'#7fd4ff'; const pulse=0.75+0.25*Math.sin(M.t*7);
+function drawCrossTargets(ctx,ppm){ const u=M.user; const WP=q=>VLAND?{x:q.y,y:-q.x}:{x:q.x,y:q.y}; /* 가로 화면은 그리는 동안 좌표가 돌아가 있음 → 실제 경기장 좌표로 판단 */ const U=WP(u); if(!(M.ball.owner===u&&!M.setPiece&&!M.charge&&crossZone(U))) return; const s=Math.sign(U.x-W/2)||1;
+  const C=M.players.filter(q=>{ const Q=WP(q); return q.team===0&&!q.isUser&&q.role!=='GK'&&Q.y<19&&Math.abs(Q.x-W/2)<20.16; }); if(!C.length) return;
+  ctx.save(); ctx.shadowBlur=0; C.slice(0,4).forEach(q=>{ const Q=WP(q); const cut=Q.y>11.5; const near=!cut&&(Q.x-W/2)*s>0; const col=cut?'#5fe0b5':near?'#ffd84d':'#7fd4ff'; const pulse=0.75+0.25*Math.sin(M.t*7);
     ctx.globalAlpha=0.9*pulse; ctx.strokeStyle=col; ctx.lineWidth=3; ctx.beginPath(); ctx.ellipse(q.x*ppm,q.y*ppm+0.3*ppm,1.05*ppm,0.6*ppm,0,0,7); ctx.stroke();
     ctx.globalAlpha=0.35*pulse; ctx.fillStyle=col; ctx.fill(); }); ctx.restore(); ctx.shadowBlur=4; }
 

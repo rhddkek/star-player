@@ -229,9 +229,9 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await p3.waitForTimeout(1600);
     ok('프리킥: 벽 세우기 · 조준 패널 · 회전/파워 → 감아차기, 벽 점프 · 궤적 계산 정확(±0.35m)', F0.dx<0.35&&F0.dz<0.35&&F0.dx2<0.35&&F0.dz2<0.35&&F0.fk&&F0.wall>=2&&F0.sp==='fk'&&F1.panel&&F1.lab&&/프리킥/.test(F1.sit)&&F1.bars==='hidden'&&F2.shot&&F2.free&&F2.jump&&F2.panel&&F2.sh===1, JSON.stringify({F0,F1,F2}));
     for(let k=0;k<25;k++){ const busy=await p3.evaluate(()=>!!(M.restart||M.ball.isShot||M.celebT>0||(M.ball.owner&&M.ball.owner.role==='GK'))); if(!busy) break; await p3.waitForTimeout(200); } // 프리킥 슛이 끝난 뒤(골·세이브 정리 후) 측정
-    const G0=await p3.evaluate(()=>{ M.freeze=0; M.restart=null; M.setPiece=null; M.trans=null; const u=M.user; u.x=W/2; u.y=5; M.ball.owner=null; M.ball.x=W/2; M.ball.y=0.6; M.ball.vx=0; M.ball.vy=-18; M.ball.z=0.4; M.ball.vz=0; M.ball.lastKicker=u; return M.score[0]; });
+    const G0=await p3.evaluate(()=>{ M.freeze=0; M.restart=null; M.setPiece=null; M.trans=null; const u=M.user; u.x=W/2; u.y=5; M.ball.owner=null; M.ball.x=W/2; M.ball.y=0.6; M.ball.vx=0; M.ball.vy=-18; M.ball.z=0.4; M.ball.vz=0; M.ball.lastKicker=u; const gk=M.players.find(q=>q.team===1&&q.role==='GK'); if(gk){ gk.x=W/2+12; gk.y=3; gk.stun=2; } return M.score[0]; }); // 키퍼가 막을 수 있는 자리면 결과가 들쭉날쭉 → 키퍼를 비켜 세움
     await p3.waitForTimeout(600);
-    const G1=await p3.evaluate(()=>({g:M.score[0],dej:M.players.filter(p=>p.team===1&&p.dejT>0).length,run:M.players.filter(p=>p.team===0&&(p.celebRun||p.celebT>0)).length,ban:el('banner').classList.contains('show')}));
+    const G1=await p3.evaluate(()=>({st:M.state,fr:+(M.freeze||0).toFixed(2),rs:!!M.restart,rp:!!M.replay,ri:M.replayIn,sp:M.setPiece&&M.setPiece.type,bx:+M.ball.x.toFixed(1),by:+M.ball.y.toFixed(1),bo:M.ball.owner&&M.ball.owner.role,ch:!!M.chance,pa:M.paused,g:M.score[0],dej:M.players.filter(p=>p.team===1&&p.dejT>0).length,run:M.players.filter(p=>p.team===0&&(p.celebRun||p.celebT>0)).length,ban:el('banner').classList.contains('show')}));
     ok('골 세리머니: 상대 낙담 · 동료가 달려와 함께 세리머니 · 골 배너', G1.g===G0+1&&G1.dej>=8&&G1.run>=2&&G1.ban, JSON.stringify({G0,G1}));
     const T1=await p3.evaluate(()=>{ S.noTilt=true; resize(); const a=el('screen-match').classList.contains('tilt'); S.noTilt=false; resize(); const b2=el('screen-match').classList.contains('tilt'); return {off:!a,on:b2}; });
     ok('원근 시점 끄기/켜기 설정 · 오류 없음', T1.off&&T1.on&&e3.length===0, JSON.stringify({T1,e3:e3.slice(0,3)}));
@@ -455,6 +455,10 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       return {posn,ok,bendDeg:Math.round(bend*180/Math.PI),mv:+mv.toFixed(1),sr:subRole(u),hx:Math.round(u.hx),half,circ,gd:+gd.toFixed(1)}; });
     ok('v73 손맛: 공은 휘지 않고(0°) 내가 받으러 움직여 받음 · 선호 포지션(측면 MF) 자리 · 킥오프 각자 진영·센터서클 · 키퍼가 잡은 공엔 9m 밖', V.posn==='wm'&&V.ok>=5&&V.bendDeg<=1&&V.mv>0.5&&V.mv<4.5&&V.sr==='WM'&&(V.hx<20||V.hx>48)&&V.half===0&&V.circ===0&&V.gd>=8.5&&e8.length===0, JSON.stringify({...V,e8:e8.slice(0,2)}));
     await c8.close(); }
+  { const c9=await b.newContext({...devices['iPhone 13 landscape']}); const p9=await c9.newPage(); await p9.goto(FILE); await p9.click('#go-create'); await p9.click('#btn-new'); await p9.waitForTimeout(400);
+    await p9.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await p9.waitForTimeout(800); await p9.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await p9.waitForTimeout(2500);
+    const X=await p9.evaluate(()=>new Promise(res=>{ M.freeze=0; const u=M.user; u.x=49; u.y=22; setOwner(u); M.players.filter(q=>q.team===0&&!q.isUser&&q.role!=='GK').slice(0,3).forEach((q,i)=>{ q.x=[38,46,42][i]; q.y=[8,7,14][i]; q.stun=2; }); let n=0; const oe=CanvasRenderingContext2D.prototype.ellipse, od=drawCrossTargets; drawCrossTargets=function(c,p){ CanvasRenderingContext2D.prototype.ellipse=function(...a){ n++; return oe.apply(this,a); }; try{ od(c,p); } finally { CanvasRenderingContext2D.prototype.ellipse=oe; } }; setTimeout(()=>{ drawCrossTargets=od; res({n,land:isLand()}); },300); }));
+    ok('v73 크로스 지역: 가로 화면에서도 박스 안 동료 표시', X.land&&X.n>=3, JSON.stringify(X)); await c9.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

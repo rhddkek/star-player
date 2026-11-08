@@ -926,6 +926,103 @@ svg.emb-s{flex:0 0 auto}
   .res-top{grid-template-columns:minmax(170px,32%) 1fr} .hero-res{height:calc(100dvh - 150px)!important} .hero-res .plate b{font-size:.95rem}.hero-res .rt-b b{font-size:1.4rem}
   .lg-sel .nm b{font-size:.95rem}.lg-sel .chg{padding:4px 7px;font-size:.7rem}
 }
+
+/* v72 가로 한 화면 */
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit #screen-hub .wrap{overflow:hidden;padding-block:6px 6px;display:flex;flex-direction:column}
+  body.land-fit #hub-col{flex:1 1 0;min-height:0;gap:6px}
+  body.land-fit #hub-col>.tabpanel:not([hidden]){flex:1 1 0;display:flex;flex-direction:column;gap:6px;min-height:0}
+  body.land-fit .fl-row{flex:1 1 0;min-height:0;display:flex;gap:8px}
+  body.land-fit .fl-col{min-width:0;flex-grow:1;flex-shrink:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:16px}
+  body.land-fit .fl-col::-webkit-scrollbar{display:none}
+  body.land-fit .fl-col>*{flex:0 0 auto;margin-top:0!important;margin-bottom:0!important}
+  body.land-fit .fl-col>.hero{flex:1 1 auto;height:auto!important;min-height:140px!important;position:relative!important;top:auto!important}
+  body.land-fit .fl-col:only-child{flex-basis:100%!important}
+  body.land-fit .fl-hide,body.land-fit .fl-gone{display:none!important}
+  body.land-fit .fl-row{zoom:.8}
+  body.land-fit #screen-hub .hh-t{font-size:.95rem}
+  body.land-fit .hub-seg{flex:0 0 auto;padding:3px!important}body.land-fit .hub-seg button{padding:4px 2px!important;font-size:.76rem!important;min-height:0}
+  body.land-fit #screen-result .wrap{overflow:hidden;display:flex;flex-direction:column;padding-block:6px 0}
+  body.land-fit #result-col{flex:1 1 0;min-height:0;gap:6px}
+  body.land-fit #result-col>.fl-row{flex:1 1 0}
+  body.land-fit #result-col .res-go{position:static;flex:0 0 auto;padding:4px 0 calc(6px + env(safe-area-inset-bottom,0px));background:none}
+  body.land-fit #result-col .res-go .btn{min-height:40px!important;padding-block:6px!important}
+}
+@media (orientation:landscape) and (max-height:520px){
+  /* 홈: 다음 경기 카드가 한 칸을 꽉 채우고, 경기 시작 버튼은 항상 아래에 보이게 */
+  body.land-fit .fl-col>.nm2{flex:1 0 auto;display:flex;flex-direction:column}
+  body.land-fit .nm2 .nm2-vs{margin:0 0 2px}
+  body.land-fit .nm2 .nm2-vs .tm>:first-child{zoom:.48}body.land-fit .nm2 .nm2-vs .vs{font-size:1.4rem}
+  body.land-fit .nm2 .tstrip .tl,body.land-fit .nm2 .tstrip small+small{display:none}body.land-fit .nm2 .tstrip .row{flex-wrap:nowrap}
+  body.land-fit .nm2 .hm-goal summary{padding-block:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.land-fit .nm2 .hm-goal summary *{white-space:nowrap}
+  body.land-fit .fl-col>.nm2{padding-bottom:8px}body.land-fit .nm2 .nm2-h{margin-bottom:4px!important}
+  body.land-fit .nm2 .ribbon{font-size:.85rem;margin:0 auto!important}body.land-fit .nm2 .nm2-vs .vs{font-size:1.1rem!important}body.land-fit .nm2 .nm2-vs .tm b{font-size:.92rem!important}
+  body.land-fit .nm2 .hm-goal{padding:4px 10px!important}
+  body.land-fit .fl-col>.nm2{position:relative}body.land-fit .nm2 .go-btn{width:calc(100% - 128px)!important;font-size:1rem!important}
+  body.land-fit .nm2 .hm-mode{position:absolute;right:14px;bottom:8px;width:122px;height:42px;margin:0!important;display:flex;align-items:center}
+  body.land-fit .nm2 .hm-mode .segs{display:flex;width:100%;height:100%;align-items:stretch}body.land-fit .nm2 .hm-mode .segs button{flex:1 1 0;padding:2px 1px!important;font-size:.7rem!important;min-width:0;white-space:nowrap}
+  body.land-fit #screen-hub .hub-head{padding-block:2px!important;min-height:0}body.land-fit #screen-hub .gearbtn{width:32px;height:32px}body.land-fit #screen-hub .hub-head .money .v{font-size:1.05rem}body.land-fit .nm2 .tstrip{padding:4px 10px!important}body.land-fit .nm2 .go-btn{min-height:42px!important;height:42px}
+  body.land-fit .nm2 .hm-goal .prep-d,body.land-fit .nm2 .mode-d{display:none}body.land-fit .nm2 .go-btn{min-height:42px!important}body.land-fit .nm2 .nm2-h{padding-block:6px;margin-bottom:6px}body.land-fit .nm2 .ribbon{padding-block:2px}
+  body.land-fit .nm2 .nm2-vs .tm{gap:2px}body.land-fit .nm2 .nm2-vs .tm b{font-size:1rem}
+  body.land-fit .nm2 .ribbon{margin:2px auto}
+  body.land-fit .nm2 .tstrip{margin-top:4px;padding:6px 10px}body.land-fit .nm2 .tstrip small{margin-top:2px}
+  body.land-fit .nm2 .hm-goal{margin-top:4px}
+  body.land-fit .nm2 .go-btn{margin-top:auto!important;min-height:46px}
+  body.land-fit .nm2 .hm-mode{margin-top:4px}body.land-fit .nm2 .mode-d{margin:2px 0 0;font-size:.74rem}
+  body.land-fit .fl-col>.side{gap:8px}
+  /* 결과 */
+  body.land-fit .hero-res .plate{left:6px;right:6px;bottom:6px;padding:6px 8px}
+  body.land-fit .hero-res .plate b{font-size:1rem}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit .fl-tabs{flex:0 0 auto;display:flex;gap:3px;background:#0b1428;border-radius:12px;padding:3px;position:sticky;top:0;z-index:2}
+  body.land-fit .fl-tabs button{flex:1 1 0;min-width:0;border:0;border-radius:9px;background:transparent;color:#cfd8ea;font:inherit;font-size:.82rem;font-weight:800;padding:6px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  body.land-fit .fl-tabs button.on{background:linear-gradient(180deg,#8ff3cf,#5fe0b5);color:#0c2b22}
+  body.land-fit .fl-col>.fl-off{display:none!important}
+  body.land-fit .fl-col>.side>*{flex:0 0 auto}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit .fl-col>.fl-fill{flex:1 1 0!important;min-height:0;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+  body.land-fit .fl-fill .fl-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+  body.land-fit .fl-fill:has(.fl-scroll){overflow:hidden}
+  body.land-fit .fl-fill .fl-scroll:not(table){display:block}
+  body.land-fit .fl-fill .fl-scroll thead th,body.land-fit .fl-fill .fl-scroll tr:first-child th{position:sticky;top:0;z-index:1;background:inherit}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit .fl-col div:has(>.srow){display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}body.land-fit .fl-col .srow{margin:0!important}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit .fl-col .card:has(.srow)>p.muted{display:none}
+  body.land-fit .fl-col .srow{padding-block:4px!important;min-height:0}
+  body.land-fit .fl-col .sinfo{padding:4px 8px!important;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.land-fit .fl-col .sapply .btn{min-height:36px!important;padding-block:4px!important}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit #m-overlay>.card{zoom:.76}
+  body.land-fit .hub-modal>.card{zoom:.82}
+  body.land-fit #cer-col,body.land-fit #pro-col{zoom:.8}
+  body.land-fit .sc-list .row b,body.land-fit .sc-list b{word-break:keep-all}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.land-fit .ht2 .ht-art{display:none}body.land-fit .ht2{display:block!important}body.land-fit .ht2 .ht-r{width:100%}
+  body.land-fit #m-overlay>.card:has(.ht2){max-width:min(760px,96vw)!important;zoom:.75}
+  body.land-fit .ht2 .ht-r{display:grid;grid-template-columns:1fr 1fr;column-gap:14px;grid-auto-flow:row dense;align-items:start}
+  body.land-fit .ht2 .ht-r>*{grid-column:1}body.land-fit .ht2 .ht-r>.label:has(+.ht-opts){grid-row:1}body.land-fit .ht2 .ht-r>.ht-opts{grid-row:2/span 6;align-self:start}body.land-fit .ht2 .ht-r>.ht-opts .ht-o{padding:5px 10px}
+  body.land-fit .ht2 .ht-r>.label:has(+.ht-opts),body.land-fit .ht2 .ht-r>.ht-opts,body.land-fit .ht2 .ht-r>.ht-opts~*{grid-column:2}
+  body.land-fit #m-overlay>.card:has(.lu2){zoom:.64}body.land-fit .lu2{grid-template-columns:minmax(0,1.25fr) minmax(200px,1fr)!important}
+  body.land-fit .hub-modal>.card:has([data-pm]){max-width:min(780px,96vw)!important;zoom:.78}
+  body.land-fit .hub-modal>.card:has([data-pm]) .list{display:grid!important;grid-template-columns:1fr 1fr}
+  body.land-fit #cer-col{zoom:.68}
+  body.land-fit .tc-grid{zoom:.8}
+}
+
+@media (orientation:landscape) and (max-height:520px) and (max-width:700px){ body.land-fit #m-overlay>.card:has(.lu2){zoom:.58} body.land-fit .fl-row{zoom:.74} body.land-fit .nm2 .hm-mode{width:96px} body.land-fit .nm2 .go-btn{width:calc(100% - 102px)!important;font-size:.88rem!important;padding-inline:4px!important} body.land-fit .fl-col .srow{grid-template-columns:18px 40px 1fr auto;gap:4px} }
 </style>
 
 <!-- ============ TITLE / NEW PLAYER ============ -->
@@ -5632,6 +5729,56 @@ function migrateV2(){ if((S.v||0)>=2) return;
 el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); restoreStr(); migrateV3(); migrateV4(); migrateV5(); renameComps(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.conts) compInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } if(S.prologue){ proResume(); return; } if(S.trust==null) trustMigrate(); tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
 document.querySelectorAll('#tabs .ti').forEach(t=>t.innerHTML=icon(t.dataset.i,22));
 initTitle(); sprInit();
+
+/* ===== v72 가로 한 화면: 화면 자체는 스크롤 없이, 내용은 칸(열)으로 나눠 한 화면에 ===== */
+const LAND_MQ=window.matchMedia('(orientation:landscape) and (max-height:520px)');
+// 각 화면: 칸 구성(평탄화한 자식 순서) · 칸 너비(%)
+const FIT_SPEC={
+  'home':{g:[[0],[1],[2]],w:[23,37,40]},
+  'player:stat':{g:[[0,2,3,4],[1]],w:[30,70]},
+  'player:week':{g:[[0]],w:[100]},
+  'shop:gear':{g:[[0]],w:[100]},
+  'shop:cos':{g:[[0],[1,2,3,4,5,6,7]],w:[30,70]},
+  'player:profile':{g:[[0,1],[2],[3,4,5]],w:[32,36,32]},
+  'skill':{g:[[0],[1,2,3]],w:[34,66]},
+  'league':{g:[[0],[1]],w:[62,38],hide:['lg-ban']},
+  'career:record':{g:[[0],[1]],w:[58,42]},
+  'transfer':{g:[[0,1],[2,3,4]],w:[40,60]},
+  'career:scout':{g:[[0],[1],[2,3]],w:[31,37,32],hide:['hero-sc']},
+  'shop:endo':{g:[[0,2,3],[1,4,5]],w:[45,55]},
+  'shop:life':{g:[[0,1,2]],w:[100]},
+  'result':{g:[[0],[1],[2,3,4,5]],w:[24,40,36]},
+};
+function fitFlat(box,hide){ const out=[]; [...box.children].forEach(c=>{ if(c.classList.contains('hub-seg')||c.classList.contains('fl-row')||c.classList.contains('res-go')) return; if(hide&&hide.some(h=>c.classList.contains(h))){ c.classList.add('fl-hide'); return; } if(c.classList.contains('lay')||c.classList.contains('res-top')||c.classList.contains('side')||c.classList.contains('gcol')){ [...c.children].forEach(k=>{ if(hide&&hide.some(h=>k.classList.contains(h))){ k.classList.add('fl-hide'); return; } if(k.classList.contains('side')||k.classList.contains('gcol')){ [...k.children].forEach(x=>out.push(x)); k.classList.add('fl-gone'); return; } out.push(k); }); c.classList.add('fl-gone'); return; } out.push(c); }); return out; }
+function fitApply(box,key){ if(!box) return; const on=LAND_MQ.matches; document.body.classList.toggle('land-fit',on); if(!on) return; const sp=FIT_SPEC[key]; if(!sp) return;
+  let row=box.querySelector(':scope>.fl-row'); const items=fitFlat(box,sp.hide);
+  if(!row){ row=document.createElement('div'); row.className='fl-row'; sp.g.forEach((g,i)=>{ const c=document.createElement('div'); c.className='fl-col'; c.style.flexBasis=sp.w[i]+'%'; row.append(c); }); const seg=box.querySelector(':scope>.hub-seg'); if(seg) seg.after(row); else box.prepend(row);
+    const cols=[...row.children]; const used=new Set(); sp.g.forEach((g,i)=>g.forEach(j=>{ if(items[j]){ cols[i].append(items[j]); used.add(j); } })); items.forEach((it,j)=>{ if(!used.has(j)) cols[cols.length-1].append(it); }); }
+  else { const cols=[...row.children]; items.forEach(it=>cols[cols.length-1].append(it)); }
+  [...row.children].forEach(c=>{ if(!c.children.length) c.remove(); });
+  [...row.children].forEach((c,i)=>fitTabs(c,key+'#'+i));
+  [...row.children].forEach(fitFill);
+  const go=box.querySelector(':scope>.res-go'); if(go&&box.lastElementChild!==go) box.append(go); }
+let fitBusy=false, fitMO=null;
+/* 한 칸에 카드가 넘치면: 카드마다 작은 탭을 달아 한 번에 하나씩 (스크롤 대신) */
+const FIT_TAB={};
+function fitLabel(c){ let q=null; for(const sl of ['.nm2-h span','.sec>b','.sec>span:not(.pill)','.sec','.sh b','.sh','h2','h3','summary b','summary','.label','b']){ q=c.querySelector(sl); if(q&&q.textContent.trim()) break; } let t=(q?q.textContent:c.textContent||'').replace(/[\u{1F000}-\u{1FFFF}☀-➿◆★☆⭐]/gu,'').replace(/\s+/g,' ').trim(); if(t.length>7) t=t.slice(0,6)+'…'; return t||'정보'; }
+function fitFill(col){ col.querySelectorAll('.fl-fill').forEach(x=>x.classList.remove('fl-fill')); col.querySelectorAll('.fl-scroll').forEach(x=>x.classList.remove('fl-scroll')); if(col.scrollHeight<=col.clientHeight+4) return;
+  const vis=[...col.children].filter(k=>!k.classList.contains('fl-off')&&!k.classList.contains('fl-tabs')&&!k.classList.contains('hero')); const big=vis.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(!big) return; big.classList.add('fl-fill');
+  let t=big; for(let d=0;d<3;d++){ const kids=[...t.children]; if(!kids.length) break; const k=kids.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(k.offsetHeight<big.offsetHeight*0.45) break; t=k; if(k.matches('.list,.tbl,table,.skl,ul,#div-table,.jour-r,.wk3')||k.children.length>3) break; } if(t!==big) t.classList.add('fl-scroll'); }
+function fitTabs(col,id){ const old=col.querySelector(':scope>.fl-tabs'); if(old) old.remove(); [...col.children].forEach(k=>k.classList.remove('fl-off'));
+  const kids=[...col.children].filter(k=>!k.classList.contains('hero')); if(kids.length<2||col.scrollHeight<=col.clientHeight+4) return;
+  let cur=Math.min(FIT_TAB[id]||0,kids.length-1); const bar=document.createElement('div'); bar.className='fl-tabs';
+  const show=()=>{ kids.forEach((k,i)=>k.classList.toggle('fl-off',i!==cur)); [...bar.children].forEach((b,i)=>b.classList.toggle('on',i===cur)); col.scrollTop=0; };
+  kids.forEach((k,i)=>{ const b=document.createElement('button'); b.textContent=fitLabel(k); b.onclick=e=>{ e.stopPropagation(); cur=FIT_TAB[id]=i; show(); }; bar.append(b); });
+  col.prepend(bar); show(); }
+function fitNow(){ if(fitBusy) return; fitBusy=true; try{ const p=document.querySelector('#hub-col>.tabpanel:not([hidden])'); if(p&&!el('screen-hub').hidden) fitApply(p,curKey()); const rc=el('result-col'); if(rc&&!el('screen-result').hidden) fitApply(rc,'result'); } finally { if(fitMO) fitMO.takeRecords(); fitBusy=false; } }
+(function fitWire(){ const mo=fitMO=new MutationObserver(()=>fitNow()); document.querySelectorAll('#hub-col>.tabpanel').forEach(p=>mo.observe(p,{childList:true})); const rc=el('result-col'); if(rc) mo.observe(rc,{childList:true});
+  const mo2=new MutationObserver(()=>fitNow()); ['screen-hub','screen-result'].forEach(id=>{ const s=el(id); if(s) mo2.observe(s,{attributes:true,attributeFilter:['hidden']}); });
+  const onCh=()=>{ document.body.classList.toggle('land-fit',LAND_MQ.matches); if(typeof S!=='undefined'&&S&&!el('screen-hub').hidden&&typeof renderHub==='function') renderHub(); else fitNow(); };
+  if(LAND_MQ.addEventListener) LAND_MQ.addEventListener('change',onCh); else if(LAND_MQ.addListener) LAND_MQ.addListener(onCh);
+  document.body.classList.toggle('land-fit',LAND_MQ.matches); })();
+
 </script>
 
 </html>

@@ -433,6 +433,14 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const lens={}; ['kr-1','be-1','at-1','sc-1','dk-1','ch-1'].forEach(d=>lens[d]=S.fixtures[d].length); const u=S.conts.uel; return {divs:Object.keys(S.divs).length,c,cc,uel:u.step===u.steps.length&&!!u.champion,lens,star:clubStar10(CLUBS['en-1-1']),s10:/s10/.test(starHTML(CLUBS['kr-2-0']))}; });
     ok('리그 확장 v70: 37개 리그(아시아·유럽·남미) · 대륙컵 6개(챔스 36·유로파 24·컨퍼런스 24·ACLE 24·ACL2 16·리베르타 16) · 리그 선택 시트(대륙 탭→목록 탭) · 내 대회 경기 진행 · 스플릿 규정 · 별 10개', pk.tabs===4&&pk.asia===9&&pk.eu===12&&pk.sam===4&&pk.cur==='nl-1'&&pk.acl===2&&V.divs===37&&V.c.ucl===36&&V.c.uel===24&&V.c.uecl===24&&V.c.acl===24&&V.c.acl2===16&&V.c.lib===16&&V.cc>=8&&V.uel&&V.lens['kr-1']===38&&V.lens['be-1']===40&&V.lens['at-1']===32&&V.lens['sc-1']===38&&V.star===10&&V.s10&&e6.length===0, JSON.stringify({pk,V,e6:e6.slice(0,2)}));
     await c6.close(); }
+  // v72 가로 한 화면: 화면 자체는 스크롤 없음 · 홈의 경기 시작 버튼이 화면 안
+  { const {devices}=require('playwright'); const c7=await b.newContext({...devices['iPhone 13 landscape']}); const p7=await c7.newPage(); const e7=[]; p7.on('pageerror',e=>e7.push(e.message)); await p7.goto(FILE); await p7.click('#go-create'); await p7.click('#btn-new'); await p7.waitForTimeout(300);
+    await p7.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; for(let i=0;i<3;i++) autoMatch(true); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    const F={}; for(const k of ['home','player:stat','skill','league','transfer','career:record','shop:gear']){ await p7.evaluate(k=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); goKey(k); },k); await p7.waitForTimeout(150);
+      F[k]=await p7.evaluate(()=>{ const w=document.querySelector('#screen-hub .wrap'); const g=document.querySelector('#hub-col>.tabpanel:not([hidden]) #btn-go'); const r=g&&g.getBoundingClientRect(); return {over:w.scrollHeight-w.clientHeight,cols:document.querySelectorAll('#hub-col>.tabpanel:not([hidden]) .fl-col').length,go:g?(r.bottom<=innerHeight&&r.height>20):null}; }); }
+    const bad=Object.entries(F).filter(([k,v])=>v.over>2||v.cols<1||v.go===false);
+    ok('가로 한 화면 v72: 홈·성장·스킬·리그·이적·기록·장비 화면 스크롤 없음(칸 배치) · 경기 시작 버튼 화면 안', bad.length===0&&F.home.go===true&&e7.length===0, JSON.stringify({bad,home:F.home,e7:e7.slice(0,2)}));
+    await c7.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

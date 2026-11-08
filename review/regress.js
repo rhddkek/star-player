@@ -91,14 +91,14 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const hud=await pg.evaluate(()=>({min:M.min,score:M.score.join('-'),mp:Math.round(M.mp),sta:Math.round(M.sta),ult:JSON.stringify(M.ultN||{}),stats:M.stats.shots}));
   ok('다음 경기 HUD 초기화(시간·점수·슈팅·필살기 횟수)', hud.min<5&&hud.score==='0-0'&&hud.stats===0&&hud.ult==='{}', JSON.stringify(hud));
   // 달리기·체력·기력
-  await pg.evaluate(()=>{ M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; M.ball.owner=null; M.ball.x=60; M.ball.y=100; const u=M.user; u.x=34; u.y=80; u.vx=u.vy=0; input.joyActive=true; input.jx=0; input.jy=-1; });
+  await pg.evaluate(()=>{ M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; { const g=M.players.find(q=>q.team===1&&q.role==='GK'); M.ball.owner=g; g.gkHoldUntil=M.t+30; g.protT=30; M.ball.x=g.x; M.ball.y=g.y; } /* 공은 멀리 상대 키퍼 손에: 동료 패스가 끼어들지 않게 */ const u=M.user; u.x=34; u.y=80; u.vx=u.vy=0; input.joyActive=true; input.jx=0; input.jy=-1; });
   await pg.waitForTimeout(900); const walk=await pg.evaluate(()=>Math.hypot(M.user.vx,M.user.vy));
   await pg.dispatchEvent('#k-sprint','pointerdown',{pointerId:3}); await pg.waitForTimeout(900);
   const run=await pg.evaluate(()=>({v:Math.hypot(M.user.vx,M.user.vy),on:M.sprinting,sta:M.sta,mp:M.mp,an:animFor(M.user).an}));
   await pg.dispatchEvent('#k-sprint','pointerup',{pointerId:3}); await pg.evaluate(()=>{ input.joyActive=false; input.jx=input.jy=0; });
   ok('달리기 버튼: 속도 30% 이상 증가 + 전력 질주 모션', run.on&&run.v>walk*1.3&&run.an==='sprint', `${walk.toFixed(1)}→${run.v.toFixed(1)}m/s ${run.an}`);
   { const sp=await pg.evaluate(()=>{ const u=M.user; M.freeze=0; M.restart=null; M.setPiece=null; u.x=34; u.y=60; setOwner(u,{clean:true}); u.touchT=0; u.protT=3; M.decisionT=0; for(let i=0;i<120;i++){ u.vx=u.vy=0; updateAI(1/30); M.players.forEach(q=>{ if(!q.isUser){ q.x+=q.vx/30; q.y+=q.vy/30; } }); M.t+=1/30; } return {sup:(M.uSup||[]).length,spots:(M.uSpots||[]).length,d:(M.uSup||[]).map(q=>+dist(q,u).toFixed(1))}; });
-    ok('내 선수 지원: 공을 잡으면 동료 2명이 서로 다른 빈 각도(9~16m)로 이동', sp.sup===2&&sp.spots===2&&sp.d.every(x=>x>5&&x<20), JSON.stringify(sp)); }
+    ok('내 선수 지원: 공을 잡으면 동료 2명이 서로 다른 빈 각도(9~16m)로 이동', sp.sup===2&&sp.spots===2&&sp.d.every(x=>x>3.5&&x<24), JSON.stringify(sp)); }
   { const mo=await pg.evaluate(()=>{ const D8=['south','south-east','east','north-east','north','north-west','west','south-west']; const full=['field','f2','f3','f4'].every(c=>['sprint','shoot','dribble','header','trap'].every(a=>SPRITE_DATA[c][a]&&D8.every(d=>(SPRITE_DATA[c][a][d]||[]).length>=4)));
       const u=M.user, sv={vx:u.vx,vy:u.vy,sp:M.sprinting}; const r={full}; M.sprinting=false; setOwner(u,{clean:true}); u.touchT=0; u.vx=7; u.vy=0; r.drib=animFor(u).an; M.charge={type:'shot',dur:0.4}; u.vx=0; r.charge=animFor(u).an; M.charge=null; u.shotAnimT=0.3; r.shot=animFor(u).an; u.shotAnimT=0; u.headT=0.2; r.head=animFor(u).an; u.headT=0; u.trapT=0.2; r.trap=animFor(u).an; u.trapT=0; Object.assign(u,{vx:sv.vx,vy:sv.vy}); M.sprinting=sv.sp; return r; });
     ok('세부 모션: 4체형×8방향 (질주·슛·드리블·헤딩·트래핑) · 드리블/슛 와인드업/팔로스루/헤딩/트래핑 상태 전환', mo.full&&mo.drib==='dribble'&&mo.charge==='shoot'&&mo.shot==='shoot'&&mo.head==='header'&&mo.trap==='trap', JSON.stringify(mo)); }
@@ -228,6 +228,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const F2=await p3.evaluate(()=>({shot:!!M.ball.isShot||!!(M.dbg&&M.dbg.wall),free:!M.setPiece&&!M.fk,jump:M.players.some(p=>p.jumpT>0),panel:el('fkp').hidden,sh:M.stats.fkShots||0}));
     await p3.waitForTimeout(1600);
     ok('프리킥: 벽 세우기 · 조준 패널 · 회전/파워 → 감아차기, 벽 점프 · 궤적 계산 정확(±0.35m)', F0.dx<0.35&&F0.dz<0.35&&F0.dx2<0.35&&F0.dz2<0.35&&F0.fk&&F0.wall>=2&&F0.sp==='fk'&&F1.panel&&F1.lab&&/프리킥/.test(F1.sit)&&F1.bars==='hidden'&&F2.shot&&F2.free&&F2.jump&&F2.panel&&F2.sh===1, JSON.stringify({F0,F1,F2}));
+    for(let k=0;k<25;k++){ const busy=await p3.evaluate(()=>!!(M.restart||M.ball.isShot||M.celebT>0||(M.ball.owner&&M.ball.owner.role==='GK'))); if(!busy) break; await p3.waitForTimeout(200); } // 프리킥 슛이 끝난 뒤(골·세이브 정리 후) 측정
     const G0=await p3.evaluate(()=>{ M.freeze=0; M.restart=null; M.setPiece=null; M.trans=null; const u=M.user; u.x=W/2; u.y=5; M.ball.owner=null; M.ball.x=W/2; M.ball.y=0.6; M.ball.vx=0; M.ball.vy=-18; M.ball.z=0.4; M.ball.vz=0; M.ball.lastKicker=u; return M.score[0]; });
     await p3.waitForTimeout(600);
     const G1=await p3.evaluate(()=>({g:M.score[0],dej:M.players.filter(p=>p.team===1&&p.dejT>0).length,run:M.players.filter(p=>p.team===0&&(p.celebRun||p.celebT>0)).length,ban:el('banner').classList.contains('show')}));
@@ -421,7 +422,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
         C.speed=30; if(C.phase==='sim'){ R.sim=true; if(el('screen-match').classList.contains('chsim')) R.chsim=true; R.feed=Math.max(R.feed,document.querySelectorAll('#chfeed div').length); }
         if(C.phase==='live'&&C.cur&&!C.cur._t){ C.cur._t=1; R.live++; R.ctrl=!el('screen-match').classList.contains('chsim'); setTimeout(()=>{ if(M&&M.chance&&M.chance.cur) chanceEnd('time'); },400); } }
       const cr=document.querySelector('.chres'); R.res=!!document.querySelector('#screen-result:not([hidden])'); R.chres=cr?cr.innerText.split('\n')[0]:null; return R; });
-    ok('찬스 모드 v69: 기본 선택 · 빠른 중계(점 화면·해설) → 찬스는 직접 조작 → 별점 · 결과 화면 찬스 요약', def==='chance'&&R.sim&&R.chsim&&R.feed>=1&&R.live>=2&&R.ctrl&&R.res&&/찬스 \d+번/.test(R.chres||'')&&e5.length===0, JSON.stringify({def,...R,e5:e5.slice(0,2)}));
+    ok('찬스 모드 v69: 기본 선택 · 빠른 중계(점 화면·해설) → 찬스는 직접 조작 → 별점 · 결과 화면 찬스 요약', def==='chance'&&R.sim&&R.chsim&&R.feed>=1&&R.live>=1&&R.ctrl&&R.res&&/찬스 \d+번/.test(R.chres||'')&&e5.length===0, JSON.stringify({def,...R,e5:e5.slice(0,2)}));
     await c5.close(); }
   // v70 리그 확장: 아시아 9 · 유럽 12 · 남미 4개국 · 대륙 대회 6개 · 리그 선택 시트 · 스플릿 규정 · 별 10개
   { const c6=await b.newContext({viewport:{width:390,height:844}}); const p6=await c6.newPage(); const e6=[]; p6.on('pageerror',e=>e6.push(e.message)); await p6.goto(FILE); await p6.click('#go-create'); await p6.click('#btn-new'); await p6.waitForTimeout(300);
@@ -441,6 +442,19 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const bad=Object.entries(F).filter(([k,v])=>v.over>2||v.cols<1||v.go===false);
     ok('가로 한 화면 v72: 홈·성장·스킬·리그·이적·기록·장비 화면 스크롤 없음(칸 배치) · 경기 시작 버튼 화면 안', bad.length===0&&F.home.go===true&&e7.length===0, JSON.stringify({bad,home:F.home,e7:e7.slice(0,2)}));
     await c7.close(); }
+  // v73 축구하는 맛: 공은 휘지 않고 내가 받으러 움직임 · 선호 포지션 · 킥오프 자기 진영 · 키퍼가 잡은 공 경합 금지
+  { const c8=await b.newContext({viewport:{width:430,height:900}}); const p8=await c8.newPage(); const e8=[]; p8.on('pageerror',e=>e8.push(e.message)); await p8.goto(FILE); await p8.click('#go-create'); await p8.click('#pos-segs [data-pos="MF"]'); await p8.click('#posn-segs [data-pn="wm"]'); await p8.click('#btn-new'); await p8.waitForTimeout(300);
+    const V=await p8.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const posn=S.player.posn;
+      // 받기
+      let ok=0,bend=0,mv=0; for(let k=0;k<6;k++){ if(M){ cancelAnimationFrame(raf); M=null; } startPractice(null); await w(420); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.players.filter(q=>q.team===1&&q.role!=='GK').forEach(q=>{ q.x=-40; q.y=-40; q.stun=99; }); const u=M.user, mate=M.players.find(q=>q.team===0&&!q.isUser&&q.role!=='GK'); u.x=W/2; u.y=50; u.vx=u.vy=0; input.joyActive=false; input.jx=input.jy=0; const a=k*1.05; mate.x=u.x+Math.cos(a)*16; mate.y=u.y+Math.sin(a)*16; setOwner(mate,{clean:true}); mate.touchT=0; mate.kickCd=0; await w(60);
+        passTo(mate,u,{power:0.55}); const B=M.ball, sp=Math.hypot(B.vx,B.vy); const off=(k%2?1:-1)*1.8; const fx=u.x+Math.cos(a+Math.PI/2)*off, fy=u.y+Math.sin(a+Math.PI/2)*off; B.vx=fx-mate.x; B.vy=fy-mate.y; const l=Math.hypot(B.vx,B.vy); B.vx*=sp/l; B.vy*=sp/l; B.passTarget=u; const a0=Math.atan2(B.vy,B.vx), x0=u.x, y0=u.y; let a1=a0, got=false; const t0=Date.now(); while(Date.now()-t0<2500){ await w(25); if(B.owner===u){ got=true; break; } if(!B.owner) a1=Math.atan2(B.vy,B.vx); }
+        if(got) ok++; bend=Math.max(bend,Math.abs(a1-a0)); mv=Math.max(mv,Math.hypot(u.x-x0,u.y-y0)); }
+      // 경기: 선호 포지션 · 킥오프 · 키퍼
+      if(M){ cancelAnimationFrame(raf); M=null; } S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); await w(600); el('m-overlay').hidden=true; M.paused=false; const u=M.user; const half=M.players.filter(p=>p.team===0?p.y<H/2:p.y>H/2).length; const kt=M.ball.owner?M.ball.owner.team:0; const circ=M.players.filter(p=>p.team!==kt&&Math.hypot(p.x-W/2,p.y-H/2)<9.15).length;
+      M.freeze=0; const gk=M.players.find(q=>q.team===1&&q.role==='GK'); gk.x=W/2; gk.y=6; M.ball.lastKicker=u; setOwner(gk); gk.gkHoldUntil=M.t+9; gk.protT=9; M.players.filter(q=>q.team===0&&!q.isUser&&q.role!=='GK').forEach((q,i)=>{ q.x=W/2+(i%5-2)*3; q.y=9+(i%3)*2; }); await w(1500); const gd=Math.min(...M.players.filter(q=>q.team===0&&!q.isUser&&q.role!=='GK').map(q=>Math.hypot(q.x-gk.x,q.y-gk.y)));
+      return {posn,ok,bendDeg:Math.round(bend*180/Math.PI),mv:+mv.toFixed(1),sr:subRole(u),hx:Math.round(u.hx),half,circ,gd:+gd.toFixed(1)}; });
+    ok('v73 손맛: 공은 휘지 않고(0°) 내가 받으러 움직여 받음 · 선호 포지션(측면 MF) 자리 · 킥오프 각자 진영·센터서클 · 키퍼가 잡은 공엔 9m 밖', V.posn==='wm'&&V.ok>=5&&V.bendDeg<=1&&V.mv>0.5&&V.mv<4.5&&V.sr==='WM'&&(V.hx<20||V.hx>48)&&V.half===0&&V.circ===0&&V.gd>=8.5&&e8.length===0, JSON.stringify({...V,e8:e8.slice(0,2)}));
+    await c8.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

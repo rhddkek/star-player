@@ -192,7 +192,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const pe=await pg.evaluate(async()=>{ S.noReplay=true; S.player.level=8; if(!S.player.skills.includes('split')) S.player.skills.push('split'); M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null;
       const u=M.user; u.x=16; u.y=74; setOwner(u,{clean:true}); u.touchT=0; const q=M.players.find(p=>p.team===0&&!p.isUser&&p.role!=='GK'); q.x=54; q.y=40; passTo(u,q,{power:0.95,long:true}); const b=M.ball; let zmax=0; const L=landPt(b);
       for(let i=0;i<40;i++){ updateBall(1/30); zmax=Math.max(zmax,b.z); if(b.z<=0&&i>5) break; }
-      const icon=!!pxi('split'), eyeIco=ICO.eye===5&&ART.icons.length===64; const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=0; updateHUD&&updateHUD(); const lab=el('k-shot').querySelector('span').textContent;
+      const icon=!!pxi('split'), eyeIco=ICO.eye===5&&ART.icons.length>=64&&ICO.pulse>=64; const o=M.players.find(p=>p.team===1&&p.role!=='GK'); setOwner(o,{clean:true}); M._objT=0; updateHUD&&updateHUD(); const lab=el('k-shot').querySelector('span').textContent;
       cancelAnimationFrame(raf); ambience(false); M=null; show('screen-hub'); renderHub(); return {zmax:+zmax.toFixed(1),landErr:+Math.hypot(L.x-54,L.y-40).toFixed(1),icon,eyeIco,lab,gest:!!document.querySelector('#k-pass .gest')}; });
     ok('패스 엔진: 롱패스가 높이 떠서 동료 근처에 떨어짐 · 새 스킬 아이콘 · 상대 공일 때 따라가기 버튼', pe.zmax>6&&pe.landErr<9&&pe.icon&&pe.eyeIco&&pe.lab==='따라가기'&&pe.gest, JSON.stringify(pe)); }
   // 스타숍: 스폰서 계약 · 꾸미기 · 광고 촬영
@@ -509,7 +509,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
         r.cover={avg:+(sum/n).toFixed(1),dbg:(M.dbg||{}).cover||0}; }
       // ③ 엔진 기록: 양 팀 AI 한 경기 (그리기 끔)
       { M=null; show('screen-hub'); startMatch(false); { const g=el('lu-go'); if(g) g.click(); } el('m-overlay').hidden=true; M.paused=false; M.introT=0; M.botUser=true; M.chanceReq=false; M.chance=null; const real=M.user; real.isUser=false; M.user={x:-60,y:-60,vx:0,vy:0,fx:0,fy:-1,team:0,i:99,role:'FW',isUser:true,st:{...real.st},hx:-60,hy:-60,ai:{},sta:1};
-        const oFT=fullTime; let over=false; fullTime=function(){ over=true; M.over=true; }; let fr=0; while(!over&&fr<7000){ t+=33.3; lastT=t-33.3; loop(t); fr++; if(M.htWait>0){ M.htWait=0; } if(M.paused){ M.paused=false; el('m-overlay').hidden=true; } if(M.replay) endReplay(); } fullTime=oFT;
+        const oFT=fullTime; let over=false; fullTime=function(){ over=true; M.over=true; }; let fr=0; while(!over&&fr<7000){ t+=33.3; lastT=t-33.3; loop(t); fr++; if(M.ball.owner===M.user){ setOwner(real); M.restart=null; M.setPiece=null; } /* 시험용 가짜 내 선수가 킥오프 공을 받으면 진짜 선수에게 */ if(M.htWait>0){ M.htWait=0; } if(M.paused){ M.paused=false; el('m-overlay').hidden=true; } if(M.replay) endReplay(); } fullTime=oFT;
         r.sim={min:Math.round(M.min),shots:[M.tstats[0].shots,M.tstats[1].shots],passes:[(M.dbg||{}).pc0||0,(M.dbg||{}).pc1||0]}; }
       M=null; draw=oDraw; updateHUD=oHUD; window.requestAnimationFrame=oRAF; banner=oBan; show('screen-hub'); S.startLock=0;
       // ④ 선발 선택: 능력치 차이가 크면 선발 못 함 · 비슷하면 대부분 선발 (가끔 로테이션)
@@ -533,6 +533,17 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     { const N=await pv.evaluate(()=>{ const lg={}; Object.values(CLUBS).forEach(c=>{ if(c.nat||!c.homeDiv) return; (lg[c.homeDiv]=lg[c.homeDiv]||[]); for(let i=0;i<18;i++) lg[c.homeDiv].push(playerName(c.id,i)); }); let dupLg=0, n=0; Object.values(lg).forEach(a=>{ n+=a.length; if(new Set(a).size<a.length) dupLg++; }); const b=ensureBuddy&&ensureBuddy(); return {leagues:Object.keys(lg).length,n,dupLg,buddyOk:!b||b.name===playerName(b.club,b.i)}; });
       ok('v79 선수 이름: 같은 리그 안에서 겹치는 이름 없음 · 호흡 동료 이름 일치', N.dupLg===0&&N.buddyOk&&N.leagues>=30, JSON.stringify(N)); }
     ok('v78 내 팀(스태프 4명)·고향 축구교실 · 아이콘 뒤 글자 보임', R.life.st===4&&R.life.coachLv===1&&R.life.acad===1&&R.life.lucText&&ev.length===0, JSON.stringify({...R.life,ms:R.ms,ev:ev.slice(0,2)})); await cv.close(); }
+  // v80: 새 스킬 5종 · 플레이 스타일 · 패스 성공률 (별도 프로세스)
+  { const {execFileSync}=require('child_process'); const HTML=FILE.replace('file://','');
+    let V=null, ve=''; try{ const o=execFileSync('node',[__dirname+'/v80check.js',HTML],{encoding:'utf8',timeout:400000}); const i=o.lastIndexOf('\nerrs '); V=JSON.parse(o.slice(0,i)); ve=o.slice(i+6).trim(); }catch(e){ ve=String(e).slice(0,200); }
+    ok('v80 파동 결계: 달려든 수비수를 튕겨 내 공을 지킴', !!V&&V.pulse.with.hits>=1&&V.pulse.with.lost===0&&V.pulse.without.lost>=1, JSON.stringify(V&&V.pulse));
+    ok('v80 마그넷·제트·드래곤·섬광 동작', !!V&&V.magnet.got&&V.boost.k>1.15&&V.dragon.goals>=3&&V.dragon.knocked>=3&&V.flare.stunned>=1&&V.flare.gkBlind, JSON.stringify(V&&{m:V.magnet,b:V.boost,d:V.dragon,f:V.flare}));
+    ok('v80 새 스킬 아이콘·수치표 연결', !!V&&V.skills.length===5&&V.skills.every(x=>x.endsWith(':true:true')), JSON.stringify(V&&V.skills));
+    ok('v80 플레이 스타일 효과: 박스 안 슛·키퍼 보정 · 레벨 특성 대기', !!V&&V.arch.shotErrBox<1&&V.arch.gkBox<1&&V.arch.pending===false&&V.arch.pending2===true, JSON.stringify(V&&V.arch));
+    ok('v80 플레이 스타일 팝업: 3가지 중 선택 · 열린 단계만 고름 · 닫기', !!V&&V.ui.card&&V.ui.n3===3&&V.ui.opn===4&&V.ui.lock===1&&V.ui.arch.id==='finisher'&&V.ui.arch.picks[1]===0&&V.ui.closed&&ve==='[]', JSON.stringify(V&&V.ui)+' '+ve);
+    let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'3'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
+    const pct=k=>P2&&P2[k]?parseInt(P2[k]):0;
+    ok('v80 패스 성공률(AI끼리 3경기): 전체 70% 이상 · 짧은 패스 76% 이상', pct('T0 all')>=70&&pct('T1 all')>=70&&pct('T0 short')>=76&&pct('T1 short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']})); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

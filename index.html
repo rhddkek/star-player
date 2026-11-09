@@ -1664,14 +1664,59 @@ Object.assign(NAME_POOLS,{
   uy:[['로드리게스','곤살레스','페르난데스','가르시아','로페스','마르티네스','실바','페레이라','소사','코레아'],['페데리코','로드리고','니콜라스','마티아스','세바스티안','디에고','아구스틴','브루노','파쿤도','막시밀리아노'],false],
   co:[['로드리게스','고메스','가르시아','로페스','에르난데스','마르티네스','디아스','모레노','무뇨스','로하스'],['후안','카를로스','다비드','다니엘','루이스','안드레스','카밀로','세바스티안','하이메','요한'],false],
 });
+/* ===== v79 이름: 이름 풀을 3~10배로 늘리고, 같은 리그 안에서는 이름이 겹치지 않게 ===== */
+(function growNames(){
+  const sp=t=>t.trim().split(/\s+/);
+  const KR_SUR=sp('김 김 김 김 김 김 김 김 김 김 김 김 김 김 이 이 이 이 이 이 이 이 이 이 박 박 박 박 박 최 최 최 정 정 정 강 강 조 조 윤 윤 장 장 임 임 한 오 서 신 권 황 안 송 류 전 홍 고 문 양 손 배 백 허 유 남 심 노 하 곽 성 차 주 우 구 민 진 나 지 엄 변 채 원 천 방');
+  const KR_GIV=sp('민준 서준 도윤 예준 시우 하준 주원 지호 지후 준우 준서 건우 도현 현우 지훈 우진 선우 서진 민재 현준 연우 유준 정우 승우 승현 시윤 준혁 은우 지환 승민 지우 유찬 윤우 민성 준영 시후 진우 지원 수현 재윤 시현 동현 태윤 민우 재원 한결 지성 태민 은찬 윤호 성민 재민 민규 서우 성현 태현 예성 지한 우현 준수 동하 민찬 하율 재현 이준 상현 준호 영민 태준 승준 정민 도훈 성훈 경민 현수 재훈 동건 민혁 상우 진혁 대현 상민 우성 기현 영훈 형준 종현 세훈 정훈 원준 석진 도영 태경 인호 진수 병철 광민 다온 로운 이안 하람 결 온유');
+  const P=NAME_POOLS; P.kr=[KR_SUR,KR_GIV,true];
+  const add=(id,s,g)=>{ const q=P[id]; if(!q) return; s&&q[0].push(...sp(s)); g&&q[1].push(...sp(g)); q[0]=[...new Set(q[0])]; q[1]=[...new Set(q[1])]; };
+  const EN_S='에반스 토머스 로버츠 워커 톰슨 화이트 휴즈 에드워즈 그린 홀 우드 해리스 마틴 잭슨 클라크 루이스 해리슨 쿠퍼 워드 모리스 킹 베이커 터너 힐 무어 앨런 영 미첼 벨 쿡 베일리 파커 필립스 벤틀리 콜린스 스톤 리드 헤이스 플레처 피셔',
+        EN_G='노아 레오 아치 알피 헨리 프레디 테오 아서 아이작 조슈아 다니엘 매슈 루이스 라이언 벤 샘 맥스 에단 리스 메이슨 코너 칼럼 딜런 타일러 조던 브랜던 키어런 네이선 애덤 마커스 잭슨 루크 필 앨릭스 대니 엘리엇';
+  const DE_S='슈바르츠 치머만 브라운 크뤼거 하르트만 랑게 베르너 크라우제 레만 쾰러 헤르만 쾨니히 발터 하우프트 프랑크 알브레히트 짐머 루트비히 뵈머 프란츠 카이저 포겔 프리드리히 켈러 귄터 로트 바이어 숄츠 슈톨 디트리히',
+        DE_G='니클라스 팀 율리안 야니크 토비아스 마르셀 케빈 데니스 율리우스 벤 모리츠 필립 니코 플로리안 마르코 다니엘 세바스티안 안드레 크리스티안 요나탄 다비트 헨리크 콘스탄틴 카이 마테오 에밀 레니 올레 하네스 지몬';
+  const ES_S='디아스 무뇨스 알바레스 로메로 알론소 구티에레스 나바로 토레스 도밍게스 바스케스 라모스 힐 라미레스 세라노 블랑코 몰리나 모랄레스 수아레스 오르티스 델가도 카스트로 오르테가 루비오 마린 산스 이글레시아스 메디나 가리도 코르테스 카스티요',
+        ES_G='마누엘 루이스 호세 카를로스 미겔 안토니오 이반 라울 이케르 우나이 오스카르 마리오 엔리케 페드로 호르헤 빅토르 후안 사무엘 우고 라파엘 곤살로 이냐키 안데르 미켈 에릭 마르크 호엘 니코 이스마엘 루벤';
+  const PT_S='카르발류 피레스 헤이스 로샤 아우베스 메데이루스 카르도주 바헤투 피뉴 모라이스 테이셰이라 네베스 몬테이루 멘데스 프레이타스 카스트루 라모스 비에이라 쿠냐 마샤두',
+        PT_G='다니엘 마르쿠스 에두아르두 히카르두 미겔 파울루 비토르 마테우스 가브리에우 레안드루 페르난두 루이스 카이우 에베르통 다비 아르투르 엔조 지오반니 무릴루 라우';
+  const NL_S='콕 헨드릭스 판레이우언 더흐로트 보스 페르베이 브라윈 더바르 스호우턴 페이터르스 반라르 클라선 데커르 펠트만 코스터 판다위넌 블롬 프린스 리트벨트 판헤일',
+        NL_G='마틴 롭 니크 툰 바스 스테인 리크 예스퍼 사이먼 바우트 카스 틸 요리스 하위스 마르턴 피터르 케이스 텀 라르스 욥';
+  const AR_S='알자흐라니 알말키 알샴라니 알가므디 알오마리 알마티리 알살렘 알누아이미 알아테이비 알쿠와리 알마르리 알주바이르 알하산 알사디 알바크르 알자밀 알라시드 알나세르 알무사 알칼리파',
+        AR_G='아흐메드 알리 오마르 칼리드 마지드 하미드 자세르 타리크 이브라힘 무사 유수프 아딜 바시르 나와프 라에드 와리드 아이만 함단 지야드 무함나드';
+  ['en','sc'].forEach(c=>add(c,EN_S,EN_G)); ['de','at','ch'].forEach(c=>add(c,DE_S,DE_G)); ['es','ar','uy','co'].forEach(c=>add(c,ES_S,ES_G)); ['pt','br'].forEach(c=>add(c,PT_S,PT_G)); ['nl','be'].forEach(c=>add(c,NL_S,NL_G)); ['sa','qa'].forEach(c=>add(c,AR_S,AR_G));
+  add('jp','요시다 야마다 사사키 야마구치 마쓰모토 이노우에 기무라 하야시 시미즈 야마자키 모리 아베 이케다 하시모토 야마시타 이시카와 나카지마 마에다 후지타 오가와 고토 오카다 하세가와 무라카미 곤도 이시이 사이토 사카모토 엔도 아오키 후지이 니시무라 후쿠다 오타 미우라',
+    '하루키 소스케 유키 겐타 다쿠미 쇼타 료 가이토 고타 슌 다이치 유야 가즈키 히로토 쓰바사 마사토 료타 고헤이 다이스케 겐지 히카루 나오키 유이치 다케루 신지 고키 아쓰시 세이야 가나타 미나토');
+  add('it','콘티 데루카 만치니 코스타 지오르다노 리초 롬바르디 모레티 바르바 폰타나 산토로 마리아니 리날디 카루소 페라라 갈리 마르티니 레오네 롱고 젠틸레 마르티넬리 비탈레 카타네오 팔미에리',
+    '마르코 루카 시모네 가브리엘레 에마누엘레 크리스티안 다니엘레 파비오 스테파노 클라우디오 파올로 로베르토 잔루카 체사레 필리포 자코모 엔리코 마누엘 미켈레 피에트로 사무엘레 티치아노');
+  add('fr','르페브르 미셸 가르니에 포르 루 지라르 앙드레 메르시에 블랑 게랭 부아이에 프랑수아 마티외 샹피옹 롤랑 뒤퐁 르냉 코스트 바르비에 페랭 클레망 쇼뱅 베르트랑',
+    '앙투안 니콜라 바티스트 마티외 토마 막심 알렉상드르 쥘리앵 브누아 다미앵 요안 상드로 로맹 에탕 사샤 바스티앙 마엘 엔조 사뮈엘 플로리앙 야니스');
+  add('cn','가오 린 허 궈 뤄 정 량 셰 쑹 탕 한 펑 덩 차오 쩡 샤오 톈 둥 위안 판 두 청 진 웨이',
+    '쯔하오 위항 하오란 즈밍 원보 톈 루이 칭 펑후이 젠 진룽 쉬안 자오 윈펑 이판 위천 쯔양 하오위 원지에 루이린 신위');
+  add('th','짜이디 폰삭 쿤타 위셋 탐마삭 룽롯 분텅 쑥사와 삼란 차이완 품밧 인타몬 왕사 나카랏 시통','아누왓 차와낏 끼띠 품 차치 쑤라칫 타마논 위타야 아피찻 낫타폰 퐁삭 카몬 시리왓 파와릿');
+  add('id','사리 위보워 하리얀토 수산토 다르마완 수기아르토 쿠수마 위라누가 판가베안 시마투팡 루비스 다마닉','아디트야 바구스 판지 리오 위라 아지즈 파자르 일항 레스키 드위 안드리 유디');
+  add('ir','라히미 모라디 사데기 아흐마디 자파리 바게리 골라미 라자비 카제미 몰라에이 파테미 사파리','레자 아미르 하미드 마수드 바히드 알리 파르샤드 쿠로시 나비드 바바크 아라시 시아마크');
+  add('uz','라시도프 카리모프 나자로프 할리코프 우스모노프 사이도프 쿠르바노프 이스마일로프 아흐메도프 자파로프 토시모프 마흐무도프 바키로프 율다셰프 노르마토프 사피로프','사르도르 자홍기르 베흐조드 디요르 샤흐조드 일호모 아크말 도스톤 파루흐 시로지딘 호지마트 아브로르 바부르 산자르 티무르 울루그벡');
+  add('dk','요한센 마센 올센 톰센 크리스티안센 포울센 할보르센 베크 달 홀름 빈테르 쇠고르 비에르 다르 스코우','토비아스 마그누스 올리버 루카스 알베르트 시몬 마르쿠스 아스게르 니콜라이 율리우스 노아 일리아스 소피우스 오스카르');
+  add('sc','맥케이 맥키 그레이 해밀턴 커 앤더슨 레이드 맥길 하디 더글러스','그레그 니얼 스튜어트 데클런 크레이그 로스 제이미');
+  add('be','바우터르스 베르메이런 더코크 마르턴스 판다머 라우버르스 헤이선 더바커르 클라위스 람브레흐트','이브 브람 디테르 예론 케이스 뤼번 아드리앙 막심 바스티안 시토');
+  add('uy','아쿠냐 벨리스 쿠에바스 피리스 비달 레나','이그나시오 에밀리아노 가스톤 브라이안 미겔');
+  add('co','오스피나 레스트레포 바르가스 오소리오 아리아스 카르데나스','하메스 데이비드 프레디 윌마르 에데르 안데르송');
+  add('ar','시메오네 메디나 파스 아쿠냐 몬티엘 로메로','엑세키엘 알렉시스 라우타로 지오바니 프랑코 루카스');
+})();
+function nameSeed(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h; }
+function nmMix(s){ s=Math.imul(s^(s>>>16),0x45d9f3b)>>>0; s=Math.imul(s^(s>>>16),0x45d9f3b)>>>0; return (s^(s>>>16))>>>0; }
+function mkName(P,s){ const [sur,giv,surFirst]=P; const a=nmMix(s), b=nmMix(s^0x9e3779b9); const sn=sur[a%sur.length], gn=giv[b%giv.length]; return surFirst?sn+gn:gn+' '+sn; }
+const _NM={}; const NM_N=26;
+function rosterNames(clubId){ if(_NM[clubId]) return _NM[clubId]; const c=CLUBS[clubId]; const grp=c.homeDiv?Object.values(CLUBS).filter(x=>x.homeDiv===c.homeDiv).sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0):[c];
+  const used=new Set(); grp.forEach(x=>{ if(_NM[x.id]) _NM[x.id].forEach(n=>used.add(n)); }); grp.forEach(x=>{ if(_NM[x.id]) return; const P=NAME_POOLS[x.country]||NAME_POOLS.kr; const L=[]; for(let k=0;k<NM_N;k++){ let nm, t=0; do{ nm=mkName(P,nameSeed(x.id+'#'+k+'#'+t)); t++; }while(used.has(nm)&&t<80); used.add(nm); L.push(nm); } _NM[x.id]=L; });
+  return _NM[clubId]; }
+
 const HS_ME={id:'hs-me',name:'칠성고',short:'칠성고',c1:'#1d3f8f',c2:'#ffffff',str:44,country:'kr',nat:true,homeDiv:null,school:true};
 const HS_OPP={id:'hs-op',name:'서진고',short:'서진고',c1:'#b8322a',c2:'#f5e6c8',str:43,country:'kr',nat:true,homeDiv:null,school:true};
 CLUBS['hs-me']=HS_ME; CLUBS['hs-op']=HS_OPP;
 function playerName(clubId,i){
-  const c=CLUBS[clubId]; const [sur,giv,surFirst]=NAME_POOLS[c.country];
-  const seed=c.id.split('-').reduce((a,x)=>a*7+x.length*3+(parseInt(x)||0)*11,c.str)+i*13;
-  const sn=sur[Math.floor(hash(seed+1)*sur.length)], gn=giv[Math.floor(hash(seed+2)*giv.length)];
-  return surFirst?sn+gn:gn+' '+sn;
+  const c=CLUBS[clubId]; if(!c) return '선수'; if(i>=0&&i<NM_N) return rosterNames(clubId)[i]; // 같은 리그 안에서 겹치지 않는 이름
+  return mkName(NAME_POOLS[c.country]||NAME_POOLS.kr,nameSeed(clubId+'#x'+i));
 }
 const TACTICS=[{id:'counter',name:'역습',desc:'공격수가 앞으로 깊게 침투, 빠른 전진 패스'},{id:'poss',name:'점유',desc:'짧고 정확한 패스, 서두르지 않음'},{id:'press',name:'압박',desc:'3명이 공을 쫓고 태클이 거칠다'},{id:'long',name:'롱볼',desc:'수비에서 공중으로 길게 넘긴다'}];
 function tacticOf(club){ const k=(typeof S!=='undefined'&&S&&S.mgr&&S.mgr[club.id])||0; return TACTICS[(Math.floor(hash(club.str*31+club.id.length*7+5)*TACTICS.length)+k)%TACTICS.length]; }
@@ -1766,7 +1811,7 @@ function newGame(name,pos){
   S={
     player:{name,pos,level:1,xp:0,points:5,stats:{...base},money:300,rep:0,skills:['dash'],equip:['dash',null,null,null],items:[],age:18,cond:100,injury:0,natl:{caps:0,goals:0},cups:0,
       career:{apps:0,goals:0,assists:0,ratings:[],titles:0}},
-    v:6, cid:'c'+Date.now().toString(36)+Math.floor(Math.random()*1e4), started:new Date().toISOString().slice(0,10), trophies:[], clubId:'kr-2-0', wage:80, season:1, round:1, divs, tables:{}, fixtures:{}, offers:[], offersFor:null, history:[], lastResults:[], pstats:{}, form:[], awards:[], contractEnd:2, weekAct:null, weekMsg:'', pendingNat:false, natDone:{}, cup:null, cupPending:false, natLog:[],
+    v:7, cid:'c'+Date.now().toString(36)+Math.floor(Math.random()*1e4), started:new Date().toISOString().slice(0,10), trophies:[], clubId:'kr-2-0', wage:80, season:1, round:1, divs, tables:{}, fixtures:{}, offers:[], offersFor:null, history:[], lastResults:[], pstats:{}, form:[], awards:[], contractEnd:2, weekAct:null, weekMsg:'', pendingNat:false, natDone:{}, cup:null, cupPending:false, natLog:[],
   };
   startSeason();
   save();
@@ -6031,11 +6076,12 @@ function migrateV4(){ if((S.v||0)>=4) return;
     for(let r=0;r<S.round-1;r++){ (S.fixtures[id][r]||[]).forEach(([a,b])=>{ const [ga,gb]=simMatch(CLUBS[a].str,CLUBS[b].str); applyResult(id,a,b,ga,gb); attributeSimGoals(a,ga); attributeSimGoals(b,gb); simExtras(a,gb); simExtras(b,ga); }); } });
   S.v=4; if(added) setTimeout(()=>toast('잉글랜드·스페인·이탈리아·독일·프랑스에 3부 리그가 생겼어요'),300); }
 function migrateV6(){ if((S.v||0)>=6) return; S.baseStr=S.baseStr||{}; Object.values(CLUBS).forEach(c=>{ const A=LG_ADJ[c.homeDiv]; if(!A) return; const d=Math.round(A[0]); if(S.baseStr[c.id]!=null) S.baseStr[c.id]=Math.round(S.baseStr[c.id]+d); if(S.cstr&&S.cstr[c.id]!=null){ c.str=clamp(Math.round(S.cstr[c.id]+d),20,99); } }); S.v=6; setTimeout(()=>toast('K리그 수준이 올라가고(아시아 3위권) 중국 리그가 내려갔어요'),500); }
+function migrateV7(){ if((S.v||0)>=7) return; try{ if(S.buddy&&CLUBS[S.buddy.club]&&S.buddy.i!=null) S.buddy.name=playerName(S.buddy.club,S.buddy.i); if(S.comp&&CLUBS[S.comp.club]&&S.comp.num!=null) S.comp.name=playerName(S.comp.club,S.comp.num); }catch(e){} S.v=7; } // 선수 이름 생성 방식 변경(v79) → 저장된 동료·경쟁자 이름도 새 이름으로
 function migrateV2(){ if((S.v||0)>=2) return;
   const placed=new Set(); Object.values(S.divs).forEach(d=>d.clubs.forEach(c=>placed.add(c)));
   Object.values(CLUBS).forEach(c=>{ if(c.nat||placed.has(c.id)||!S.divs[c.homeDiv]) return; S.divs[c.homeDiv].clubs.push(c.id); });
   S.v=2; startSeason(); toast('리그가 실제 규모로 확장되어 이번 시즌을 1라운드부터 다시 시작해요'); }
-el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); restoreStr(); migrateV3(); migrateV4(); migrateV5(); migrateV6(); renameComps(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.conts) compInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } if(S.prologue){ proResume(); return; } if(S.trust==null) trustMigrate(); tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
+el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); restoreStr(); migrateV3(); migrateV4(); migrateV5(); migrateV6(); migrateV7(); renameComps(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.conts) compInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } if(S.prologue){ proResume(); return; } if(S.trust==null) trustMigrate(); tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
 document.querySelectorAll('#tabs .ti').forEach(t=>t.innerHTML=icon(t.dataset.i,22));
 initTitle(); sprInit();
 

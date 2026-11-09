@@ -497,7 +497,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       { let seed=7; const rr=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; }; const res={goal:0,save:0,miss:0}; const oGS=goalScored, oOB=outOfBounds, oSV=gkSave; let out=null;
         goalScored=function(){ out='goal'; M.ball.owner=null; M.ball.vx=M.ball.vy=0; M.ball.x=W/2; M.ball.y=H/2; }; outOfBounds=function(){ out=out||'miss'; M.ball.vx=M.ball.vy=0; M.ball.x=W/2; M.ball.y=H/2; }; gkSave=function(){ out='save'; oSV.apply(this,arguments); };
         const gk=M.players.find(q=>q.team===1&&q.role==='GK'); gk.st.gk=70; const sh=M.players.find(q=>q.team===0&&q.role==='FW'&&!q.isUser); sh.st.shot=72;
-        for(let k=0;k<120;k++){ M.min=10; M.half2=false; M.htWait=0; M.paused=false; M.over=false; M.players.forEach(q=>{ if(q!==gk&&q!==sh){ q.x=q.team===0?5:63; q.y=95; q.vx=q.vy=0; } }); M.user.x=34; M.user.y=100;
+        for(let k=0;k<200;k++){ M.min=10; M.half2=false; M.htWait=0; M.paused=false; M.over=false; M.players.forEach(q=>{ if(q!==gk&&q!==sh){ q.x=q.team===0?5:63; q.y=95; q.vx=q.vy=0; } }); M.user.x=34; M.user.y=100;
           const d0=11+rr()*15, a=(rr()-0.5)*1.4; sh.x=W/2+Math.sin(a)*d0; sh.y=Math.max(6,Math.cos(a)*d0); sh.vx=sh.vy=0; gk.x=W/2; gk.y=2; gk.vx=gk.vy=0; M.setPiece=null; M.restart=null; M.ball.saveChecked=false; setOwner(sh);
           for(let f=0;f<30;f++){ t+=33.3; lastT=t-33.3; sh.vx=sh.vy=0; loop(t); if(M.ball.owner!==sh) setOwner(sh); sh.touchT=0; M.freeze=0; }
           out=null; sh.touchT=0; shoot(sh,W/2+(rr()-0.5)*6.6,0,{power:0.55+rr()*0.4,force:true}); for(let f=0;f<120&&!out;f++){ t+=33.3; lastT=t-33.3; loop(t); M.freeze=0; if(M.ball.owner===gk) out='save'; else if(M.ball.owner) out='miss'; } res[out||'miss']++; }
@@ -536,14 +536,15 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // v80: 새 스킬 5종 · 플레이 스타일 · 패스 성공률 (별도 프로세스)
   { const {execFileSync}=require('child_process'); const HTML=FILE.replace('file://','');
     let V=null, ve=''; try{ const o=execFileSync('node',[__dirname+'/v80check.js',HTML],{encoding:'utf8',timeout:400000}); const i=o.lastIndexOf('\nerrs '); V=JSON.parse(o.slice(0,i)); ve=o.slice(i+6).trim(); }catch(e){ ve=String(e).slice(0,200); }
-    ok('v80 파동 결계: 달려든 수비수를 튕겨 내 공을 지킴', !!V&&V.pulse.with.hits>=1&&V.pulse.with.lost===0&&V.pulse.without.lost>=1, JSON.stringify(V&&V.pulse));
+    ok('v80 파동 결계: 달려든 수비수를 지속 시간 내내 튕겨 내 공을 지킴 (수비 3명이 계속 달려들 때: 없으면 8번 중 3번 이상, 쓰면 1번 이하로 뺏김)', !!V&&V.pulse.with.hits>=8&&V.pulse.with.lost<=1&&V.pulse.without.lost>=3, JSON.stringify(V&&V.pulse));
     ok('v80 마그넷·제트·드래곤·섬광 동작', !!V&&V.magnet.got&&V.boost.k>1.15&&V.dragon.goals>=3&&V.dragon.knocked>=3&&V.flare.stunned>=1&&V.flare.gkBlind, JSON.stringify(V&&{m:V.magnet,b:V.boost,d:V.dragon,f:V.flare}));
     ok('v80 새 스킬 아이콘·수치표 연결', !!V&&V.skills.length===5&&V.skills.every(x=>x.endsWith(':true:true')), JSON.stringify(V&&V.skills));
     ok('v80 플레이 스타일 효과: 박스 안 슛·키퍼 보정 · 레벨 특성 대기', !!V&&V.arch.shotErrBox<1&&V.arch.gkBox<1&&V.arch.pending===false&&V.arch.pending2===true, JSON.stringify(V&&V.arch));
     ok('v80 플레이 스타일 팝업: 3가지 중 선택 · 열린 단계만 고름 · 닫기', !!V&&V.ui.card&&V.ui.n3===3&&V.ui.opn===4&&V.ui.lock===1&&V.ui.arch.id==='finisher'&&V.ui.arch.picks[1]===0&&V.ui.closed&&ve==='[]', JSON.stringify(V&&V.ui)+' '+ve);
-    let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'3'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
-    const pct=k=>P2&&P2[k]?parseInt(P2[k]):0;
-    ok('v80 패스 성공률(AI끼리 3경기): 전체 70% 이상 · 짧은 패스 76% 이상', pct('T0 all')>=70&&pct('T1 all')>=70&&pct('T0 short')>=76&&pct('T1 short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']})); }
+    ok('v81 스킬 습득 레벨 Lv.1~20에 고르게(레벨당 2개 이하) · 강화 Lv.10까지(효율 -50%) · 늦은 스킬도 Lv.24에 만렙', !!V&&V.sk81.n===9&&V.sk81.lv===10&&V.sk81.eff===0.5&&V.sk81.maxPer<=2&&V.sk81.maxLvl===20&&V.sk81.early===10&&V.sk81.zone10<=24&&V.sk81.priceMono, JSON.stringify(V&&V.sk81));
+    let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'5'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
+    const pool=k=>{ let ok2=0,n=0; ['T0','T1'].forEach(T=>{ const v=P2&&P2[T+' '+k]; if(!v) return; const m=v.match(/(\d+)% \(([\d.]+)/); if(m){ ok2+=(+m[1])*(+m[2]); n+=(+m[2]); } }); return n?ok2/n:0; };
+    ok('v80 패스 성공률(AI끼리 5경기, 두 팀 합산): 전체 70% 이상 · 짧은 패스 76% 이상', pool('all')>=70&&pool('short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']})); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

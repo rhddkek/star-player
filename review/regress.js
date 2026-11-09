@@ -88,8 +88,8 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const hub=await pg.evaluate(()=>({round:S.round||S.week||0,M:typeof M!=='undefined'&&M?{over:M.over}:null}));
   ok('결과 → 홈 복귀·라운드 진행', hub.round>round0, `라운드 ${round0}→${hub.round}`);
   await pg.click('#btn-go').catch(()=>{}); await pg.waitForTimeout(500); const lu2=await pg.$('#lu-go'); if(lu2) await lu2.click(); await pg.waitForTimeout(1200);
-  const hud=await pg.evaluate(()=>({min:M.min,score:M.score.join('-'),mp:Math.round(M.mp),sta:Math.round(M.sta),ult:JSON.stringify(M.ultN||{}),stats:M.stats.shots}));
-  ok('다음 경기 HUD 초기화(시간·점수·슈팅·필살기 횟수)', hud.min<5&&hud.score==='0-0'&&hud.stats===0&&hud.ult==='{}', JSON.stringify(hud));
+  const hud=await pg.evaluate(()=>({min:M.min,score:M.score.join('-'),mp:Math.round(M.mp),sta:Math.round(M.sta),ult:JSON.stringify(M.ultN||{}),stats:M.stats.shots,bench:!!M.bench}));
+  ok('다음 경기 HUD 초기화(시간·점수·슈팅·필살기 횟수 · 벤치 출발이면 60분부터)', (hud.bench?hud.min>=59&&hud.min<62:hud.min<5&&hud.score==='0-0')&&hud.stats===0&&hud.ult==='{}', JSON.stringify(hud));
   // 달리기·체력·기력
   await pg.evaluate(()=>{ M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; { const g=M.players.find(q=>q.team===1&&q.role==='GK'); M.ball.owner=g; g.gkHoldUntil=M.t+30; g.protT=30; M.ball.x=g.x; M.ball.y=g.y; } /* 공은 멀리 상대 키퍼 손에: 동료 패스가 끼어들지 않게 */ const u=M.user; u.x=34; u.y=80; u.vx=u.vy=0; input.joyActive=true; input.jx=0; input.jy=-1; });
   await pg.waitForTimeout(900); const walk=await pg.evaluate(()=>Math.hypot(M.user.vx,M.user.vy));
@@ -177,7 +177,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const sk=await pg.evaluate(()=>{ S.player.level=2; renderSkill.full=false; renderSkill.f='all'; tab='skill'; renderHub(); const n1=document.querySelectorAll('#tab-skill .skgrid button.sk').length; const btn=!!document.getElementById('sk-full'); renderSkill.full=true; renderHub(); const n2=document.querySelectorAll('#tab-skill .skgrid button.sk').length; renderSkill.full=false; renderHub(); return {n1,n2,btn}; });
     ok('스킬 화면: 기본은 쓸 수 있는 것+다음 해금만, 전체 보기 펼치기', sk.btn&&sk.n1<sk.n2, JSON.stringify(sk)); }
   { const lg=await pg.evaluate(()=>({n:Object.keys(S.divs).length, it:S.divs['it-1'].clubs.length, fr:S.divs['fr-1'].clubs.length, star:clubStars(CLUBS['en-1-1']), low:clubStars(CLUBS['kr-2-0']), v:S.v}));
-    ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===37&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v===5, JSON.stringify(lg)); }
+    ok('7개국 리그(이탈리아·프랑스 포함) · 별 등급', lg.n===37&&lg.it===20&&lg.fr===18&&lg.star>=4.5&&lg.low<=1&&lg.v>=5, JSON.stringify(lg)); }
   // 리그 화면: 나라 → 1·2부 → 팀/선수 순위 → 기록 종류
   { const lg2=await pg.evaluate(()=>{ for(let i=0;i<3;i++) autoMatch(true); tab='league'; renderLeague.cur=null; renderLeague.view='players'; renderLeague.pf='kp'; renderHub(); const W=innerWidth; const bad=[]; document.querySelectorAll('#tab-league *').forEach(e=>{ if(e.closest('.lg-co')) return; /* 나라 줄은 의도된 가로 스크롤 */ const b=e.getBoundingClientRect(); if(b.width>0&&b.right>W+1) bad.push((e.className||e.tagName).toString().slice(0,20)); });
       const rows=document.querySelectorAll('#tab-league table tr').length; const kpN=Object.values(S.pstats).filter(v=>v.kp>0).length, csN=Object.values(S.pstats).filter(v=>v.cs>0).length; const co=!!el('lg-open')&&document.querySelectorAll('#tab-league .lg-kind button').length===6; renderLeague.view='table'; renderHub(); return {bad,rows,kpN,csN,co}; });
@@ -255,7 +255,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('경기 안내: 중복 팝업 버림·선수 위 한 칸 · 버튼 상태(수비/지원) · 따라가기로 잡아도 자동 슛 없음 · 평점 변화 이유', mu.dup&&mu.one&&mu.def==='def'&&mu.sup==='sup'&&mu.passDim&&mu.chase&&mu.noCharge&&mu.lock&&mu.noShot&&/패스 성공 \+/.test(mu.why), JSON.stringify(mu)); }
   // UX 정리: 홈 · 성장 · 스킬 · 스타숍 · 기록
   { const ux=await pg.evaluate(()=>{ const r={}; S.weekAct=null; S.player.injury=0; S.endo.offers=[]; tab='home'; renderHub(); const go=el('btn-go'); r.go=!!go; { const vh=window.innerHeight, gb=go.getBoundingClientRect(); const t=el('tab-home').innerText; r.first=gb.bottom<vh-60&&/다음 경기/.test(t)&&/선발 출전|투입 예정/.test(t)&&/오늘 목표/.test(t)&&/컨디션/.test(t); r.firstInfo=Math.round(gb.bottom)+'/'+vh; r.yellow=[...el('tab-home').querySelectorAll('.btn.primary')].length; r.weekRow=!!el('tab-home').querySelector('[data-row=week]'); } r.modes=document.querySelectorAll('#sel-mode [data-mode]').length>=3; r.noMarket=!el('tab-home').textContent.includes('시장 가치');
-      tab='player'; renderPlayer.sub='stat'; renderPlayer.pend={shot:2}; S.player.points=Math.max(3,S.player.points); renderHub(); r.apply=el('pt-apply').textContent; r.sinfo=document.querySelector('.sinfo').textContent; r.wkDup=!!el('tab-player').querySelector('#wk-card'); const sh=weekSheet(); r.wk=sh.querySelectorAll('#wk-card .wk-o').length; r.wkTxt=/게이지 \+\d+ · 100이 차면 \+1 확정/.test(sh.textContent)&&/연계 훈련|휴식/.test(sh.textContent); sh.remove(); renderPlayer.pend={};
+      tab='player'; renderPlayer.sub='stat'; renderPlayer.pend={shot:2}; S.player.points=Math.max(3,S.player.points); renderHub(); r.apply=el('pt-apply').textContent; r.sinfo=document.querySelector('.sinfo').textContent; r.wkDup=!!el('tab-player').querySelector('#wk-card'); const sh=weekSheet(); r.wk=sh.querySelectorAll('#wk-card .wk-o').length; r.wkTxt=/게이지 \+\d+ · (100이|다) 차면 \+1 확정/.test(sh.textContent)&&/연계 훈련|휴식/.test(sh.textContent); sh.remove(); renderPlayer.pend={};
       renderPlayer.sub='profile'; renderHub(); r.prof=el('tab-player').textContent.includes('이번 시즌')&&el('tab-player').textContent.includes('시장 가치');
       renderPlayer.sub='records'; renderHub(); r.rs=document.querySelectorAll('#tab-player .rs').length>0||!(S.history||[]).length;
       tab='skill'; renderSkill.sel=null; renderSkill.f='all'; renderHub(); document.querySelector('#tab-skill [data-f="tackle"]').click(); const sel=SKILLS.find(x=>x.id===renderSkill.sel); r.fsel=sel&&sel.type==='tackle'; r.sit=!!document.querySelector('#tab-skill .sk-sit'); const ls=[...document.querySelectorAll('#tab-skill .sk')].map(b=>SKILLS.find(x=>x.id===b.dataset.sk).lvl); r.sorted=ls.every((v,i)=>!i||ls[i-1]<=v); renderSkill.f='all';
@@ -487,6 +487,50 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
         if(alone) res.aloneN++; else res.openN++; if(M.stats.passes===before){ res.refuse++; continue; } const t0=Date.now(); while(Date.now()-t0<4500){ await w(40); const o=M.ball.owner; if(o||M.setPiece){ if(o&&o.team===0){ if(alone) res.alone++; else { res.open++; res.gain+=y0-o.y; } } break; } } }
       res.gain=Math.round(res.gain/Math.max(1,res.open)); return res; });
     ok('v76 스루패스: 앞에 동료 있으면 대부분 연결 · 앞에 아무도 없어도 빈 공간으로 찔러 동료가 뛰어감 (거절 0)', R.refuse===0&&R.open>=7&&R.alone>=1&&R.gain>=5&&et.length===0, JSON.stringify({...R,et:et.slice(0,2)})); await ct.close(); }
+  // ── v78: 동료 AI · 골키퍼 · 선발 경쟁 · 이적시장 기간 · 개인 코치 팝업 · 성장 곡선 · 리그 수준 · 내 팀/축구교실
+  { const cv=await b.newContext({viewport:{width:430,height:900}}); const pv=await cv.newPage(); const ev=[]; pv.on('pageerror',e=>ev.push(e.message)); await pv.goto(FILE); await pv.click('#go-create'); await pv.click('#pos-segs [data-pos="MF"]'); await pv.click('#btn-new'); await pv.waitForTimeout(400);
+    const R=await pv.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; S.startLock=1; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const r={}; const T0=performance.now();
+      const oDraw=draw, oHUD=updateHUD, oRAF=window.requestAnimationFrame, oBan=banner; draw=()=>{}; updateHUD=()=>{}; window.requestAnimationFrame=()=>0; banner=()=>{};
+      let t=performance.now(); const step=n=>{ for(let f=0;f<n;f++){ t+=33.3; lastT=t-33.3; loop(t); M.freeze=0; } };
+      // ① 골키퍼: 11~26m 슛 120개 → 선방률
+      show('screen-hub'); renderHome.mode='play'; startMatch(false); { const g=el('lu-go'); if(g) g.click(); } el('m-overlay').hidden=true; M.paused=false; M.introT=0; M.botUser=true;
+      { let seed=7; const rr=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; }; const res={goal:0,save:0,miss:0}; const oGS=goalScored, oOB=outOfBounds, oSV=gkSave; let out=null;
+        goalScored=function(){ out='goal'; M.ball.owner=null; M.ball.vx=M.ball.vy=0; M.ball.x=W/2; M.ball.y=H/2; }; outOfBounds=function(){ out=out||'miss'; M.ball.vx=M.ball.vy=0; M.ball.x=W/2; M.ball.y=H/2; }; gkSave=function(){ out='save'; oSV.apply(this,arguments); };
+        const gk=M.players.find(q=>q.team===1&&q.role==='GK'); gk.st.gk=70; const sh=M.players.find(q=>q.team===0&&q.role==='FW'&&!q.isUser); sh.st.shot=72;
+        for(let k=0;k<120;k++){ M.min=10; M.half2=false; M.htWait=0; M.paused=false; M.over=false; M.players.forEach(q=>{ if(q!==gk&&q!==sh){ q.x=q.team===0?5:63; q.y=95; q.vx=q.vy=0; } }); M.user.x=34; M.user.y=100;
+          const d0=11+rr()*15, a=(rr()-0.5)*1.4; sh.x=W/2+Math.sin(a)*d0; sh.y=Math.max(6,Math.cos(a)*d0); sh.vx=sh.vy=0; gk.x=W/2; gk.y=2; gk.vx=gk.vy=0; M.setPiece=null; M.restart=null; M.ball.saveChecked=false; setOwner(sh);
+          for(let f=0;f<30;f++){ t+=33.3; lastT=t-33.3; sh.vx=sh.vy=0; loop(t); if(M.ball.owner!==sh) setOwner(sh); sh.touchT=0; M.freeze=0; }
+          out=null; sh.touchT=0; shoot(sh,W/2+(rr()-0.5)*6.6,0,{power:0.55+rr()*0.4,force:true}); for(let f=0;f<120&&!out;f++){ t+=33.3; lastT=t-33.3; loop(t); M.freeze=0; if(M.ball.owner===gk) out='save'; else if(M.ball.owner) out='miss'; } res[out||'miss']++; }
+        goalScored=oGS; outOfBounds=oOB; gkSave=oSV; r.gk={...res,pct:Math.round(res.save/Math.max(1,res.save+res.goal)*100)}; }
+      // ② 내가 자리를 비우면 동료가 메움
+      { M=null; show('screen-hub'); startMatch(false); { const g=el('lu-go'); if(g) g.click(); } el('m-overlay').hidden=true; M.paused=false; M.introT=0; M.freeze=0;
+        const u=M.user; const mates=M.players.filter(q=>q.team===0&&!q.isUser&&q.role!=='GK'); const holder=M.players.find(q=>q.team===1&&q.role==='MF'); let sum=0,n=0;
+        for(let f=0;f<180;f++){ t+=33.3; lastT=t-33.3; u.x=34; u.y=14; u.vx=u.vy=0; if(M.ball.owner!==holder) setOwner(holder); holder.touchT=1; holder.vx=holder.vy=0; M.freeze=0; M.setPiece=null; loop(t); if(f>90){ const Pu=shapePoint(u,0,false,H-M.ball.y,M.ball.x,null); sum+=nearest(mates,Pu)[1]; n++; } }
+        r.cover={avg:+(sum/n).toFixed(1),dbg:(M.dbg||{}).cover||0}; }
+      // ③ 엔진 기록: 양 팀 AI 한 경기 (그리기 끔)
+      { M=null; show('screen-hub'); startMatch(false); { const g=el('lu-go'); if(g) g.click(); } el('m-overlay').hidden=true; M.paused=false; M.introT=0; M.botUser=true; M.chanceReq=false; M.chance=null; const real=M.user; real.isUser=false; M.user={x:-60,y:-60,vx:0,vy:0,fx:0,fy:-1,team:0,i:99,role:'FW',isUser:true,st:{...real.st},hx:-60,hy:-60,ai:{},sta:1};
+        const oFT=fullTime; let over=false; fullTime=function(){ over=true; M.over=true; }; let fr=0; while(!over&&fr<7000){ t+=33.3; lastT=t-33.3; loop(t); fr++; if(M.htWait>0){ M.htWait=0; } if(M.paused){ M.paused=false; el('m-overlay').hidden=true; } if(M.replay) endReplay(); } fullTime=oFT;
+        r.sim={min:Math.round(M.min),shots:[M.tstats[0].shots,M.tstats[1].shots],passes:[(M.dbg||{}).pc0||0,(M.dbg||{}).pc1||0]}; }
+      M=null; draw=oDraw; updateHUD=oHUD; window.requestAnimationFrame=oRAF; banner=oBan; show('screen-hub'); S.startLock=0;
+      // ④ 선발 선택: 능력치 차이가 크면 선발 못 함 · 비슷하면 대부분 선발 (가끔 로테이션)
+      { const dist={}; ensureComp(); [3,-14].forEach(g=>{ const c={start:0,bench:0,out:0}; for(let i=0;i<300;i++){ S.comp.ovr=ovr()-g; S.trust=62; S.starter=true; S.player.cond=80; S.sel=null; S.round=1+i%30; S.history.length=Math.min(S.history.length,i%7); const s=selFor({type:'league',opp:{id:'x'}}); c[s.k]++; } dist['g'+g]=c; }); r.sel=dist; S.sel=null; }
+      // ⑤ 이적시장 기간: 제안 유지 · 거절해도 다시 옴 · 기간 끝나면 닫힘
+      { toast=()=>{}; const sc=ensureScout(); const ids=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&c.str<ovr()+8&&c.wage>CLUBS[S.clubId].wage).slice(0,3).map(c=>c.id); ids.forEach(id=>sc.f[id]=75); winterWindow([]); const n0=S.offers.length, c0=S.offers[0]&&S.offers[0].clubId; rejectOffer(0); const n1=S.offers.length; const rnd=Math.random; Math.random=()=>0.1; winTick([]); Math.random=rnd; const back=S.offers.some(o=>o.clubId===c0&&o.back); S.round=S.win.until+1; winTick([]); r.win={n0,n1,back,closed:!S.win&&S.offers.length===0}; S.round=1; }
+      // ⑥ 개인 코치 팝업: 횟수 고르고 한 번에 · 주당 횟수 제한 · 높은 능력치는 게이지가 큼
+      { const p=S.player; p.money=1e6; p.stats.shot=50; p.tg={}; S.coachWk=null; coachModal(); const m=document.querySelector('.co-m'); m.querySelector('[data-cp="shot"]').click(); m.querySelector('[data-cp="shot"]').click(); const dis=m.querySelector('[data-cp="pass"]').disabled; const m0=p.money; m.querySelector('#co-go').click(); r.coach={shot:p.stats.shot,paid:m0-p.money>0,limitHit:dis,left:coachLimit()-coachUsed(),hiCost:[ptCost(50),ptCost(80),ptCost(95)]}; document.querySelectorAll('.hub-modal').forEach(x=>x.remove()); }
+      // ⑦ 리그 수준: 한국 1부 > 태국·중국, 일본보다 조금 아래
+      { const avg=d=>{ const a=Object.values(CLUBS).filter(c=>c.homeDiv===d); return a.reduce((x,c)=>x+c.str,0)/a.length; }; r.lg={kr:+avg('kr-1').toFixed(1),jp:+avg('jp-1').toFixed(1),cn:+avg('cn-1').toFixed(1),th:+avg('th-1').toFixed(1)}; }
+      // ⑧ 내 팀·축구교실 화면 · 선 아이콘 뒤 글자 보임
+      { S.player.money=1e6; goKey('shop:life'); const st=document.querySelectorAll('.st-it').length; const b1=document.querySelector('[data-st="coach"]'); b1&&b1.click(); const ac=document.querySelector('#ac-up'); ac&&ac.click(); const sp=document.createElement('span'); sp.innerHTML=luc('leaf',15)+'글자'; document.body.append(sp); const vis=sp.getBoundingClientRect().width>30; sp.remove(); r.life={st,coachLv:staffLv('coach'),acad:S.acad&&S.acad.lv,lucText:vis}; }
+      r.ms=Math.round(performance.now()-T0); return r; });
+    ok('v78 골키퍼: 11~26m 슛 선방률 65~85% (각 좁히기 · 슛 순간 옆으로)', R.gk.pct>=65&&R.gk.pct<=85, JSON.stringify(R.gk));
+    ok('v78 내가 자리를 비우면 동료가 메움 (내 원래 자리 근처 4m 안)', R.cover.avg<4&&R.cover.dbg>=1, JSON.stringify(R.cover));
+    ok('v78 엔진 기록: AI끼리 90분 · 양 팀 모두 슈팅 · 패스 연결', R.sim.min>=90&&R.sim.shots[0]+R.sim.shots[1]>=2&&R.sim.passes[0]>5&&R.sim.passes[1]>5, JSON.stringify(R.sim));
+    ok('v78 선발 경쟁: 비슷하면 대부분 선발(가끔 로테이션) · 능력치가 크게 모자라면 선발 0 (벤치·명단 제외)', R.sel.g3.start>=240&&R.sel.g3.bench>=3&&R.sel['g-14'].start===0&&R.sel['g-14'].out>20, JSON.stringify(R.sel));
+    ok('v78 이적시장 기간: 제안 유지 · 개별 거절 · 조건 올려 재제안 · 기간 끝나면 마감', R.win.n0>=2&&R.win.n1===R.win.n0-1&&R.win.back&&R.win.closed, JSON.stringify(R.win));
+    ok('v78 개인 코치 팝업: 횟수 골라 한 번에 · 주당 제한 · 높은 능력치일수록 비쌈', R.coach.shot===52&&R.coach.paid&&R.coach.limitHit&&R.coach.left===0&&R.coach.hiCost[2]>R.coach.hiCost[1]&&R.coach.hiCost[1]>R.coach.hiCost[0], JSON.stringify(R.coach));
+    ok('v78 리그 수준: 한국 1부 > 중국·태국, 일본보다 조금 아래', R.lg.kr>R.lg.cn&&R.lg.kr>R.lg.th&&R.lg.kr<R.lg.jp, JSON.stringify(R.lg));
+    ok('v78 내 팀(스태프 4명)·고향 축구교실 · 아이콘 뒤 글자 보임', R.life.st===4&&R.life.coachLv===1&&R.life.acad===1&&R.life.lucText&&ev.length===0, JSON.stringify({...R.life,ms:R.ms,ev:ev.slice(0,2)})); await cv.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

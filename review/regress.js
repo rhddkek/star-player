@@ -466,6 +466,12 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await pa.evaluate(()=>goKey('league')); await pa.waitForTimeout(250); const bx=await pa.evaluate(()=>{ const s=document.querySelector('#hub-col>.tabpanel:not([hidden]) .fl-scroll'); if(!s) return null; const r=s.getBoundingClientRect(); return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2),ch:s.clientHeight,sh:s.scrollHeight}; });
     let top=0; if(bx){ const cdp=await ca.newCDPSession(pa); await cdp.send('Input.synthesizeScrollGesture',{x:bx.x,y:bx.y,yDistance:-200,speed:800}); await pa.waitForTimeout(250); top=await pa.evaluate(()=>document.querySelector('#hub-col>.tabpanel:not([hidden]) .fl-scroll').scrollTop); }
     ok('가로: 리그 순위표 손가락으로 넘김 · 칸 안에 잘린 내용 없음', bx&&bx.sh>bx.ch&&top>50&&hid.length===0, JSON.stringify({bx,top,hid})); await ca.close(); }
+  { const ca=await b.newContext({...devices['iPhone 13 landscape']}); const pa=await ca.newPage(); await pa.goto(FILE); await pa.click('#go-create'); await pa.click('#btn-new'); await pa.waitForTimeout(400);
+    await pa.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; for(let i=0;i<3;i++) autoMatch(true); document.querySelectorAll('.hub-modal,.toast').forEach(m=>m.remove()); goKey('league'); }); await pa.waitForTimeout(500);
+    const bx=await pa.evaluate(()=>{ const r=document.querySelector('#hub-col>.tabpanel:not([hidden]) tbody tr:nth-child(3)').getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; }); const cd=await ca.newCDPSession(pa); const T=(type,y)=>cd.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x:bx.x,y}]});
+    await T('touchStart',bx.y); for(let i=1;i<=8;i++){ await T('touchMove',bx.y-i*12); await pa.waitForTimeout(16); } await T('touchEnd'); await pa.waitForTimeout(500);
+    const st=await pa.evaluate(()=>{ const s=document.querySelector('#hub-col>.tabpanel:not([hidden]) .fl-scroll'); return s?Math.round(s.scrollTop):-1; });
+    ok('v74 가로: 리그 순위표 손가락으로 밀림', st>40, 'scrollTop '+st); await ca.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

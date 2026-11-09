@@ -472,6 +472,11 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await T('touchStart',bx.y); for(let i=1;i<=8;i++){ await T('touchMove',bx.y-i*12); await pa.waitForTimeout(16); } await T('touchEnd'); await pa.waitForTimeout(500);
     const st=await pa.evaluate(()=>{ const s=document.querySelector('#hub-col>.tabpanel:not([hidden]) .fl-scroll'); return s?Math.round(s.scrollTop):-1; });
     ok('v74 가로: 리그 순위표 손가락으로 밀림', st>40, 'scrollTop '+st); await ca.close(); }
+  { const cb=await b.newContext({...devices['iPhone 13 landscape']}); const pb=await cb.newPage(); const eb=[]; pb.on('pageerror',e=>eb.push(e.message)); await pb.goto(FILE); await pb.click('#go-create'); await pb.click('#btn-new'); await pb.waitForTimeout(400);
+    const R=await pb.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const out={};
+      for(const a of [0,8,20]){ S.player.career.apps=a; S.trust=95; if(M){ cancelAnimationFrame(raf); M=null; } show('screen-hub'); renderHome.mode='play'; S.lastMode='play'; startMatch(false); await w(500); const hid=getComputedStyle(el('k-shot')).visibility; const g=el('lu-go'); if(g) g.click(); await w(900); out['lv'+a]=hintLv(); out['gest'+a]=getComputedStyle(document.querySelector('#k-sprint .gest')).display; out['ovl'+a]=hid; }
+      const t0=S.hintMode; hintModeNext(); const t1=S.hintMode; S.hintMode='off'; out.off=hintLv(); S.hintMode='on'; out.on=hintLv(); S.hintMode=t0; return {...out,t1}; });
+    ok('v75 조작 힌트 단계: 처음엔 전부 → 8경기 핵심만 → 16경기 끔 · 설정으로 항상/끔 · 라인업 중 조작 버튼 숨김', R.lv0===2&&R.lv8===1&&R.lv20===0&&R.gest0!=='none'&&R.gest8==='none'&&R.gest20==='none'&&R.ovl0==='hidden'&&R.off===0&&R.on===2&&eb.length===0, JSON.stringify({...R,eb:eb.slice(0,2)})); await cb.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

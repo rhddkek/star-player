@@ -4335,8 +4335,8 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
   if(team===0&&pl.deliveryT>0){ pl.deliveryT=0; const air=M.ball.z>0.6||(M.t-(pl.gotT||M.t))<0.3; shoot(pl,goal.x+rnd(-2.4,2.4),goal.y,{power:0.9,hard:true,header:air,force:true}); M.ball.pHead=true; M.ball.delFin=pl.delP||1; comicPop(pl.x,pl.y-2,air?'택배 헤딩!!':'택배 발리!!','#ffe27a',true); return; }
   if(team===0&&M.giveGo&&M.giveGo.mate===pl&&M.ball.owner===pl){ const G=M.giveGo; if(G.dec==null){ const g=ggDecide(pl,theirs); G.dec=g.ok; G.why=g.why; const dg=M.dbg||(M.dbg={}); dg[g.ok?'ggYes':'ggNo']=(dg[g.ok?'ggYes':'ggNo']||0)+1; }
     const u2=M.user, age=M.t-G.t; if(age>3.4) M.giveGo=null; else if(pl.touchT<=0.05&&!M.setPiece){ const run=(-u2.vy)>2.6||M.reqThru>0; const [,uo]=nearest(theirs.filter(q=>q.role!=='GK'),u2); const tp=thruPoint(u2,0.6); const lr=laneRisk(pl,tp,theirs);
-      if(run&&u2.y<pl.y+6&&dist(pl,u2)<34&&!u2.sentOff&&(uo>1.2||M.reqThru>0)&&(lr<0.75||M.reqThru>0)){ M.lastGG=M.t; M.giveGo=null; M.reqThru=0; pl.wallT=0; const pw=clamp(0.5+((-u2.vy)-3)/22,0.5,0.85); throughBall(pl,u2,pw); M.ball.nolook=true; feat(pl.buddy?'원투 침투! (호흡)':'원투 침투!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+1; if(pl.buddy) chemAdd('combo',3); return; }
-      if(age<1.3&&nearest(theirs,pl)[1]>1.2){ pl.ai.tx=pl.x; pl.ai.ty=pl.y; const fx=u2.x-pl.x, fy=u2.y-pl.y, fl=Math.hypot(fx,fy)||1; pl.fx=fx/fl; pl.fy=fy/fl; return; } // 공 지키며 내 움직임을 본다
+      if(run&&(G.dec||M.reqThru>0)&&u2.y<pl.y+6&&dist(pl,u2)<34&&!u2.sentOff&&(uo>1.2||M.reqThru>0)&&(lr<0.75||M.reqThru>0)){ M.lastGG=M.t; /* v88: 동료가 돌려주기로 했을 때만 */ M.giveGo=null; M.reqThru=0; pl.wallT=0; const pw=clamp(0.5+((-u2.vy)-3)/22,0.5,0.85); throughBall(pl,u2,pw); M.ball.nolook=true; feat(pl.buddy?'원투 침투! (호흡)':'원투 침투!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+1; if(pl.buddy) chemAdd('combo',3); return; }
+      if(G.dec&&age<1.3&&nearest(theirs,pl)[1]>1.2){ pl.ai.tx=pl.x; pl.ai.ty=pl.y; const fx=u2.x-pl.x, fy=u2.y-pl.y, fl=Math.hypot(fx,fy)||1; pl.fx=fx/fl; pl.fy=fy/fl; return; } // 공 지키며 내 움직임을 본다
       if(age>=1.3&&!G.dec) M.giveGo=null; } }
   if(pl.wallT>0){ const from=pl.wallFrom; if(from&&from.team===team){ const moving=(from.vy*(team===0?-1:1))>2.5; const laneOk=!theirs.some(q=>pointSegDist(q,pl,from)<1.2); const ahead=team===0?from.y<pl.y-1:from.y>pl.y+1; if(moving&&ahead&&laneOk&&dist(pl,from)<18&&(from.isUser?!!(M.giveGo&&M.giveGo.mate===pl&&M.giveGo.dec===true):Math.random()<0.5)){ if(from.isUser) M.lastGG=M.t; pl.wallT=0; passTo(pl,from,{sure:true,lead:0.9,power:0.5}); if(from.isUser) popup(from.x,from.y-2.4,'벽패스 리턴!','#9fd0ff'); M.stats.walls=(M.stats.walls||0)+(from.isUser?1:0); if(from.isUser&&pl.buddy) chemAdd('combo',3); return; } } }
   if(pl.returnT>0&&team===0&&pl.touchT>0.05) return; // 트래핑 끝나면 바로 리턴
@@ -4366,8 +4366,8 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
     if(M.request>0&&ud<45&&laneOk&&uod>1.8){ passTo(pl,u,{sure:true}); M.request=0; M.stats.reqOk=(M.stats.reqOk||0)+1; popup(u.x,u.y-2.4,'패스 와요!','#9fd0ff'); return; }
     if(M.request>0&&pl.buddy&&(M.buddySt||0)>=2&&ud<40&&uod>1.4){ passTo(pl,u,{sure:true,lift:!laneOk,lead:0.7}); M.request=0; M.stats.reqOk=(M.stats.reqOk||0)+1; popup(u.x,u.y-2.4,'(호흡) 패스 와요!','#9fd0ff'); return; }
     if(pl.buddy&&(M.buddySt||0)>=1&&!attackThird&&ud>4&&ud<30&&laneOk&&uod>2.4&&Math.random()<0.12*(M.buddySt||0)){ passTo(pl,u,{sure:true}); return; }
-    if(userBetter&&Math.random()<0.75){ passTo(pl,u,{sure:true}); return; }
-    if(starving&&!attackThird&&ud>3&&ud<38&&laneOk&&uod>2.4&&Math.random()<0.45){ passTo(pl,u,{sure:true}); return; }
+    if(userBetter&&Math.random()<0.55){ passTo(pl,u,{sure:true}); return; }
+    if(starving&&!attackThird&&ud>3&&ud<38&&laneOk&&uod>2.4&&Math.random()<0.3){ passTo(pl,u,{sure:true}); return; }
   }
   // ── 크로스: 측면 깊은 곳이면 박스 안으로 ──
   { const deep=stl==='earlyX'?(team===0?pl.y<42:pl.y>H-42):(team===0?pl.y<24:pl.y>H-24); const wide=Math.abs(pl.x-W/2)>(stl==='earlyX'?15:18); if(deep&&wide&&Math.random()<(stl==='earlyX'?0.6:stl==='cutIn'?0.25:0.5)){ const dg=M.dbg||(M.dbg={}); if(stl==='earlyX') dg['earlyX'+team]=(dg['earlyX'+team]||0)+1; const box=mine.filter(q=>q!==pl&&Math.abs(q.x-W/2)<12&&Math.abs(q.y-goal.y)<17); const t=box.sort((a,c)=>Math.abs(a.y-goal.y)-Math.abs(c.y-goal.y))[0]; if(t){ passTo(pl,t,{power:0.9,lead:0.5,cross:Math.random()<0.6?'high':'low'}); if(team===0) M.crossT=M.t; if(t.isUser) popup(t.x,t.y-2.4,'크로스 온다!','#9fd0ff'); return; } } }
@@ -4380,24 +4380,26 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
   const spaceAhead=!theirs.some(q=>{ const dx=q.x-pl.x, dy=(q.y-pl.y)*dir; return dy>-1&&dy<8&&Math.abs(dx)<4; });
   let best=null,bs=-1e9; const crowd=theirs.filter(q=>dist(q,pl)<12).length; const fieldO=theirs.filter(q=>q.role!=='GK');
   mine.forEach(q=>{ if(q===pl||q.role==='GK') return; const d=dist(pl,q); if(d<4||d>48) return; const [,od]=nearest(theirs,q); const fwd=(pl.y-q.y)*dir*-1;
-    const swC=crowd>=5&&Math.abs(q.x-pl.x)>24&&od>9&&!(team===0?pl.y>H*0.6:pl.y<H*0.4)&&d<40; let risk=laneRisk(pl,q,theirs); if(swC) risk=Math.min(risk,laneRisk(pl,q,theirs.filter(o=>dist(o,q)<6))+0.1); const qg=dist(q,goal); const ownHalf=team===0?pl.y>H*0.55:pl.y<H*0.45;
-    let sc=Math.min(od,8)*1.3+fwd*(tac==='counter'?1.4:stl==='playmaker'?1.45:1.2)-(fwd<-6?6:0)-(fwd<-12&&d>22?6:0)-d*(tac==='poss'?0.16:stl==='playmaker'?0.09:0.12)-risk*(ownHalf?16:10);
+    const swC=(crowd>=3||stl==='playmaker'||pl.role==='DF')&&Math.abs(q.x-pl.x)>20&&od>7&&!(team===0?pl.y>H*0.72:pl.y<H*0.28)&&d<46&&(q.y-pl.y)*dir>-8; /* v88: 반대 전환 더 자주 */ let risk=laneRisk(pl,q,theirs); if(swC) risk=Math.min(risk,laneRisk(pl,q,theirs.filter(o=>dist(o,q)<6))+0.1); const qg=dist(q,goal); const ownHalf=team===0?pl.y>H*0.55:pl.y<H*0.45;
+    const bu=ownHalf&&(pl.role==='DF'||pl.role==='GK')&&!pressured; let sc=Math.min(od,8)*1.3+fwd*(tac==='counter'?1.4:stl==='playmaker'?1.45:1.2)*(bu&&fwd<0?0.4:1)-(fwd<-6?(bu?1.5:6):0)-(fwd<-12&&d>22?6:0)-d*(tac==='poss'?0.16:stl==='playmaker'?0.09:0.12)-risk*(ownHalf?16:10);
     if(q.style==='runner'&&(q.vy*dir)>2&&fwd>4) sc+=2.5; if(q.style==='target'&&fwd>3&&fwd<14&&od>1.5) sc+=1.5;
     // 라인 깨기: 패스가 넘기는 상대 수
     const lb=fieldO.filter(o=>(o.y-pl.y)*dir>1&&(q.y-o.y)*dir>1&&Math.abs(o.x-(pl.x+q.x)/2)<16).length; if(risk<0.2) sc+=Math.min(lb,3)*1.6;
     // 받는 동료 앞 공간
     if(!theirs.some(o=>{ const ax=o.x-q.x, ay=(o.y-q.y)*dir; return ay>-0.5&&ay<7&&Math.abs(ax)<4; })) sc+=2.5;
     // 반대 전환: 공 쪽이 붐비고 반대편이 비었을 때
-    q._sw=swC; if(swC) sc+=(stl==='playmaker'?5:3);
+    q._sw=swC; if(swC) sc+=(stl==='playmaker'?4.5:2.2)+(crowd>=5?2:0);
     // 핑퐁 방지: 방금 준 동료에게 바로 되돌리기
     if(q===pl.recvFrom&&held2<3&&!pressured) sc-=7;
     if(qg<20&&od>3) sc+=6; // 슈팅 가능한 동료
     if(q.role==='FW'&&(team===0?q.vy<-2.5:q.vy>2.5)&&fwd>5) sc+=3; // 침투 중인 공격수
-    if(q.isUser) sc+=3+(M.t-(M.lastUserTouchT||0)>10?3:0);
+    if(q.isUser) sc+=1.5+(M.t-(M.lastUserTouchT||0)>12?2.5:0); /* v88: 내 선수 가산점 줄임 */
     if(sc>bs){bs=sc;best=q;best._risk=risk;} });
   const bRisk=best?best._risk:9;
-  const wantPass=pressured||stale||Math.random()<(tac==='poss'?0.1:0.07)||pl.role==='GK'||(!spaceAhead&&Math.random()<0.25)||(best&&bs>9&&bRisk<0.3&&Math.random()<(tac==='poss'?0.45:0.32))||(held2>1.4&&Math.random()<0.25)||((stl==='playmaker'||stl==='target')&&best&&bs>5&&Math.random()<0.3); // 좋은 패스길이 열리면 끌지 않고 바로 연결
-  M.thruCd=M.thruCd||[0,0]; if(best&&!best.isUser&&best.role==='FW'&&(best.vy*dir)>2.5&&M.t>M.thruCd[team]&&Math.random()<0.3){ M.thruCd[team]=M.t+7; const P=thruPoint(best,0.55); const [,po]=nearest(theirs.filter(q=>q.role!=='GK'),P); if(po>3.5&&laneRisk(pl,P,theirs)<0.45){ throughBall(pl,best,0.55); return; } } // 침투하는 공격수에게 스루
+  const wantPass=pressured||stale||Math.random()<(tac==='poss'?0.1:0.07)||pl.role==='GK'||(!spaceAhead&&Math.random()<0.25)||(best&&bs>9&&bRisk<0.3&&Math.random()<(tac==='poss'?0.45:0.32))||(held2>1.4&&Math.random()<0.25)||((stl==='playmaker'||stl==='target')&&best&&bs>5&&Math.random()<0.3)||(pl.role==='DF'&&!spaceAhead&&best&&bRisk<0.4&&Math.random()<0.4); // 좋은 패스길이 열리면 끌지 않고 바로 연결 · v88 수비수는 막히면 돌려서 빌드업
+  M.thruCd=M.thruCd||[0,0]; M.spaceCd=M.spaceCd||[0,0];
+  if(!composing&&M.t>M.spaceCd[team]&&nod>1.6&&Math.random()<(stl==='playmaker'?0.5:0.3)){ const sq=mine.filter(q=>q!==pl&&!q.isUser&&q.role!=='GK'&&q.role!=='DF'&&((pl.y-q.y)*-dir)>5&&dist(pl,q)<38&&!theirs.some(o=>{ const ax=o.x-q.x, ay=(o.y-q.y)*dir; return ay>-1&&ay<10&&Math.abs(ax)<5; })).map(q=>({q,P:thruPoint(q,0.6)})).filter(o=>o.P.y>3&&o.P.y<H-3&&laneRisk(pl,o.P,theirs)<0.42&&nearest(theirs.filter(z=>z.role!=='GK'),o.P)[1]>3.2).sort((a,c)=>(c.q.y-a.q.y)*dir-(0)); const o=sq[0]; if(o){ M.spaceCd[team]=M.t+4.5; throughBall(pl,o.q,0.6); const dg=M.dbg||(M.dbg={}); dg['space'+team]=(dg['space'+team]||0)+1; return; } } /* v88: 앞 공간이 빈 동료에게 공간으로 찔러 줌 */
+  if(best&&!best.isUser&&best.role!=='GK'&&best.role!=='DF'&&(best.vy*dir)>2.5&&M.t>M.thruCd[team]&&Math.random()<0.45){ M.thruCd[team]=M.t+5; const P=thruPoint(best,0.55); const [,po]=nearest(theirs.filter(q=>q.role!=='GK'),P); if(po>3.5&&laneRisk(pl,P,theirs)<0.45){ throughBall(pl,best,0.55); return; } } // 침투하는 공격수에게 스루
   const doPass=(t)=>{ const tv=Math.hypot(t.vx,t.vy), running=tv>4&&(t.vy*dir)>1.5; const d=dist(pl,t);
     // 3자 연계 예약: 짧은 패스를 받는 동료가 침투 공격수에게 원터치로 넘겨주게
     if(d<16&&!t.isUser){ const runner=mine.find(r=>r!==t&&r!==pl&&r.role!=='GK'&&(r.vy*dir)>3&&((r.y-t.y)*dir)>5&&dist(r,t)<28); if(runner&&Math.random()<(t.style==='target'?0.85:0.55)) t.layoff={to:runner,t:M.t+2.2}; }
@@ -4438,9 +4440,9 @@ function ggDecide(pl,theirs){ const u=M.user, opp=theirs.filter(q=>q.role!=='GK'
   const [,uo]=nearest(opp,u); if(uo>3.5) s+=0.15; else if(uo<1.8){ s-=0.5; why=why||'마크당함'; }               // 내가 마크당하면 안 줌
   const better=M.players.find(q=>q.team===0&&q!==pl&&!q.isUser&&q.role!=='GK'&&q.y<pl.y-8&&q.y<u.y-3&&nearest(opp,q)[1]>5&&laneRisk(pl,q,theirs)<0.4); if(better){ s-=0.25; why=why||'더 좋은 동료'; }
   if(M.reqThru>0||M.request>0) s+=0.9;                                                                             // 요청하면 거의 줌
-  if(pl.buddy) s+=(M.buddySt||0)>=1?0.35:0.08; // 믿는 동료: 원투 벽 거의 확정
+  if(pl.buddy) s+=(M.buddySt||0)>=1?0.25:0.06; // 믿는 동료: 원투 벽 거의 확정
   if(M.lastGG&&M.t-M.lastGG<10) s-=0.2;                                                                           // 매번 같은 패턴은 안 함
-  const p=clamp(0.3+s,0.06,0.95); const ok=Math.random()<p; return {ok,p,why:ok?'':(why||'동료 판단')}; }
+  const p=clamp(0.22+s,0.05,0.95); const ok=Math.random()<p; /* v88: 기본 원투 확률 낮춤 */ return {ok,p,why:ok?'':(why||'동료 판단')}; }
 function laneRisk(from,to,theirs,vb){ // 패스 차단 위험: 공이 그 지점에 닿는 시간 vs 수비수가 뛰어오는 시간
   const dx=to.x-from.x, dy=to.y-from.y, L=Math.hypot(dx,dy)||1; const v=vb||clamp(8.5+0.85*L,9,30); const tEnd=Math.max(0.45,1-1.9/L); let r=0;
   theirs.forEach(q=>{ if(q.role==='GK'&&Math.hypot(q.x-to.x,q.y-to.y)>7) return; const t=((q.x-from.x)*dx+(q.y-from.y)*dy)/(L*L); const nd=Math.hypot(q.x-from.x,q.y-from.y);

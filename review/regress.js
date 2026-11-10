@@ -99,9 +99,9 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   ok('달리기 버튼: 속도 30% 이상 증가 + 전력 질주 모션', run.on&&run.v>walk*1.3&&run.an==='sprint', `${walk.toFixed(1)}→${run.v.toFixed(1)}m/s ${run.an}`);
   { const sp=await pg.evaluate(()=>{ const u=M.user; M.freeze=0; M.restart=null; M.setPiece=null; u.x=34; u.y=60; setOwner(u,{clean:true}); u.touchT=0; u.protT=3; M.decisionT=0; for(let i=0;i<120;i++){ u.vx=u.vy=0; updateAI(1/30); M.players.forEach(q=>{ if(!q.isUser){ q.x+=q.vx/30; q.y+=q.vy/30; } }); M.t+=1/30; } return {sup:(M.uSup||[]).length,spots:(M.uSpots||[]).length,d:(M.uSup||[]).map(q=>+dist(q,u).toFixed(1))}; });
     ok('내 선수 지원: 공을 잡으면 동료 2명이 서로 다른 빈 각도(9~16m)로 이동', sp.sup===2&&sp.spots===2&&sp.d.every(x=>x>3.5&&x<24), JSON.stringify(sp)); }
-  { const mo=await pg.evaluate(()=>{ const D8=['south','south-east','east','north-east','north','north-west','west','south-west']; const full=['field','f2','f3','f4'].every(c=>['sprint','shoot','dribble','header','trap'].every(a=>SPRITE_DATA[c][a]&&D8.every(d=>(SPRITE_DATA[c][a][d]||[]).length>=4)));
+  { const mo=await pg.evaluate(()=>{ const D8=['south','south-east','east','north-east','north','north-west','west','south-west']; const full=['field','f2','f3','f4'].every(c=>['run','sprint','shoot','header','trap'].every(a=>SPRITE_DATA[c][a]&&D8.every(d=>(SPRITE_DATA[c][a][d]||[]).length>=4)));
       const u=M.user, sv={vx:u.vx,vy:u.vy,sp:M.sprinting}; const r={full}; M.sprinting=false; setOwner(u,{clean:true}); u.touchT=0; u.vx=7; u.vy=0; r.drib=animFor(u).an; M.charge={type:'shot',dur:0.4}; u.vx=0; r.charge=animFor(u).an; M.charge=null; u.shotAnimT=0.3; r.shot=animFor(u).an; u.shotAnimT=0; u.headT=0.2; r.head=animFor(u).an; u.headT=0; u.trapT=0.2; r.trap=animFor(u).an; u.trapT=0; Object.assign(u,{vx:sv.vx,vy:sv.vy}); M.sprinting=sv.sp; return r; });
-    ok('세부 모션: 4체형×8방향 (질주·슛·드리블·헤딩·트래핑) · 드리블/슛 와인드업/팔로스루/헤딩/트래핑 상태 전환', mo.full&&mo.drib==='dribble'&&mo.charge==='shoot'&&mo.shot==='shoot'&&mo.head==='header'&&mo.trap==='trap', JSON.stringify(mo)); }
+    ok('세부 모션: 4체형×8방향 (달리기·질주·슛·헤딩·트래핑) · 드리블(v83부터 달리기 동작을 잔걸음으로)/슛 와인드업/팔로스루/헤딩/트래핑 상태 전환', mo.full&&mo.drib==='run'&&mo.charge==='shoot'&&mo.shot==='shoot'&&mo.head==='header'&&mo.trap==='trap', JSON.stringify(mo)); }
   ok('체력·기력 숫자 정상(NaN 아님)·달리면 체력 감소', Number.isFinite(run.sta)&&Number.isFinite(run.mp)&&run.sta<100, `체력 ${run.sta&&run.sta.toFixed(0)} 기력 ${run.mp&&run.mp.toFixed(0)}`);
   await pg.evaluate(()=>{ M.paused=true; });
 
@@ -558,6 +558,10 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('v82 역오퍼: 고향팀 수락 → 제안 추가 · 같은 구단 재요청 막힘 · 이적시장당 3번', !!V&&V.rev.ok&&V.rev.offered&&V.rev.dup&&V.rev.n===3&&V.rev.pill&&V.rev.dmN===3, JSON.stringify(V&&V.rev));
     ok('v82 33세 FA: 고향팀의 부름 · 베테랑은 1년 계약', !!V&&V.call.home&&V.call.yrs.every(y=>y===1), JSON.stringify(V&&V.call));
     ok('v82 은퇴 투어 발표 → 시즌 끝 은퇴식 · 레전드 등급', !!V&&V.fw.fc&&V.fw.fw&&V.fw.screen&&V.fw.legend&&V.fw.lines>=1&&ve==='[]', JSON.stringify(V&&V.fw)+' '+ve); }
+  { const mv=await pg.evaluate(()=>{ const r={}; const pl={fx:1,fy:0,vx:0,vy:0}; r.d0=dirOfP(pl); pl.fx=Math.cos(0.5); pl.fy=Math.sin(0.5); r.d1=dirOfP(pl); pl.fx=Math.cos(0.6); pl.fy=Math.sin(0.6); r.d2=dirOfP(pl); pl.fx=Math.cos(0.5); pl.fy=Math.sin(0.5); r.d3=dirOfP(pl);
+      const C=['field','f2','f3','f4']; r.run8=C.every(c=>DIRS8.every(d=>(SPRITE_DATA[c].run[d]||[]).length===8&&(SPRITE_DATA[c].sprint[d]||[]).length===8));
+      const oM=M; M={t:0,ball:{owner:null},players:[],weather:null}; const q={team:1,role:'MF',i:1,vx:8,vy:0,fx:1,fy:0,st:{spd:60},look:'field'}; animFor(q); for(let k=0;k<30;k++){ M.t+=1/120; animFor(q); } const p120=q.runPh; q.runPh=0; q._at=null; M.t=0; animFor(q); for(let k=0;k<15;k++){ M.t+=1/60; animFor(q); } r.ph120=+p120.toFixed(2); r.ph60=+q.runPh.toFixed(2); r.an=animFor(q).an; M=oM; return r; });
+    ok('v83 달리기·질주 새 동작 4체형×8방향 · 방향 경계 여유(깜빡임 없음) · 화면 주사율과 상관없이 같은 걸음', mv.run8&&mv.d0==='east'&&mv.d1==='east'&&mv.d2==='south-east'&&mv.d3==='south-east'&&Math.abs(mv.ph120-mv.ph60)<0.05&&mv.ph60>0, JSON.stringify(mv)); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

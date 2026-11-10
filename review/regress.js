@@ -545,7 +545,8 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'5'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
     const pool=k=>{ let ok2=0,n=0; ['T0','T1'].forEach(T=>{ const v=P2&&P2[T+' '+k]; if(!v) return; const m=v.match(/(\d+)% \(([\d.]+)/); if(m){ ok2+=(+m[1])*(+m[2]); n+=(+m[2]); } }); return n?ok2/n:0; };
     ok('v80 패스 성공률(AI끼리 5경기, 두 팀 합산): 전체 70% 이상 · 짧은 패스 76% 이상', pool('all')>=70&&pool('short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']}));
-    ok('v88 AI 패스 다양성(AI끼리 5경기, 경기당): 반대 전환 롱패스 4회+ · 빈 공간 찔러주기 1회+ · 스루 6회+', !!(P2&&P2.ai)&&P2.ai.sw>=4&&P2.ai.space>=1&&P2.ai.thru>=6, JSON.stringify(P2&&P2.ai)); }
+    ok('v88 AI 패스 다양성(AI끼리 5경기, 경기당): 반대 전환 롱패스 4회+ · 빈 공간 찔러주기 1회+ · 스루 6회+', !!(P2&&P2.ai)&&P2.ai.sw>=4&&P2.ai.space>=1&&P2.ai.thru>=6, JSON.stringify(P2&&P2.ai));
+    ok('v91 팀 공격 계획 섞기(AI끼리 5경기): 빌드업·롱볼·짧은 연계·측면·역습 중 4종 이상 · 킥오프 뒤로/롱볼 둘 다 나옴', !!(P2&&P2.plan)&&['plan_build','plan_direct','plan_tiki','plan_wing','plan_counter'].filter(k=>(P2.plan[k]||0)>0).length>=4&&((P2.plan.ko_back0||0)+(P2.plan.ko_back1||0)+(P2.plan.ko_long0||0)+(P2.plan.ko_long1||0))>0, JSON.stringify(P2&&P2.plan)); }
   { let V=null; try{ const o=require('child_process').execFileSync('node',[__dirname+'/v87check.js',FILE.replace('file://',''),'40'],{encoding:'utf8',timeout:400000}); V=JSON.parse(o.slice(o.indexOf('{'),o.indexOf('\n'))); }catch(e){ V={err:String(e).slice(0,200)}; }
     const air=V&&V.first?((V.first.attHead||0)+(V.first.defHead||0)+(V.first.claim||0))/V.n:0;
     ok('v87 코너킥: 머리 높이로 떨어져 공중볼 경합(80%+) · 슈팅 25%+ · 골 1~20% · 패스 속도 1.2배 · 코너·빌드업 찬스', !!V&&air>=0.8&&V.shot/V.n>=0.25&&V.goal/V.n>=0.01&&V.goal/V.n<=0.2&&V.passK===1.2&&V.chNames.includes('corner')&&V.chNames.includes('build'), JSON.stringify(V&&{n:V.n,first:V.first,shot:V.shot,goal:V.goal,headGoal:V.headGoal,passK:V.passK,err:V.err})); }
@@ -584,6 +585,17 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       r.o=ovr(); r.direct=clubInterested(epl); r.role=roleAt(epl).k; S.clubId=epl.id; trustReset(epl,0); r.eplT=[S.trust,trustThr().up,S.comp.ovr];
       const k1=Object.values(CLUBS).filter(c=>!c.nat&&D(c)==='kr-1').sort((a,b)=>b.str-a.str)[0]; S.clubId=k1.id; trustReset(k1,0); r.k1T=[S.trust,trustThr().up,S.comp.ovr]; S=JSON.parse(sv); return r; });
     ok('v86 리그 수준 재정비 · 빅리그 바로 이적 가능 · 빅클럽 주전 경쟁 빡셈: EPL>챔피언십>사우디>J리그>K리그1>중국>태국>K리그2 · 국내 2부에서 바로 EPL 관심 · 빅클럽은 벤치 출발에 선발 기준 높음', tr.A['en-1']>tr.A['en-2']&&tr.A['en-2']>tr.A['sa-1']&&tr.A['sa-1']>tr.A['jp-1']&&tr.A['jp-1']>tr.A['kr-1']&&tr.A['kr-1']>tr.A['cn-1']&&tr.A['cn-1']>tr.A['th-1']&&tr.A['th-1']>tr.A['kr-2']&&tr.A['kr-1']>=66&&tr.direct&&tr.role==='prospect'&&tr.eplT[1]>=tr.k1T[1]+10&&tr.eplT[0]<tr.eplT[1]&&tr.eplT[2]>=95, JSON.stringify(tr)); }
+  // v91: 리그 수준 표기·적응 · 이적시장 연장/거절 뒤 새 제안 · 크로스 · 동료 공 잡기 · 팀 공격 계획
+  { const tr=await pg.evaluate(()=>{ const sv=JSON.stringify(S); const r={}; const oT=toast, oR=renderHub; toast=()=>{}; renderHub=()=>{};
+      const wolves=Object.values(CLUBS).find(c=>!c.nat&&c.homeDiv==='en-1'&&c.str<=78); const nl=Object.values(CLUBS).filter(c=>!c.nat&&c.homeDiv==='nl-1').sort((a,b)=>b.str-a.str)[0]; S.clubId=wolves.id; S.loan=null;
+      const A=adaptPreview(nl); r.pen=A?A.pen:0; r.lv=[lgLvOf(wolves),lgLvOf(nl)]; r.strs=[wolves.str,nl.str];
+      S.player.rep=3000; Object.keys(S.player.stats).forEach(k=>S.player.stats[k]=80); S.round=10; S.offers=[]; S.offersFor=null; S.preContract=null; S.lastYearChoice=null; S.contractEnd=S.season+2; winterWindow([]); r.len=S.win.until-S.round+1;
+      while(S.offers&&S.offers.length) rejectOffer(0); const oRn=Math.random; Math.random=()=>0.1; let got=0; for(let i=0;i<3;i++){ S.round++; const n=[]; winTick(n); got+=n.filter(x=>/새 이적 제안|다시 연락/.test(x)).length; } Math.random=oRn; r.got=got;
+      toast=oT; renderHub=oR; S=JSON.parse(sv); return r; });
+    ok('v91 리그 수준: EPL(10) 중위권 → 네덜란드(7) 강팀은 해외 이동 부담(−2)만 · 겨울 시장 5R · 전부 거절해도 시장 중 새 제안', tr.pen<=2&&tr.lv[0]>tr.lv[1]&&tr.len===5&&tr.got>=2, JSON.stringify(tr));
+    let V=null; try{ const o=require('child_process').execFileSync('node',[__dirname+'/v91check.js',FILE.replace('file://',''),'30','1.6'],{encoding:'utf8',timeout:400000}); V=JSON.parse(o.slice(o.indexOf('{'),o.indexOf('\n'))); }catch(e){ V={err:String(e).slice(0,200)}; }
+    ok('v91 크로스: 1.6m 붙은 수비가 발끝에서 바로 줍지 않음(이전 95%+) · 공격 쪽 첫 경합·슈팅 나옴 · 동료가 띄운 공은 여유 있으면 잡아 둠', !!V&&!V.err&&(V.first.defCtrl||0)<=V.n*0.6&&V.att1st>=1&&V.shot>=2&&V.hdr&&V.hdr.ctrl===V.hdr.n, JSON.stringify(V));
+  }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

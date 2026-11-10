@@ -697,7 +697,7 @@ tr.now td{background:#fff3c9}
 .ofc{position:relative;display:flex;flex-direction:column;gap:8px}.ofc.best{border-color:#3cb48c;background:#eefaf4;box-shadow:0 0 0 3px #7ff0c855,0 4px 0 #0008}
 .ofc-ck{position:absolute;top:-10px;right:-8px;width:30px;height:30px;border-radius:50%;background:#3cb48c;color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;border:3px solid #fff}
 .ofc-h{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:0;cursor:pointer;border-bottom:1px solid #e0d6bf;padding-bottom:8px}.ofc-h b{display:block;font-family:var(--font-display);font-weight:400;font-size:1.3rem;line-height:1.15}.ofc-h small{color:#5f6878;font-weight:600}
-.st-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px;margin:4px 0 10px}.st-n{display:grid;justify-items:center;gap:2px;min-width:74px;padding:8px 6px;border-radius:12px;background:rgba(0,0,0,.04);text-align:center}.st-n.loan{outline:2px dashed #4f9fd8;outline-offset:-2px}.st-n small{font-size:.72rem;color:var(--muted,#777)}.st-ar{font-weight:700;opacity:.6}.st-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}.st-kpi small{display:block;font-size:.72rem;color:var(--muted,#777)}.st-kpi b{font-size:1.15rem}.ofc-lg{font-weight:700;color:inherit}.r3 .up{color:#178a52;font-weight:700}.r3 .dn{color:#c0392b;font-weight:700}.ofc-ad{display:block;font-size:.74rem;color:var(--muted,#7a7a7a);margin:2px 0 4px;line-height:1.3}.ofc-ad.bad{color:#c0392b;font-weight:600}.rec-sub td{padding-top:2px!important;padding-bottom:4px!important;opacity:.75}.ofc-kv{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.ofc-kv>div:first-child>div{display:flex;gap:10px;align-items:baseline}.ofc-kv small{color:#5f6878;font-weight:600;min-width:30px}.ofc-kv b{font-size:1.05rem}
+.st-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px;margin:4px 0 10px}.st-n{display:grid;justify-items:center;gap:2px;min-width:74px;padding:8px 6px;border-radius:12px;background:rgba(0,0,0,.04);text-align:center}.st-n.loan{outline:2px dashed #4f9fd8;outline-offset:-2px}.st-n small{font-size:.72rem;color:var(--muted,#777)}.st-ar{font-weight:700;opacity:.6}.st-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}.st-kpi small{display:block;font-size:.72rem;color:var(--muted,#777)}.st-kpi b{font-size:1.15rem}.ofc-lg{font-weight:700;color:inherit}.ofc-h i.up{color:#178a52;font-style:normal;font-weight:700}.ofc-h i.dn{color:#c0392b;font-style:normal}.r3 .up{color:#178a52;font-weight:700}.r3 .dn{color:#c0392b;font-weight:700}.ofc-ad{display:block;font-size:.74rem;color:var(--muted,#7a7a7a);margin:2px 0 4px;line-height:1.3}.ofc-ad.bad{color:#c0392b;font-weight:600}.rec-sub td{padding-top:2px!important;padding-bottom:4px!important;opacity:.75}.ofc-kv{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.ofc-kv>div:first-child>div{display:flex;gap:10px;align-items:baseline}.ofc-kv small{color:#5f6878;font-weight:600;min-width:30px}.ofc-kv b{font-size:1.05rem}
 .ovb{background:#c9f3e2;border-radius:12px;padding:4px 12px;text-align:center}.ovb small{display:block;font-size:.68rem;color:#2d5a4a}.ovb b{font-size:2rem;line-height:1;color:#0c3b2e}
 .ofc-p{text-align:center;border-top:1px solid #e0d6bf;padding-top:6px}.ofc-p small{font-weight:600;color:#5f6878}.fmp{max-width:180px;display:block;margin:0 auto}
 .ofc-fl{display:flex;flex-wrap:wrap;gap:4px;min-height:0}
@@ -2533,7 +2533,7 @@ function fmPitch(fm,w,hh,col){ w=w||150; hh=hh||84; const rows=String(fm||'4-4-2
 function offScore(o){ return o.wage*divMult(divOf(o.clubId).id)*(roleAt(CLUBS[o.clubId]).k==='prospect'?0.6:1); }
 function offerGrid(){ const bestO=S.offers.reduce((b,o,i)=>b<0||offScore(o)>offScore(S.offers[b])?i:b,-1);
   const g=h(`<div class="offg">${S.offers.map((o,i)=>{ const c=CLUBS[o.clubId]; const role=roleAt(c); const tac=tacticOf(c); const tag=o.home?'고향팀의 부름':o.rev?'역오퍼 수락':o.renew?'재계약':o.loan?'반 시즌 임대':o.pre?'보스만 사전 계약':clubKind(c);
-    return `<div class="card ofc ${i===bestO?'best':''}">${i===bestO?'<span class="ofc-ck">✓</span>':''}<button class="ofc-h" data-prof="${c.id}">${crestSVG(c,50)}<span><b>${esc(c.name)}</b><small><span class="ofc-lg">${esc(divName(divOf(c.id).id))}</span> · ${tag}</small></span></button>
+    return `<div class="card ofc ${i===bestO?'best':''}">${i===bestO?'<span class="ofc-ck">✓</span>':''}<button class="ofc-h" data-prof="${c.id}">${crestSVG(c,50)}<span><b>${esc(c.name)}</b><small><span class="ofc-lg">${esc(divName(divOf(c.id).id))}</span> · ${(()=>{ const a=lgLvOf(c), m=lgLvOf(CLUBS[S.clubId]); return o.renew||a===m?`수준 ${a}/10`:`수준 ${a}/10 <i class="${a>m?'up':'dn'}">(지금 ${m})</i>`; })()} · ${tag}</small></span></button>
       <div class="ofc-kv"><div><div><small>주급</small><b>${fmtMoney(o.wage)}</b></div><div><small>역할</small><b>${role.t}</b></div></div><div class="ovb"><small>팀 전력</small><b class="num">${c.str}</b></div></div>${(()=>{ const A=o.renew?null:adaptPreview(c); return `<small class="ofc-ad ${A?'bad':''}">${A?`⚠ 적응: 능력치 −${A.pen} · ${A.n}경기`:'적응 부담 없음'} · 경쟁자 OVR ${compOvrOf(c)} / 나 ${ovr()}</small>`; })()}
       <div class="ofc-p">${fmPitch(TACTIC_FORM[tac.id])}<small>${TACTIC_FORM[tac.id]} · ${tac.name}</small></div>
       <div class="ofc-fl">${o.home?'<span class="pill good">🏠 고향팀</span>':''}${o.rev?'<span class="pill info">📨 역오퍼</span>':''}${o.back?'<span class="pill acc">📞 조건 올려 재제안</span>':''}${o.scouted?'<span class="pill info">👀 스카우트 추천</span>':''}${o.raised?'<span class="pill acc">🔥 경쟁 입찰</span>':''}${o.low?'<span class="pill bad">부진 조건</span>':''}${(!o.renew&&!o.loan&&S.season<S.contractEnd)?`<span class="pill">이적료 ${fmtMoney(marketValue())}</span>`:''}</div>
@@ -3171,9 +3171,9 @@ function winterWindow(notes){ const sc=ensureScout(); const offers=[]; const o=o
   else if(hasItem('agent')) makeOffers().filter(x=>!x.renew).slice(0,2).forEach(x=>{ if(!offers.some(y=>y.clubId===x.clubId)) offers.push(x); });
   // 임대: 출전 부족
   if(!S.loan&&(benchCount()>=3||(S.role==='prospect'&&benchCount()>=2))){ loanOptions().forEach(c=>offers.push({clubId:c.id,wage:S.wage,years:0,loan:true})); }
-  S.win={k:'winter',s:S.season,until:S.round+2}; S.rejected=[];
-  if(!offers.length){ notes&&notes.push('❄️ 겨울 시장 개장 · 3R · 제안 0건'); return; }
-  biddingWar(offers,notes); S.offers=offers; S.offersFor='mid'; notes&&notes.push(`❄️ 겨울 시장 개장 · 3R · 제안 ${offers.length}건`); }
+  S.win={k:'winter',s:S.season,until:S.round+4}; S.rejected=[];
+  if(!offers.length){ notes&&notes.push('❄️ 겨울 시장 개장 · 5R · 제안 0건'); return; }
+  biddingWar(offers,notes); S.offers=offers; S.offersFor='mid'; notes&&notes.push(`❄️ 겨울 시장 개장 · 5R · 제안 ${offers.length}건`); }
 function renewNowTerms(){ const mine=CLUBS[S.clubId]; const q=clamp((ovr()-(mine.str-14))/28,0,1); return {wage:Math.max(Math.round(S.wage*1.1),Math.round(mine.wage*(0.7+0.9*q))),years:3,bonus:Math.round(S.wage*4)}; }
 function contractCard(){ if(!isLastYear()||S.lastYearChoice) return null; const t=renewNowTerms();
   const c=h(`<div class="card"><div class="sec">📝 계약 마지막 시즌<span class="pill">${esc(CLUBS[S.clubId].short)}</span></div>
@@ -3231,7 +3231,7 @@ function renderTransfer(){
       <div class="grid2" style="margin-top:8px"><div class="kv"><span class="label">${pxi('star',18)} 올해의 선수</span><b style="font-size:1.1rem;color:${c.poy.me?'var(--accent)':'inherit'}">${esc(c.poy.name)}</b><small class="muted">${esc(CLUBS[c.poy.club].short)} · ${c.poy.g}골 ${c.poy.a}도움</small></div>${c.yoy?`<div class="kv"><span class="label">${pxi('medal',18)} 영플레이어</span><b style="font-size:1.1rem;color:${c.yoy.me?'var(--accent)':'inherit'}">${esc(c.yoy.name)}</b><small class="muted">${esc(CLUBS[c.yoy.club].short)} · ${c.yoy.age}세</small></div>`:''}</div>
       <div style="margin-top:10px"><span class="label">올해의 팀</span><div class="row" style="gap:6px;margin-top:4px">${c.toty.map(x=>`<span class="pill ${x.me?'acc':''}" title="${esc(CLUBS[x.club].name)}">${x.pos} ${esc(x.name)}</span>`).join('')}</div></div>
       </details>`)); }
-  box.append(h(`<div class="card hi"><div class="row" style="gap:10px;flex-wrap:nowrap;align-items:center">${por('agent',48)}<h2 style="margin:0">계약 제안 ${S.offers.length}</h2></div><p class="muted" style="margin:4px 0 0">${S.offersFor==='mid'?`${S.win&&S.win.k==='summer'?'☀️ 여름':'❄️ 겨울'} 이적시장 · ${winLeft()}R 남음<br><small>이적·임대 즉시 합류 · 사전 계약 시즌 말 합류 · 거절하면 조건 올려 다시 올 수 있음</small>`:'다음 시즌 계약'}</p></div>`));
+  box.append(h(`<div class="card hi"><div class="row" style="gap:10px;flex-wrap:nowrap;align-items:center">${por('agent',48)}<h2 style="margin:0">계약 제안 ${S.offers.length}</h2></div><p class="muted" style="margin:4px 0 0">${S.offersFor==='mid'?`${S.win&&S.win.k==='summer'?'☀️ 여름':'❄️ 겨울'} 이적시장 · ${winLeft()}R 남음<br><small>이적·임대 즉시 합류 · 사전 계약 시즌 말 합류 · 거절해도 시장 중 새 구단 연락 · 거절한 구단은 조건 올려 재연락</small>`:'다음 시즌 계약'}</p></div>`));
   box.append(revCard()); box.append(offerGrid());
   if(S.offersFor==='mid'){ const wl=winLeft(); const d=h(`<div class="tr-hold"><button class="btn block" id="tr-hold">보류 · 경기 계속${wl?` (시장 ${wl}R 남음)`:''}</button><button class="btn ghost block" id="tr-noall">전부 거절 · 잔류</button></div>`); d.querySelector('#tr-hold').onclick=()=>{ tab='home'; renderHub(); }; d.querySelector('#tr-noall').onclick=()=>{ (S.offers||[]).forEach(o=>{ if(!o.renew&&!o.loan&&!o.back){ S.rejected=S.rejected||[]; S.rejected.push({clubId:o.clubId,o:{...o},s:S.season}); } }); S.offers=[]; S.offersFor=null; save(); toast(winOpen()?'모두 거절 · 이적시장 안에 조건을 올려 다시 올 수도 있어요':'전부 거절 · 잔류'); tab='home'; renderHub(); }; box.append(d); }
 }
@@ -3262,11 +3262,11 @@ function acceptOffer(o){
   S.lastYearChoice=null;
   if(!o.renew) adaptStart(from,to);
   S.clubId=o.clubId; S.wage=o.wage; p.money+=bonus; S.role=roleAt(to).k; S.guaranteed=!!o.guaranteed; if(!o.renew){ S.form=[]; trustReset(to,o.guaranteed?15:0); } p.rep+=o.renew?0:Math.round(to.rep*0.05); S.contractEnd=(S.offersFor==='mid'?S.season:S.season+1)+o.years-1;
-  S.offers=[]; const mid=S.offersFor==='mid'; S.offersFor=null; if(o.renew) S.loyal=false;
+  S.offers=[]; const mid=S.offersFor==='mid'; S.offersFor=null; if(o.renew) S.loyal=false; if(mid&&S.win) S.win.done=true; /* v91: 시장 중 이적하면 그 시장 새 제안 멈춤 */
   toast(o.renew?`${josa(to.name,'과','와')} 재계약 (주급 ${fmtMoney(o.wage)}, ${o.years}년${bonus?`, 계약금 ${fmtMoney(bonus)}`:''})`:`${to.name} ${isFA?'자유계약(FA) 이적':'이적'}! 계약금 ${fmtMoney(bonus)}${fee?` · 이적료 ${fmtMoney(fee)}의 5% 수령`:''}`); { const sc=ensureScout(); delete sc.f[o.clubId]; sc.visit=null; }
   if(!mid){ // 시즌 마감 후 → 새 시즌 (여름 이적시장은 4라운드까지 계속)
-    S.season++; startSeason(); S.win={k:'summer',s:S.season,until:4}; S.rejected=[];
-    if(wasEnd&&o.renew&&rest.length){ S.offers=rest.map(x=>({...x,fa:false,v:1})); S.offersFor='mid'; setTimeout(()=>toast(`여름 이적시장은 4라운드까지 · 남은 제안 ${rest.length}건은 이적 탭에`),400); }
+    S.season++; startSeason(); S.win={k:'summer',s:S.season,until:6}; S.rejected=[];
+    if(wasEnd&&o.renew&&rest.length){ S.offers=rest.map(x=>({...x,fa:false,v:1})); S.offersFor='mid'; setTimeout(()=>toast(`여름 이적시장은 6라운드까지 · 남은 제안 ${rest.length}건은 이적 탭에`),400); }
   } else if(S.win&&S.offersFor==null&&mid){ /* 시즌 중 이적: 창은 그대로 */ }
   save(); tab='home'; renderHub();
 }
@@ -4093,17 +4093,34 @@ function ustat(k){ // 내 선수 유효 스탯 (버프·컨디션·적응 포함
 }
 function maxSpeed(pl){ const s=pl.isUser?ustat('spd'):pl.st.spd; let v=(5.6+s/100*3.6)*1.3*(M&&M.weather==='snow'?0.95:1)*(S&&S.tempo==='real'&&M&&!M.practice?0.9:1); if(!pl.isUser&&pl.sta!=null&&pl.sta<0.5) v*=1-(0.5-pl.sta)*0.3; if(pl.isUser){ if(M.sta<25) v*=0.8; if(M.dashT>0) v*=1.6*(M.dashB>0?1.22:1); if(M.tornT>0) v*=0.55; if(M.phantomT>0) v*=1.2; if(M.sprintT>0) v*=1.3; if(M.boostT>0) v*=1.22; if(M.mvShield) v*=0.5; if(M.jockeyOn) v*=0.88; if(M.sprinting) v*=((M.ball&&M.ball.owner===pl)?1.32:1.45)*(trait('runner')?1.05:1); if(M.ball&&M.ball.owner===pl) v*=0.96; } if(pl.stun>0) v*=0.3; if(pl.role==='GK') v*=0.9; return v; }
 
+const PLAN_NM={build:'후방 빌드업',direct:'롱볼',tiki:'짧은 패스 연계',wing:'측면 공략',counter:'역습'};
+function planReset(team,why){ M.plan=M.plan||[null,null]; M.plan[team]={k:null,why,t:M.t}; }
+function planOf(team,pl){ M.plan=M.plan||[null,null]; let P=M.plan[team]; if(!P) P=M.plan[team]={k:null,why:'steal',t:M.t};
+  const ownHalf=team===0?M.ball.y>H/2:M.ball.y<H/2;
+  if(!P.k||(M.t-P.t>24)||(P.k==='build'&&!ownHalf&&!P.adv)){ const tac=M.tactic[team]; const club=team===0?M.me:M.opp; const q=clamp(((club&&club.str)||65)-58,0,32)/32;
+    const Wt={poss:{build:4,tiki:3.5,wing:2,direct:0.6,counter:0.8},press:{build:2.5,tiki:2,wing:2,direct:1.2,counter:2.2},counter:{build:1.6,tiki:0.8,wing:2,direct:1.8,counter:3},long:{build:1,tiki:0.4,wing:2.2,direct:4,counter:1.2}}[tac]||{build:2.5,tiki:1.5,wing:2,direct:1.2,counter:1.2};
+    const w={...Wt}; w.build*=0.8+0.5*q; w.tiki*=0.4+1.2*q; w.direct*=1.25-0.6*q;
+    if(P.why==='restart'||P.why==='gk'){ w.counter*=0.15; w.build*=1.5; } if(P.why==='steal'){ if(ownHalf){ w.counter*=1.6; w.build*=0.8; } else { w.counter*=0.6; w.direct*=0.3; } }
+    if(P.k==='build'&&!ownHalf){ w.build*=0.3; w.direct*=0.2; P.adv=1; } /* 빌드업으로 넘어오면 측면·연계로 마무리 */
+    const mn=matchMinute(), diff=M.score[team]-M.score[1-team]; if(mn>=70&&diff<0){ w.direct*=2.2; w.wing*=1.4; w.build*=0.6; } if(mn>=75&&diff>0){ w.build*=1.6; w.tiki*=1.4; w.direct*=0.7; w.counter*=1.3; }
+    const ks=Object.keys(w), tot=ks.reduce((a,k)=>a+w[k],0); let r=Math.random()*tot, k=ks[0]; for(const x of ks){ r-=w[x]; if(r<=0){ k=x; break; } }
+    const prev=P.k; P.k=k; P.t=M.t; P.lb=0; { const dg=M.dbg||(M.dbg={}); dg['plan_'+k]=(dg['plan_'+k]||0)+1; }
+    if(team===1&&prev!==k&&(P.why==='restart'||P.why==='gk')&&!(M._planTk>M.t)&&!M.practice&&!M.chance){ M._planTk=M.t+40; tick(`📋 ${M.opp.short} · ${PLAN_NM[k]}`); } }
+  return P; }
+function mindOf(pl){ if(pl.mind) return pl.mind; const club=pl.team===0?M.me:M.opp; const h=k=>hash(pl.i*97+k*131+((club&&club.str)||60)*7+Math.round(pl.hx*3)+(pl.team?5000:0)); const r=pl.role, st=pl.style;
+  const m={risk:h(1),drib:h(2),vis:h(3),sel:h(4)}; if(r==='DF'){ m.risk*=0.65; m.drib*=0.6; } if(r==='FW'){ m.sel=Math.min(1,m.sel+0.25); m.drib=Math.min(1,m.drib+0.15); } if(st==='playmaker'){ m.vis=Math.min(1,m.vis+0.35); } if(st==='cutIn'||st==='runner'){ m.drib=Math.min(1,m.drib+0.2); m.risk=Math.min(1,m.risk+0.15); }
+  return pl.mind=m; } /* v91: 선수마다 다른 성향 (모험·드리블·시야·욕심) */
 function kickoff(team){
-  M.setPiece=null; M.ball.offside=null;
+  M.setPiece=null; M.ball.offside=null; planReset(team,'restart'); M.koTeam=team; M.koT=M.t;
   M.players.forEach(pl=>{ pl.celebT=0; pl.diveT=0; pl.x=pl.hx; pl.y=pl.hy; pl.vx=pl.vy=0; pl.stun=0; pl.tackleT=0; if(pl.team===0) pl.y=Math.max(pl.y,H/2+0.6); else pl.y=Math.min(pl.y,H/2-0.6); if(pl.team!==team){ const dx=pl.x-W/2, dy=pl.y-H/2, d=Math.hypot(dx,dy); if(d<9.4){ const k=9.6/(d||1); pl.x=W/2+dx*k; pl.y=H/2+(dy||(pl.team===0?1:-1))*k; if(pl.team===0) pl.y=Math.max(pl.y,H/2+0.6); else pl.y=Math.min(pl.y,H/2-0.6); } } });
   const b=M.ball; b.x=W/2; b.y=H/2; b.vx=b.vy=b.vz=b.z=0; b.curve=0; b.fire=false; b.passTarget=null;
   const fws=M.players.filter(pl=>pl.team===team&&pl.role==='FW'); const fw=(team===0&&M.user.role==='FW')?M.user:(fws[0]||M.players.find(pl=>pl.team===team&&pl.role==='MF'));
   fw.x=W/2; fw.y=H/2+(team===0?0.8:-0.8);
   const fw2=fws[1]; if(fw2){ fw2.x=W/2+3; fw2.y=fw.y; }
-  setOwner(fw,{clean:true}); if(team===0&&!fw.isUser){ fw.kickoffPassT=M.t; } M.freeze=1.0; M.state='play'; sfx('whistle');
+  setOwner(fw,{clean:true}); planReset(team,'restart'); if(team===0&&!fw.isUser){ fw.kickoffPassT=M.t; } M.freeze=1.0; M.state='play'; sfx('whistle');
   if(M.t===0&&!M.bench){ const tn=TACTICS.find(t=>t.id===M.tactic[1]); banner('킥오프',`상대 ${M.opp.short}: ${tn.name} · ${tn.desc}`); }
 }
-function setOwner(pl,opts={}){ const b=M.ball; b.knock=null; b.longP=b.split=b.laser=b.curlP=b.crossH=b.hdr=false; b.curlTo=null; b.thunder=b.meteor=b.bike=false; b.knuckle=b.flick=b.nolook=b.pHead=b.lift=b.triple=b.delivery=b.dragon=false; const inSp=b.speedAtTake||0; if(pl&&pl.role==='GK'&&b.lastKicker&&b.lastKicker.team!==pl.team&&!M.setPiece){ const hd=rnd(1.3,2.1); pl.gkHoldUntil=M.t+hd; pl.inHands=true; pl.catchT=Math.max(pl.catchT||0,0.5); if(!M.practice){ popup(pl.x,pl.y-1.9,'잡았다!','#fff'); if(!(M._svT>M.t)){ M._svT=M.t+8; tick(`🧤 캐치 · ${playerName((pl.team===0?M.me:M.opp).id,pl.i)}`); } } } b.owner=pl; if(pl){ pl.protT=pl.isUser?0.8:0.45; pl.gotT=M.t; if(pl.gkHoldUntil>M.t) pl.protT=pl.gkHoldUntil-M.t+0.2; } if(pl&&pl.team===1&&M.recv){ if(M.t-M.recv.t<1.2){ M.stats.quickLoss=(M.stats.quickLoss||0)+1; } M.recv=null; } if(pl&&pl.team===0&&!pl.isUser&&M.recv&&M.t-M.recv.t>0.3) M.recv=null; // 잡은 직후 잠깐은 뺏기지 않음
+function setOwner(pl,opts={}){ const b=M.ball; if(pl&&M.possTeam!==pl.team){ M.possTeam=pl.team; planReset(pl.team,M.setPiece||M.freeze>0?'restart':pl.role==='GK'?'gk':'steal'); } b.knock=null; b.longP=b.split=b.laser=b.curlP=b.crossH=b.hdr=false; b.curlTo=null; b.thunder=b.meteor=b.bike=false; b.knuckle=b.flick=b.nolook=b.pHead=b.lift=b.triple=b.delivery=b.dragon=false; const inSp=b.speedAtTake||0; if(pl&&pl.role==='GK'&&b.lastKicker&&b.lastKicker.team!==pl.team&&!M.setPiece){ const hd=rnd(1.3,2.1); pl.gkHoldUntil=M.t+hd; pl.inHands=true; pl.catchT=Math.max(pl.catchT||0,0.5); if(!M.practice){ popup(pl.x,pl.y-1.9,'잡았다!','#fff'); if(!(M._svT>M.t)){ M._svT=M.t+8; tick(`🧤 캐치 · ${playerName((pl.team===0?M.me:M.opp).id,pl.i)}`); } } } b.owner=pl; if(pl){ pl.protT=pl.isUser?0.8:0.45; pl.gotT=M.t; if(pl.gkHoldUntil>M.t) pl.protT=pl.gkHoldUntil-M.t+0.2; } if(pl&&pl.team===1&&M.recv){ if(M.t-M.recv.t<1.2){ M.stats.quickLoss=(M.stats.quickLoss||0)+1; } M.recv=null; } if(pl&&pl.team===0&&!pl.isUser&&M.recv&&M.t-M.recv.t>0.3) M.recv=null; // 잡은 직후 잠깐은 뺏기지 않음
   b.vx=b.vy=b.vz=0; b.z=0; b.curve=0; b.fire=false; b.saveChecked=false; b.passTarget=null; if(pl){ pl.recvFrom=(b.lastKicker&&b.lastKicker!==pl&&b.lastKicker.team===pl.team)?b.lastKicker:null; pl.composeT=null; b.lastKicker=pl; }
   if(pl&&!opts.clean&&pl.role!=='GK'){ const ctl=pl.isUser?ustat('ctrl'):pl.st.ctrl; const t=clamp((inSp-14)/38,0,1)*(1.15-ctl/100)*0.5*(pl.isUser&&trait('soft')?0.45:1); pl.touchT=t; pl.touchDrift=t>0.12?{x:b.driftX||0,y:b.driftY||0}:null; if(inSp>5) pl.trapT=0.34; } }
 function dist(a,b){ const dx=a.x-b.x,dy=a.y-b.y; return Math.hypot(dx,dy); }
@@ -4115,7 +4132,7 @@ function kick(pl,dirx,diry,speed,z=0,opts={}){ if(pl) pl.inHands=false; M.ball.k
   const b=M.ball, len=Math.hypot(dirx,diry)||1; b.offside=null; pl.touchT=0; if(S&&S.tempo==='real'&&!M.practice) speed*=0.94;
   const sp=M.setPiece; if(sp&&sp.taker===pl){ if(sp.type==='throw'){ speed=Math.min(speed,16); z=Math.max(z,3.5); } M.setPiece=null; M.spHint=null; M.fk=null; if(M.wallPl){ const gg=goalOf(pl.team); const ga=Math.atan2(gg.y-pl.y,gg.x-pl.x), ka=Math.atan2(diry,dirx); const da=Math.abs(Math.atan2(Math.sin(ga-ka),Math.cos(ga-ka))); wallGo(pl,da<0.6&&speed>17); } }
   b.owner=null; b.vx=dirx/len*speed; b.vy=diry/len*speed; b.vz=z; b.z=Math.max(b.z,0.05);
-  b.lastKicker=pl; pl.kickCd=0.35; pl.kickAnimT=0.38; if(pl.role==='GK') pl.throwT=0.45; b.saveChecked=false; b.curve=opts.curve||0; b.fire=!!opts.fire; b.thunder=!!opts.thunder; b.meteor=!!opts.meteor; b.finesse=!!opts.finesse; b.hard=!!opts.hard; b.thru=!!opts.thru; b.bike=!!opts.bike; b.bikeAir=!!opts.air; b.volley=!!opts.volley; b.knuckle=!!opts.knuckle; b.knPh=Math.random()*6; b.triple=!!opts.triple; b.dragon=!!opts.dragon; b.aCtx=null; b.triK=opts.skP||1; b.isShot=false; b.flick=false; b.nolook=false; b.pHead=false; b.lift=false; b.longP=false; b.split=false; b.laser=false; b.curlP=false; b.curlTo=null; b.crossH=false; b.hdr=false; b.kx=pl.x; b.ky=pl.y; b.wasAir=z>4; b.thPh=0; b.thPts=[]; b.passTarget=opts.target||null;
+  b.lastKicker=pl; pl.kickCd=0.35; pl.kickAnimT=0.38; if(pl.role==='GK') pl.throwT=0.45; b.saveChecked=false; b.curve=opts.curve||0; b.fire=!!opts.fire; b.thunder=!!opts.thunder; b.meteor=!!opts.meteor; b.finesse=!!opts.finesse; b.hard=!!opts.hard; b.thru=!!opts.thru; b.bike=!!opts.bike; b.bikeAir=!!opts.air; b.volley=!!opts.volley; b.knuckle=!!opts.knuckle; b.knPh=Math.random()*6; b.triple=!!opts.triple; b.dragon=!!opts.dragon; b.aCtx=null; b.triK=opts.skP||1; b.isShot=false; b.flick=false; b.nolook=false; b.pHead=false; b.lift=false; b.longP=false; b.split=false; b.laser=false; b.curlP=false; b.curlTo=null; b.crossH=false; b.xSafe=false; b.cornX=false; b.hdr=false; b.kx=pl.x; b.ky=pl.y; b.wasAir=z>4; b.thPh=0; b.thPts=[]; b.passTarget=opts.target||null;
   if(!b.knock||Math.hypot(b.x-pl.x,b.y-pl.y)<1.0){ b.x=pl.x+dirx/len*0.6; b.y=pl.y+diry/len*0.6; } b.knock=null;
   if(pl.team===1&&M.interT>0&&M.user&&!M.sentOff&&!M.freeze&&!M.interPend&&speed>3){ const dx=dirx/len, dy=diry/len, ux=M.user.x-b.x, uy=M.user.y-b.y, tt=ux*dx+uy*dy; if(tt>0.8&&tt<28){ const px=b.x+dx*tt, py=b.y+dy*tt; if(Math.hypot(M.user.x-px,M.user.y-py)<(M.interR||6)) M.interPend={x:px,y:py,d:0.12}; } }
   if(dist(pl,M.user)<30) sfx(speed>19?'shot':'kick');
@@ -4179,7 +4196,7 @@ function passTo(pl,target,opts={}){
   let LT=null, lAng=null; if(air&&!opts.cross&&!lift){ LT=clamp(0.62+d*0.023,0.9,1.95); const lx=target.x+target.vx*LT*0.65, ly=target.y+target.vy*LT*0.65; const dl=Math.hypot(lx-pl.x,ly-pl.y); const k=loftKick(LT,dl); vz=k.vz; sp=k.sp*(1+rnd(-1,1)*(1-acc/100)*(opts.sure?0.03:0.1)); lAng=Math.atan2(ly-pl.y,lx-pl.x)+rnd(-err,err)*0.6; }
   let curlA=0, curlC=0, curlT=null; if(opts.curl&&!air&&!lift&&!opts.cross){ const nx=-Math.sin(ang); const sd=Math.sign(nx*opts.curl)||(Math.abs(nx)<0.2?opts.curl:1); curlA=sd*0.42; sp=Math.min(37,sp*1.07); curlT=3; }
   if(opts.cross){ const hi=opts.cross==='high'; if(hi){ const T=opts.corner?clamp(0.85+d*0.011,1.05,1.3):clamp(0.8+d*0.016,0.95,1.4); /* v87: 크로스·코너는 낮고 빠르게(정점 4~6m) */ const k=loftKick(T,d); sp=k.sp; vz=(2.4+11*T*T)/T; } else { sp=clamp(14+d*0.5,20,30); vz=4.2; } }
-  { const A=lAng!=null?lAng:ang+curlA; kick(pl,Math.cos(A),Math.sin(A),sp,vz,{target,curve:curlC}); } if(opts.cross==='high') M.ball.crossH=true; if(LT!=null){ M.ball.longP=true; } if(curlT!=null){ M.ball.curlP=true; M.ball.curlTo={x:tx,y:ty}; M.ball.curlT=curlT; } { const dg=M.dbg||(M.dbg={}); dg['pa'+pl.team]=(dg['pa'+pl.team]||0)+1; }
+  { const A=lAng!=null?lAng:ang+curlA; kick(pl,Math.cos(A),Math.sin(A),sp,vz,{target,curve:curlC}); } if(opts.cross==='high') M.ball.crossH=true; if(opts.cross) M.ball.xSafe=true; if(opts.corner) M.ball.cornX=true; /* v91: 크로스는 발을 떠나는 순간 붙은 수비가 그냥 줍지 못함(차단은 위 확률로만) */ if(LT!=null){ M.ball.longP=true; } if(curlT!=null){ M.ball.curlP=true; M.ball.curlTo={x:tx,y:ty}; M.ball.curlT=curlT; } { const dg=M.dbg||(M.dbg={}); dg['pa'+pl.team]=(dg['pa'+pl.team]||0)+1; }
   if(lift){ M.ball.lift=true; if(pl.isUser){ popup(pl.x,pl.y-1.5,'띄워 넘기기','#cfe8ff'); M.stats.lifts=(M.stats.lifts||0)+1; } }
   if(pl.isUser&&LT!=null){ popup(pl.x,pl.y-1.5,d>=38?'롱패스!':'로빙 패스','#fff'); if(d>=30){ M.camOutT=LT+0.6; sfx('sk_curve'); } }
   if(pl.isUser&&curlT!=null) popup(pl.x,pl.y-1.5,'감아 패스','#bfe0ff');
@@ -4401,10 +4418,18 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
   if(pl.layoff&&M.t<pl.layoff.t){ const r=pl.layoff.to; pl.layoff=null; if(r&&M.players.includes(r)&&!r.isUser||r&&r.isUser&&(r.vy*dir)>2){ const P=thruPoint(r,0.5); if(laneRisk(pl,P,theirs)<0.5){ throughBall(pl,r,0.5); const dg=M.dbg||(M.dbg={}); dg['third'+team]=(dg['third'+team]||0)+1; return; } } } else pl.layoff=null;
   const [nearOpp,nod]=nearest(theirs,pl);
   const tac=M.tactic[team]; const pressured=nod<(tac==='poss'?2.6:2.3);
+  const PLN=planOf(team,pl), pk=PLN.k, MD=mindOf(pl); const ownH=team===0?pl.y>H*0.5:pl.y<H*0.5;
+  /* v91: 킥오프 — 계획에 따라 뒤로 돌리기 / 바로 롱볼 / 짧게 연계 */
+  if(M.koTeam===team&&M.t-M.koT<4&&!M.setPiece&&dist(pl,{x:W/2,y:H/2})<2.5&&!(team===0&&pl.kickoffPassT!=null)){ M.koTeam=null;
+    if(pk==='direct'){ const tg=mine.filter(q=>q!==pl&&q.role!=='GK'&&(q.role==='FW'||Math.abs(q.x-W/2)>14)&&!q.isUser).sort((a,c)=>nearest(theirs,c)[1]-nearest(theirs,a)[1])[0]; if(tg){ passTo(pl,tg,{air:true,power:0.95,lead:0.6}); const dg=M.dbg||(M.dbg={}); dg['ko_long'+team]=(dg['ko_long'+team]||0)+1; return; } }
+    const back=mine.filter(q=>q!==pl&&q.role!=='GK'&&!q.isUser&&((q.y-pl.y)*dir)<-3&&dist(q,pl)<(pk==='build'?30:18)).sort((a,c)=>pk==='build'?(a.role==='DF'?-1:1)-(c.role==='DF'?-1:1)||dist(a,pl)-dist(c,pl):dist(a,pl)-dist(c,pl))[0];
+    if(back){ passTo(pl,back,{sure:true,power:pk==='build'&&dist(pl,back)>18?0.62:0.5}); const dg=M.dbg||(M.dbg={}); dg['ko_back'+team]=(dg['ko_back'+team]||0)+1; return; } }
+  /* v91: 롱볼 계획 — 수비·골키퍼가 공을 잡으면 공격수·측면으로 바로 길게 */
+  if(pk==='direct'&&ownH&&(pl.role==='DF'||pl.role==='GK'||subRole(pl)==='DM')&&(PLN.lb||0)<2&&!M.setPiece&&Math.random()<(pl.role==='GK'?0.85:0.5)){ const tg=mine.filter(q=>q!==pl&&q.role!=='GK'&&q.role!=='DF'&&((q.y-pl.y)*dir)>18&&nearest(theirs,q)[1]>2.2&&dist(q,pl)<55).sort((a,c)=>(nearest(theirs,c)[1]+(c.role==='FW'?2:0))-(nearest(theirs,a)[1]+(a.role==='FW'?2:0)))[0]; if(tg){ PLN.lb=(PLN.lb||0)+1; passTo(pl,tg,{air:true,power:0.95,lead:0.5}); const dg=M.dbg||(M.dbg={}); dg['lb'+team]=(dg['lb'+team]||0)+1; return; } }
   // ── 판단 1: 슛 ──
   const openLane=!theirs.some(q=>q.role!=='GK'&&pointSegDist(q,pl,goal)<1.6&&dist(q,pl)<10);
   const angle=Math.abs(pl.x-W/2)/Math.max(4,gd); // 측면 깊숙이 각이 좁으면 낮춤
-  const stl=pl.style; const shotQ=(gd<30?clamp((32-gd)/18,0.1,1)*(openLane?1:0.6)*(angle>0.75?0.5:1)*(pl.role==='FW'?1.15:pl.role==='MF'?0.85:0.35):0)*(stl==='cutIn'?1.3:stl==='playmaker'||stl==='target'?0.75:1);
+  const stl=pl.style; const shotQ=(gd<30?clamp((32-gd)/18,0.1,1)*(openLane?1:0.6)*(angle>0.75?0.5:1)*(pl.role==='FW'?1.15:pl.role==='MF'?0.85:0.35):0)*(stl==='cutIn'?1.3:stl==='playmaker'||stl==='target'?0.75:1)*(0.85+0.3*MD.sel);
   const userBetter=team===0&&u!==pl&&(()=>{ const ug=dist(u,goal); const [,uo]=nearest(theirs,u); return ug<gd-5&&uo>3&&ug<24&&laneRisk(pl,u,theirs)<0.4; })();
   if(team===0&&M.crossT&&M.t-M.crossT<1.6&&gd<20){ M.crossT=0; aiShot(pl,goal,{oneTouch:true}); return; } // 크로스 원터치 마무리
   const ub2=userBetter&&shotQ<0.72;
@@ -4426,36 +4451,39 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
     if(starving&&!attackThird&&ud>3&&ud<38&&laneOk&&uod>2.4&&Math.random()<0.3){ passTo(pl,u,{sure:true}); return; }
   }
   // ── 크로스: 측면 깊은 곳이면 박스 안으로 ──
-  { const deep=stl==='earlyX'?(team===0?pl.y<42:pl.y>H-42):(team===0?pl.y<24:pl.y>H-24); const wide=Math.abs(pl.x-W/2)>(stl==='earlyX'?15:18); if(deep&&wide&&Math.random()<(stl==='earlyX'?0.6:stl==='cutIn'?0.25:0.5)){ const dg=M.dbg||(M.dbg={}); if(stl==='earlyX') dg['earlyX'+team]=(dg['earlyX'+team]||0)+1; const box=mine.filter(q=>q!==pl&&Math.abs(q.x-W/2)<12&&Math.abs(q.y-goal.y)<17); const t=box.sort((a,c)=>Math.abs(a.y-goal.y)-Math.abs(c.y-goal.y))[0]; if(t){ passTo(pl,t,{power:0.9,lead:0.5,cross:Math.random()<0.6?'high':'low'}); if(team===0) M.crossT=M.t; if(t.isUser) popup(t.x,t.y-2.4,'크로스 온다!','#9fd0ff'); return; } } }
+  { const eX=stl==='earlyX'||pk==='wing'; const deep=eX?(team===0?pl.y<40:pl.y>H-40):(team===0?pl.y<24:pl.y>H-24); const wide=Math.abs(pl.x-W/2)>(eX?15:18); if(deep&&wide&&Math.random()<(stl==='earlyX'?0.6:pk==='wing'?0.5:stl==='cutIn'?0.25:pk==='tiki'?0.3:0.5)){ const dg=M.dbg||(M.dbg={}); if(stl==='earlyX') dg['earlyX'+team]=(dg['earlyX'+team]||0)+1; const box=mine.filter(q=>q!==pl&&Math.abs(q.x-W/2)<12&&Math.abs(q.y-goal.y)<17); const t=box.sort((a,c)=>Math.abs(a.y-goal.y)-Math.abs(c.y-goal.y))[0]; if(t){ passTo(pl,t,{power:0.9,lead:0.5,cross:Math.random()<0.6?'high':'low'}); if(team===0) M.crossT=M.t; if(t.isUser) popup(t.x,t.y-2.4,'크로스 온다!','#9fd0ff'); return; } } }
   if(stale&&gd<30){ shoot(pl,goal.x+rnd(-2.6,2.6),goal.y,{power:0.7}); return; }
   if(tac==='long'&&pl.role==='DF'&&Math.random()<0.12){ const fw=mine.filter(q=>q.role==='FW'&&nearest(theirs,q)[1]>2.5).sort((a,c)=>nearest(theirs,c)[1]-nearest(theirs,a)[1]); const t=fw[0]; if(t){ passTo(pl,t,{air:true,power:0.95}); return; } }
   // 침착함: 압박이 없으면 잡고 고개 들 시간 (0.3~0.9초), 그동안은 앞으로 몰고 감
-  if(pl.composeT==null) pl.composeT=nod<5?0.08:0.25+Math.random()*0.45;
+  if(pl.composeT==null) pl.composeT=nod<5?0.08:pk==='tiki'?0.08+Math.random()*0.2:pk==='build'&&ownH?0.35+Math.random()*0.55:pk==='counter'?0.1+Math.random()*0.2:0.25+Math.random()*0.45;
   const held2=M.t-(pl.gotT||M.t); const composing=held2<pl.composeT;
   // ── 판단 3: 패스 후보 평가 (내 선수도 같은 기준 + 약간의 가산점) ──
   const spaceAhead=!theirs.some(q=>{ const dx=q.x-pl.x, dy=(q.y-pl.y)*dir; return dy>-1&&dy<8&&Math.abs(dx)<4; });
   let best=null,bs=-1e9; const crowd=theirs.filter(q=>dist(q,pl)<12).length; const fieldO=theirs.filter(q=>q.role!=='GK');
   mine.forEach(q=>{ if(q===pl||q.role==='GK') return; const d=dist(pl,q); if(d<4||d>48) return; const [,od]=nearest(theirs,q); const fwd=(pl.y-q.y)*dir*-1;
     const swC=(crowd>=3||stl==='playmaker'||pl.role==='DF')&&Math.abs(q.x-pl.x)>20&&od>7&&!(team===0?pl.y>H*0.72:pl.y<H*0.28)&&d<46&&(q.y-pl.y)*dir>-8; /* v88: 반대 전환 더 자주 */ let risk=laneRisk(pl,q,theirs); if(swC) risk=Math.min(risk,laneRisk(pl,q,theirs.filter(o=>dist(o,q)<6))+0.1); const qg=dist(q,goal); const ownHalf=team===0?pl.y>H*0.55:pl.y<H*0.45;
-    const bu=ownHalf&&(pl.role==='DF'||pl.role==='GK')&&!pressured; let sc=Math.min(od,8)*1.3+fwd*(tac==='counter'?1.4:stl==='playmaker'?1.45:1.2)*(bu&&fwd<0?0.4:1)-(fwd<-6?(bu?1.5:6):0)-(fwd<-12&&d>22?6:0)-d*(tac==='poss'?0.16:stl==='playmaker'?0.09:0.12)-risk*(ownHalf?16:10);
+    const bu=ownHalf&&(pl.role==='DF'||pl.role==='GK'||(pk==='build'&&pl.role==='MF'))&&!pressured; const fK=pk==='counter'?1.35:pk==='build'&&ownHalf?0.8:1, dK=pk==='tiki'?1.8:pk==='build'?1.25:pk==='direct'?0.7:1;
+    let sc=Math.min(od,8)*1.3+fwd*(tac==='counter'?1.4:stl==='playmaker'?1.45:1.2)*fK*(bu&&fwd<0?0.4:1)-(fwd<-6?(bu?1.5:pk==='tiki'?3.5:6):0)-(fwd<-12&&d>22?6:0)-d*(tac==='poss'?0.16:stl==='playmaker'?0.09:0.12)*dK-risk*(ownHalf?16:10)*(1.25-0.5*MD.risk);
+    if(pk==='tiki'&&d<14) sc+=1.5; if(pk==='build'&&ownHalf&&d>30) sc-=4; if(pk==='wing'&&Math.abs(q.x-W/2)>17&&fwd>-4) sc+=2.5; /* v91: 계획에 따라 짧게·길게·측면으로 */
     if(q.style==='runner'&&(q.vy*dir)>2&&fwd>4) sc+=2.5; if(q.style==='target'&&fwd>3&&fwd<14&&od>1.5) sc+=1.5;
     // 라인 깨기: 패스가 넘기는 상대 수
     const lb=fieldO.filter(o=>(o.y-pl.y)*dir>1&&(q.y-o.y)*dir>1&&Math.abs(o.x-(pl.x+q.x)/2)<16).length; if(risk<0.2) sc+=Math.min(lb,3)*1.6;
     // 받는 동료 앞 공간
     if(!theirs.some(o=>{ const ax=o.x-q.x, ay=(o.y-q.y)*dir; return ay>-0.5&&ay<7&&Math.abs(ax)<4; })) sc+=2.5;
     // 반대 전환: 공 쪽이 붐비고 반대편이 비었을 때
-    q._sw=swC; if(swC) sc+=(stl==='playmaker'?4.5:2.2)+(crowd>=5?2:0);
+    q._sw=swC; if(swC) sc+=(stl==='playmaker'?4.5:2.2)+(crowd>=5?2:0)+MD.vis*1.5+(pk==='wing'?1.5:0);
     // 핑퐁 방지: 방금 준 동료에게 바로 되돌리기
-    if(q===pl.recvFrom&&held2<3&&!pressured) sc-=7;
+    if(q===pl.recvFrom&&held2<3&&!pressured) sc-=pk==='tiki'?2:7;
     if(qg<20&&od>3) sc+=6; // 슈팅 가능한 동료
     if(q.role==='FW'&&(team===0?q.vy<-2.5:q.vy>2.5)&&fwd>5) sc+=3; // 침투 중인 공격수
     if(q.isUser) sc+=1.5+(M.t-(M.lastUserTouchT||0)>12?2.5:0); /* v88: 내 선수 가산점 줄임 */
     if(sc>bs){bs=sc;best=q;best._risk=risk;} });
   const bRisk=best?best._risk:9;
-  const wantPass=pressured||stale||Math.random()<(tac==='poss'?0.1:0.07)||pl.role==='GK'||(!spaceAhead&&Math.random()<0.25)||(best&&bs>9&&bRisk<0.3&&Math.random()<(tac==='poss'?0.45:0.32))||(held2>1.4&&Math.random()<0.25)||((stl==='playmaker'||stl==='target')&&best&&bs>5&&Math.random()<0.3)||(pl.role==='DF'&&!spaceAhead&&best&&bRisk<0.4&&Math.random()<0.4); // 좋은 패스길이 열리면 끌지 않고 바로 연결 · v88 수비수는 막히면 돌려서 빌드업
+  let wantPass=pressured||stale||(pk==='tiki'&&best&&bs>3&&Math.random()<0.4)||(pk==='build'&&ownH&&pl.role!=='FW'&&best&&bRisk<0.3&&Math.random()<0.25)||Math.random()<(tac==='poss'?0.1:0.07)||pl.role==='GK'||(!spaceAhead&&Math.random()<0.25)||(best&&bs>9&&bRisk<0.3&&Math.random()<(tac==='poss'?0.45:0.32))||(held2>1.4&&Math.random()<0.25)||((stl==='playmaker'||stl==='target')&&best&&bs>5&&Math.random()<0.3)||(pl.role==='DF'&&!spaceAhead&&best&&bRisk<0.4&&Math.random()<0.4); // 좋은 패스길이 열리면 끌지 않고 바로 연결 · v88 수비수는 막히면 돌려서 빌드업
+  if(wantPass&&!pressured&&!stale&&spaceAhead&&MD.drib>0.7&&pk!=='tiki'&&pl.role!=='GK'&&Math.random()<0.45) wantPass=false; /* v91: 드리블을 좋아하는 선수는 앞이 비면 직접 몰고 감 */
   M.thruCd=M.thruCd||[0,0]; M.spaceCd=M.spaceCd||[0,0];
-  if(!composing&&M.t>M.spaceCd[team]&&nod>1.6&&Math.random()<(stl==='playmaker'?0.5:0.3)){ const sq=mine.filter(q=>q!==pl&&!q.isUser&&q.role!=='GK'&&q.role!=='DF'&&((pl.y-q.y)*-dir)>5&&dist(pl,q)<38&&!theirs.some(o=>{ const ax=o.x-q.x, ay=(o.y-q.y)*dir; return ay>-1&&ay<10&&Math.abs(ax)<5; })).map(q=>({q,P:thruPoint(q,0.6)})).filter(o=>o.P.y>3&&o.P.y<H-3&&laneRisk(pl,o.P,theirs)<0.42&&nearest(theirs.filter(z=>z.role!=='GK'),o.P)[1]>3.2).sort((a,c)=>(c.q.y-a.q.y)*dir-(0)); const o=sq[0]; if(o){ M.spaceCd[team]=M.t+4.5; throughBall(pl,o.q,0.6); const dg=M.dbg||(M.dbg={}); dg['space'+team]=(dg['space'+team]||0)+1; return; } } /* v88: 앞 공간이 빈 동료에게 공간으로 찔러 줌 */
-  if(best&&!best.isUser&&best.role!=='GK'&&best.role!=='DF'&&(best.vy*dir)>2.5&&M.t>M.thruCd[team]&&Math.random()<0.45){ M.thruCd[team]=M.t+5; const P=thruPoint(best,0.55); const [,po]=nearest(theirs.filter(q=>q.role!=='GK'),P); if(po>3.5&&laneRisk(pl,P,theirs)<0.45){ throughBall(pl,best,0.55); return; } } // 침투하는 공격수에게 스루
+  if(!composing&&M.t>M.spaceCd[team]&&nod>1.6&&Math.random()<(stl==='playmaker'?0.5:0.3)*(0.7+0.6*MD.vis)*(pk==='counter'?1.4:pk==='build'&&ownH?0.6:1)){ const sq=mine.filter(q=>q!==pl&&!q.isUser&&q.role!=='GK'&&q.role!=='DF'&&((pl.y-q.y)*-dir)>5&&dist(pl,q)<38&&!theirs.some(o=>{ const ax=o.x-q.x, ay=(o.y-q.y)*dir; return ay>-1&&ay<10&&Math.abs(ax)<5; })).map(q=>({q,P:thruPoint(q,0.6)})).filter(o=>o.P.y>3&&o.P.y<H-3&&laneRisk(pl,o.P,theirs)<0.42&&nearest(theirs.filter(z=>z.role!=='GK'),o.P)[1]>3.2).sort((a,c)=>(c.q.y-a.q.y)*dir-(0)); const o=sq[0]; if(o){ M.spaceCd[team]=M.t+4.5; throughBall(pl,o.q,0.6); const dg=M.dbg||(M.dbg={}); dg['space'+team]=(dg['space'+team]||0)+1; return; } } /* v88: 앞 공간이 빈 동료에게 공간으로 찔러 줌 */
+  if(best&&!best.isUser&&best.role!=='GK'&&best.role!=='DF'&&(best.vy*dir)>2.5&&M.t>M.thruCd[team]&&Math.random()<0.45*(pk==='counter'?1.4:1)*(0.75+0.5*MD.risk)){ M.thruCd[team]=M.t+(pk==='counter'?3.5:5); const P=thruPoint(best,0.55); const [,po]=nearest(theirs.filter(q=>q.role!=='GK'),P); if(po>3.5&&laneRisk(pl,P,theirs)<0.45){ throughBall(pl,best,0.55); return; } } // 침투하는 공격수에게 스루
   const doPass=(t)=>{ const tv=Math.hypot(t.vx,t.vy), running=tv>4&&(t.vy*dir)>1.5; const d=dist(pl,t);
     // 3자 연계 예약: 짧은 패스를 받는 동료가 침투 공격수에게 원터치로 넘겨주게
     if(d<16&&!t.isUser){ const runner=mine.find(r=>r!==t&&r!==pl&&r.role!=='GK'&&(r.vy*dir)>3&&((r.y-t.y)*dir)>5&&dist(r,t)<28); if(runner&&Math.random()<(t.style==='target'?0.85:0.55)) t.layoff={to:runner,t:M.t+2.2}; }
@@ -4481,7 +4509,7 @@ function aiSetPiece(pl,team,mine,theirs,goal,sp){
   const open=q=>{ const [,od]=nearest(theirs,q); return od; };
   if(sp.type==='throw'){ const uu=M.user; if(team===0&&uu!==pl&&dist(uu,pl)<22&&open(uu)>2){ passTo(pl,uu,{power:0.45}); return; } const c=mine.filter(q=>q!==pl&&q.role!=='GK'&&dist(q,pl)<20).sort((a,c)=>open(c)-open(a))[0]; if(c) passTo(pl,c,{power:0.45}); else kick(pl,0,team===0?-1:1,14,4); return; }
   if(sp.type==='corner'){ if(team===0&&M.cornerRun&&M.t-sp.t0<2.4) return; /* 내 선수가 자리 잡을 시간 */ const box=mine.filter(q=>q!==pl&&q.role!=='GK'&&Math.abs(q.x-W/2)<14&&Math.abs(q.y-goal.y)<16); const uIn=box.find(q=>q.isUser); const [,uo]=uIn?nearest(theirs,uIn):[null,0]; const t=(uIn&&(M.cornerToUser||uo>1.6||Math.random()<0.5||(pl.buddy&&(M.buddySt||0)>=2)))?uIn:box[Math.floor(Math.random()*box.length)]; M.cornerRun=null; M.cornerToUser=false; if(t&&t.isUser&&pl.buddy&&(M.buddySt||0)>=2){ M.setPlayT=M.t+3; popup(pl.x,pl.y-2.2,'세트 플레이! (호흡)','#ffd25a'); }
-    if(t) passTo(pl,t,{cross:'high',corner:true}); else { const tx=W/2+rnd(-5,5), ty=goal.y+(team===0?9:-9), d=Math.hypot(tx-pl.x,ty-pl.y), T=clamp(0.85+d*0.011,1.05,1.3), k=loftKick(T,d); kick(pl,tx-pl.x,ty-pl.y,k.sp,(2.4+11*T*T)/T); M.ball.crossH=true; } return; } /* v87: 코너는 머리 높이(2.4m)로 떨어지게 */
+    if(t) passTo(pl,t,{cross:'high',corner:true}); else { const tx=W/2+rnd(-5,5), ty=goal.y+(team===0?9:-9), d=Math.hypot(tx-pl.x,ty-pl.y), T=clamp(0.85+d*0.011,1.05,1.3), k=loftKick(T,d); kick(pl,tx-pl.x,ty-pl.y,k.sp,(2.4+11*T*T)/T); M.ball.crossH=true; M.ball.cornX=true; } return; } /* v87: 코너는 머리 높이(2.4m)로 떨어지게 */
   if(sp.type==='pen'){ shoot(pl,goal.x+rnd(-3,3),goal.y,{power:0.8}); return; }
   if(sp.type==='fk'){ const gd=dist(pl,goal); { const uu=M.user; if(team===0&&uu!==pl&&dist(uu,pl)<30&&open(uu)>2.5&&gd>=27){ passTo(pl,uu,{power:0.5}); return; } } if(!sp.indirect&&gd<(M.wallPl?30:27)&&Math.random()<(M.wallPl?0.75:0.6)){ if(M.wallPl) fkKick(pl,{ax:rnd(-0.9,0.9),spin:[-1,0,1,1][Math.floor(Math.random()*4)]},rnd(0.5,0.8)); else shoot(pl,goal.x+rnd(-2.5,2.5),goal.y,{power:0.75}); return; }
     if(gd<40&&Math.abs(pl.x-W/2)>13&&Math.random()<0.7){ const box=mine.filter(q=>q!==pl&&q.role!=='GK'&&Math.abs(q.x-W/2)<14&&Math.abs(q.y-goal.y)<17); const uIn=box.find(q=>q.isUser); const t=uIn&&Math.random()<0.55?uIn:box[Math.floor(Math.random()*box.length)]; if(t){ passTo(pl,t,{cross:'high',corner:true}); return; } } /* v87: 측면 프리킥은 박스 안으로 크로스 */
@@ -4601,7 +4629,7 @@ function updateUser(dt){
         if(k==='pass'){ const pm=input.passMod, ps=input.passSide; input.passMod=null; input.passSide=0; if(has&&crossZone(u)&&!M.setPiece){ const aimT=Math.hypot(jx,jy)>0.3&&pm!=='long'?pickPassTarget(u,jx,jy):null; if(aimT&&dist(aimT,u)<17&&!(Math.abs(aimT.x-W/2)<13&&aimT.y<19)) passTo(u,aimT,{power:pw}); else userCross(u,jx,jy,pw,pm); } else if(has&&(pm==='long'||(pw>0.8&&!M.setPiece))){ const t=pickLongTarget(u,jx,jy)||pickPassTarget(u,jx,jy); if(t) passTo(u,t,{power:Math.max(pw,0.85),long:true}); } else if(has&&pm==='driven'&&!M.setPiece){ const t=pickPassTarget(u,jx,jy); if(t){ passTo(u,t,{power:0.78,driven:true}); popup(u.x,u.y-1.6,'강한 패스','#ffe3a0'); } } else if(has&&pm==='curl'&&!M.setPiece){ const t=pickPassTarget(u,jx,jy); if(t){ const sd=ps||1; passTo(u,t,{power:pw,curl:-sd}); } } else if(has){ const t=pickPassTarget(u,jx,jy); if(t){ const lift=!M.setPiece&&pw<0.8&&dist(u,t)>7&&dist(u,t)<32&&laneRisk(u,t,M.players.filter(q=>q.team===1))>=0.55; passTo(u,t,{power:pw,lift}); } } else if(incomingU()){ M.oneTouch={type:'pass',t:M.t,pw}; popup(u.x,u.y-1.8,'원터치 패스 준비','#9fd0ff'); } else if(b.owner&&b.owner.team===0){ popup(u.x,u.y-1.5,'동료 공, 슛 버튼으로 패스 요청','#ffd27f'); } else if(u.tackleT<=0){ doTackle(u,false,pm?'slide':'stand'); } }
         else { if(has){ const g=goalOf(0); const sp=M.setPiece&&M.setPiece.taker===u?M.setPiece.type:null;
             if(sp==='fk'&&M.fk){ fkKick(u,M.fk,fkPow(dur)); }
-            else if(sp==='corner'){ const tx=W/2+jx*7, ty=g.y+9-jy*3; const d=Math.hypot(tx-u.x,ty-u.y); const T=clamp(0.85+d*0.011,1.05,1.3); const k=loftKick(T,d); kick(u,tx-u.x,ty-u.y,k.sp,(2.4+11*T*T)/T); M.ball.crossH=true; popup(u.x,u.y-1.5,'코너킥 크로스!','#fff'); }
+            else if(sp==='corner'){ const tx=W/2+jx*7, ty=g.y+9-jy*3; const d=Math.hypot(tx-u.x,ty-u.y); const T=clamp(0.85+d*0.011,1.05,1.3); const k=loftKick(T,d); kick(u,tx-u.x,ty-u.y,k.sp,(2.4+11*T*T)/T); M.ball.crossH=true; M.ball.cornX=true; popup(u.x,u.y-1.5,'코너킥 크로스!','#fff'); }
             else if(sp==='throw'){ const mates=M.players.filter(q=>q.team===0&&q!==u&&q.role!=='GK'&&dist(q,u)<32).sort((a,c)=>a.y-c.y); if(mates[0]) passTo(u,mates[0],{power:0.9}); popup(u.x,u.y-1.5,'롱 스로인!','#fff'); }
             else { const mod=input.shotMod; input.shotMod=null;
               if(clearZone(u)&&!gkOutChip(u)&&mod!=='chip') userClear(u,jx,jy,false);
@@ -4640,7 +4668,7 @@ function boxMates(){ return M.players.filter(q=>q.team===0&&!q.isUser&&q.role!==
 function userCross(u,jx,jy,pw,mod){ const side=Math.sign(u.x-W/2)||1; const hi=mod!=='curl'; let cand=boxMates();
   let t=null,bs=-1e9; cand.forEach(q=>{ const [,od]=nearest(M.players.filter(r=>r.team===1&&r.role!=='GK'),q); let sc=od*1.5-Math.abs(q.y-(hi?8:6))*0.4; if(Math.hypot(jx,jy)>0.3){ const dx=q.x-u.x,dy=q.y-u.y,d=Math.hypot(dx,dy)||1; sc+=((dx*jx+dy*jy)/(d*Math.hypot(jx,jy)))*8; } else sc+=hi?(-(q.x-W/2)*side)*0.25:((q.x-W/2)*side)*0.25; if(sc>bs){bs=sc;t=q;} });
   if(t){ passTo(u,t,{power:hi?0.95:0.7,cross:hi?'high':'low',lead:0.5}); M.crossT=M.t; }
-  else { const tx=W/2-side*(hi?3:0), ty=hi?9:6; const d=Math.hypot(tx-u.x,ty-u.y); const T=clamp(0.95+d*0.022,1.05,1.65); const sp=hi?loftKick(T,d).sp:clamp(14+d*0.5,20,30); kick(u,tx-u.x,ty-u.y,sp,hi?(2.4+11*T*T)/T:4.2); M.stats.passes++; M.crossT=M.t; M.ball.offside=offsideSet(u); }
+  else { const tx=W/2-side*(hi?3:0), ty=hi?9:6; const d=Math.hypot(tx-u.x,ty-u.y); const T=clamp(0.95+d*0.022,1.05,1.65); const sp=hi?loftKick(T,d).sp:clamp(14+d*0.5,20,30); kick(u,tx-u.x,ty-u.y,sp,hi?(2.4+11*T*T)/T:4.2); M.ball.crossH=hi; M.ball.xSafe=true; M.stats.passes++; M.crossT=M.t; M.ball.offside=offsideSet(u); }
   popup(u.x,u.y-1.6,hi?'높은 크로스!':'낮은 크로스!','#fff'); M.stats.crosses=(M.stats.crosses||0)+1; }
 /* ===== v76 스루패스: 빈 공간으로 찔러 넣으면 가장 먼저 닿는 동료가 뛰어 들어감 (피파·eFootball 방식) ===== */
 function ballFr(){ return M.weather==='rain'?0.55:M.weather==='snow'?0.68:0.85; }
@@ -5042,6 +5070,7 @@ function updatePossession(dt){
       { const pt=b.passTarget; if(pt&&pt!==pl&&pt.team!==pl.team&&!pt.isUser&&pt.stun<=0&&pt.kickCd<=0&&b.z<1.8&&Math.hypot(pt.x-b.x,pt.y-b.y)<1.9&&Math.hypot(pl.x-b.x,pl.y-b.y)>0.9) return; } // 받는 선수가 이미 닿아 있으면 우선
       if((b.nolook||b.flick)&&b.lastKicker&&pl.team!==b.lastKicker.team&&pl.role!=='GK'&&(b.nolook||M.t-(b.flickT||0)<1.4)) return;
       if(b.split&&b.lastKicker&&pl.team!==b.lastKicker.team) return;
+      if(b.xSafe&&b.lastKicker&&pl.team!==b.lastKicker.team&&pl.role!=='GK'&&M.t-b.kickAt<0.32) return;
       if(M.headBT>0&&b.passTarget===M.user&&pl.team===1&&b.z>0.8) return;
       if(b.lift&&b.z>1.0&&b.lastKicker&&pl.team!==b.lastKicker.team) return; // 띄운 패스는 머리 위로 넘어감 // 타점 헤딩: 내게 오는 공중볼은 상대가 못 따냄
       { const shotLike=b.lastKicker&&b.lastKicker.team!==pl.team&&!b.passTarget&&sp>14&&b.z<1.6&&b.isShot; if(shotLike&&pl.role!=='GK'&&d<1.2&&!(pl.stun>0)){ if(pl.blockCd>M.t) return; pl.blockCd=M.t+0.6; const spc=b.fire||b.thunder||b.meteor||b.bike;
@@ -5066,9 +5095,14 @@ function header(pl,b){ // 공중볼 경합: 피지컬·점프 → 슛/클리어/
   { const uu=M.user; if(M.headBT>0&&uu&&uu!==pl&&!M.sentOff&&dist(uu,b)<2.8) pl=uu; }
   const hbuf=pl.isUser&&M.headBT>0;
   const strv=pl.isUser?ustat('str'):pl.st.str; const rivals=M.players.filter(q=>q!==pl&&q.team!==pl.team&&dist(q,b)<1.6);
-  const at=b.lastKicker?b.lastKicker.team:-1, inBox=q=>Math.abs(q.y-goalOf(1-q.team).y)<18&&Math.abs(q.x-W/2)<22; const dk=q=>(b.crossH&&q.team!==at&&inBox(q))?1.6:1; /* v87: 자기 박스 수비수는 공중볼 경합 우위 */
+  const at=b.lastKicker?b.lastKicker.team:-1, inBox=q=>Math.abs(q.y-goalOf(1-q.team).y)<18&&Math.abs(q.x-W/2)<22; const dk=q=>(b.crossH&&q.team!==at&&inBox(q))?(b.cornX?1.6:1.3):1; /* v91: 오픈 플레이 크로스는 수비 우위 줄임 */ /* v87: 자기 박스 수비수는 공중볼 경합 우위 */
   if(!hbuf&&b.crossH){ const cs=M.players.filter(q=>q.role!=='GK'&&!q.sentOff&&!(q.stun>0)&&dist(q,b)<(q===b.passTarget?2.5:q.team!==at?2.1:1.8)); if(!cs.includes(pl)) cs.push(pl); const wt=q=>(q.isUser?ustat('str'):q.st.str)*dk(q)*(q===b.passTarget?1.15:1)/(0.6+dist(q,b)); let tot=cs.reduce((a,q)=>a+wt(q),0), r=Math.random()*tot; for(const q of cs){ r-=wt(q); if(r<=0){ pl=q; break; } } } /* 크로스: 근처 모두가 경합(노린 선수 우선) */
   else { const rv=hbuf?null:rivals.sort((a,c)=>dist(a,b)-dist(c,b))[0]; if(rv){ const s2=(rv.isUser?ustat('str'):rv.st.str)*dk(rv), s1=strv*dk(pl); if(Math.random()<s2/(s2+s1)){ pl=rv; } } }
+  { const fromMate=b.lastKicker&&b.lastKicker.team===pl.team&&b.lastKicker!==pl&&!b.isShot&&!b.crossH&&!hbuf; const goal0=goalOf(pl.team); const atk0=pl.team===0?pl.y<H/2:pl.y>H/2;
+    if(fromMate&&!(atk0&&dist(pl,goal0)<18)){ const [,od]=nearest(M.players.filter(q=>q.team!==pl.team),pl);
+      if(od>2.6){ const hi=b.z>2.2; if(b.lastKicker.isUser&&M.stats.passOk<M.stats.passes) M.stats.passOk++; setOwner(pl,{clean:true}); pl.touchT=0.12; if(pl.isUser||b.lastKicker.isUser) popup(pl.x,pl.y-2.4,hi?'머리로 받아 놓음':'가슴 트래핑','#e8f4ff'); return; } /* v91: 동료의 긴 패스(백패스 포함)를 헤딩으로 걷어내지 않음 */
+      const ow=atk0?null:M.players.filter(q=>q.team===pl.team&&q!==pl&&q.role!=='GK'&&dist(q,pl)>5&&dist(q,pl)<20&&nearest(M.players.filter(o=>o.team!==pl.team),q)[1]>3).sort((a,c)=>dist(a,pl)-dist(c,pl))[0];
+      if(ow){ pl.kickCd=0.5; pl.kickAnimT=0.3; pl.headT=0.35; b.owner=null; const dx=ow.x-pl.x, dy=ow.y-pl.y, l=Math.hypot(dx,dy)||1, v=clamp(7+l*0.45,9,15); b.vx=dx/l*v; b.vy=dy/l*v; b.vz=2; b.z=1.8; b.lastKicker=pl; b.passTarget=ow; b.offside=null; b.isShot=false; popup(pl.x,pl.y-1.5,'헤딩 패스','#ddd'); return; } } }
   pl.kickCd=0.5; pl.kickAnimT=0.3; pl.headT=0.35; b.speedAtTake=0; if(pl.isUser) M.stats.headers=(M.stats.headers||0)+1; M.lastHeaderT=M.t; M.lastHeaderTeam=pl.team;
   const goal=goalOf(pl.team); const gd=dist(pl,goal); const atkHalf=pl.team===0?pl.y<H/2:pl.y>H/2;
   if(hbuf&&gd<21&&atkHalf){ const acc=ustat('shot')*0.5+strv*0.5; const err=(1-acc/100)*0.18; const tx=goal.x+(Math.random()<0.5?-1:1)*rnd(1.2,2.8); const ang=Math.atan2(goal.y-pl.y,tx-pl.x)+rnd(-err,err);
@@ -6439,9 +6473,12 @@ function ptSum(v,n){ let s=0; for(let i=0;i<n;i++) s+=ptCost(v+i); return s; }
 
 /* ⑤ 리그 적응: 더 높은 리그·해외로 가면 처음 몇 경기는 몸이 따라오지 않는다 */
 function adaptPen(){ const A=S&&S.adaptL; if(!A||A.left<=0) return 0; return Math.ceil(A.pen*A.left/A.n); }
-function adaptStart(from,to){ if(!from||!to) return; const gap=(to.str-from.str); const abroad=from.country!==to.country; let pen=Math.round(Math.max(0,gap)/3)+(abroad?2:0); pen=clamp(pen,0,9); if(pen<=0){ S.adaptL=null; return; }
+function lgLvOf(c){ return clamp(Math.round((lgAvgOf(c)-46)/4.4),1,10); } /* v91: 제안 카드에 리그 수준 표시 (lgStars와 같은 기준) */
+function lgAvgOf(c){ const dv=divOf(c.id); const ids=(dv&&S.divs&&S.divs[dv.id])?S.divs[dv.id].clubs:[c.id]; const st=ids.map(id=>CLUBS[id].str).sort((a,b)=>b-a).slice(0,8); return st.reduce((a,b)=>a+b,0)/Math.max(1,st.length); }
+function adaptPenOf(from,to){ const gl=lgAvgOf(to)-lgAvgOf(from), gc=to.str-from.str; const abroad=from.country!==to.country; return clamp(Math.round(Math.max(0,gl)/3)+(abroad?2:0)+(gc>=10&&gl>=-2?1:0),0,9); } /* v91: 적응 부담은 '리그 수준' 차이로 (EPL 중위권 → 네덜란드 강팀은 해외 이동 부담만) */
+function adaptStart(from,to){ if(!from||!to) return; let pen=adaptPenOf(from,to); if(pen<=0){ S.adaptL=null; return; }
   const n=clamp(5+pen-staffLv('analyst'),3,14); S.adaptL={pen,n,left:n,to:to.id}; }
-function adaptPreview(to){ const from=CLUBS[S.clubId]; if(!from||!to||to.id===from.id) return null; const gap=(to.str-from.str); const abroad=from.country!==to.country; const pen=clamp(Math.round(Math.max(0,gap)/3)+(abroad?2:0),0,9); if(pen<=0) return null; return {pen,n:clamp(5+pen-staffLv('analyst'),3,14)}; } /* v89: 계약 전에 적응 부담 미리 보기 */
+function adaptPreview(to){ const from=CLUBS[S.clubId]; if(!from||!to||to.id===from.id) return null; const pen=adaptPenOf(from,to); if(pen<=0) return null; return {pen,n:clamp(5+pen-staffLv('analyst'),3,14)}; } /* v89: 계약 전에 적응 부담 미리 보기 */
 function adaptTick(){ const A=S.adaptL; if(!A) return null; A.left--; if(A.left<=0){ S.adaptL=null; return '✅ 리그 적응 완료 · 능력치가 제대로 나와요'; } return null; }
 
 /* ⑥ 선발 선택: 신뢰만으로 고정되지 않음 (능력치 차이·컨디션·일정·경쟁자 폼으로 로테이션·명단 제외) */
@@ -6465,14 +6502,16 @@ function isBenched(){ if(S.trust!=null) updStarter(); if(selOk(S.sel)) return S.
 function winOpen(){ const w=S.win; return !!(w&&w.s===S.season&&S.round<=w.until); }
 function winLeft(){ const w=S.win; return w?Math.max(0,w.until-S.round+1):0; }
 function winTick(notes){ const w=S.win; if(!w) return; if(w.s!==S.season||S.round>w.until){ const had=(S.offers||[]).filter(o=>!o.renew).length; S.win=null; if(S.offersFor==='mid'){ S.offers=[]; S.offersFor=null; } if(notes) notes.push(`🔒 ${w.k==='summer'?'여름':'겨울'} 이적시장 마감${had?` · 남은 제안 ${had}건 종료`:''}`); return; }
-  if(S.offersFor!=='mid') return; const sc=ensureScout(); const o=ovr(); let add=0;
+  if(S.offersFor==='end'||w.done) return; S.offers=S.offers||[]; const sc=ensureScout(); const o=ovr(); let add=0; /* v91: 전부 거절해도 시장이 열려 있는 동안 새 제안이 옴 */
   // 돌아온 구단: 거절했던 구단이 조건을 올려 다시 제안 (기간 안에 한 번)
   (S.rejected||[]).forEach(x=>{ if(x.back||S.offers.some(y=>y.clubId===x.clubId)||!CLUBS[x.clubId]) return; if(Math.random()<0.55){ x.back=true; S.offers.push({...x.o,wage:Math.round(x.o.wage*1.12),back:true,v:1}); add++; if(notes) notes.push(`📞 ${CLUBS[x.clubId].name}가 조건을 올려 다시 연락했어요 (+12%)`); } });
   // 새 제안: 관심 70 넘은 구단
   Object.keys(sc.f).forEach(id=>{ if(sc.f[id]<70||S.offers.some(y=>y.clubId===id)||(S.rejected||[]).some(y=>y.clubId===id)) return; const c=CLUBS[id]; if(!c||o<c.str-11) return; const q=clamp((o-(c.str-14))/28,0,1); S.offers.push({clubId:id,wage:Math.round(c.wage*(0.75+0.9*q)*(hasItem('agent')?1.2:1)),years:irnd(2,3),scouted:true}); add++; if(notes) notes.push(`📨 새 이적 제안: ${c.name}`); });
+  /* v91: 관심 구단 말고도 시장 안에서 새 구단이 계속 연락 (라운드마다 확률) */
+  if(!S.loan&&S.offers.filter(x=>!x.renew).length<4&&Math.random()<(w.k==='summer'?0.5:0.4)){ const seen=new Set([...(S.offers||[]).map(x=>x.clubId),...(S.rejected||[]).map(x=>x.clubId)]); const pool0=makeOffers().filter(x=>!x.renew&&!x.loan&&!seen.has(x.clubId)); const cs=new Set((S.offers||[]).map(x=>CLUBS[x.clubId].country)); const pool=pool0.filter(x=>!cs.has(CLUBS[x.clubId].country)).length?pool0.filter(x=>!cs.has(CLUBS[x.clubId].country)):pool0; if(pool.length){ const x=pool[Math.floor(Math.random()*Math.min(pool.length,6))]; S.offers.push({...x,v:1}); add++; if(notes) notes.push(`📨 새 이적 제안: ${CLUBS[x.clubId].name}`); } }
   if(add) S.offersFor='mid'; }
 function rejectOffer(i){ const o=S.offers[i]; if(!o) return; S.offers.splice(i,1); if(!o.renew&&!o.loan&&!o.back){ S.rejected=S.rejected||[]; S.rejected.push({clubId:o.clubId,o:{...o},s:S.season}); }
-  if(!S.offers.length&&S.offersFor==='mid') S.offersFor=null; save(); toast(o.back?`${CLUBS[o.clubId].name} 제안 최종 거절`:`${CLUBS[o.clubId].name} 제안 거절 · 이적시장 안에 다시 올 수도 있어요`); renderHub(); }
+  if(!S.offers.length&&S.offersFor==='mid') S.offersFor=null; save(); toast(o.back?`${CLUBS[o.clubId].name} 제안 최종 거절`:`${CLUBS[o.clubId].name} 제안 거절 · 시장 ${winLeft()}R 동안 다른 구단 연락 가능`); renderHub(); }
 
 /* ⑧ 내 팀(스태프) · 고향 축구교실: 쌓이는 주급을 쓰고 키우는 곳 */
 const STAFF=[

@@ -1593,6 +1593,8 @@ const KSHORT={'맨체스터 레드':'맨레드','맨체스터 스카이':'맨스
   '밀라노 블루블랙':'밀란블루','밀라노 레드블랙':'밀란레드','로마 옐로레드':'로마','로마 스카이':'로마스카이','피에몬테 블랙화이트':'피에몬테',
   '함부르크 블루':'함부르크','함부르크 브라운':'함브라운','프랑크푸르트 블랙레드':'프랑크푸르트','슈투트가르트 화이트레드':'슈투트가르트','아우크스부르크 레드그린':'아우크스','라이프치히 화이트레드':'라이프치히','프라이부르크 레드':'프라이부르크','글라트바흐 그린':'글라트바흐','볼프스부르크 그린':'볼프스부르크',
   '파리 블루레드':'파리','파리 블루화이트':'파리화이트','스트라스부르 블루':'스트라스부르','브라운슈바이크 펠젠':'브라운슈바이크'};
+/* v86 리그 수준 재정비 (Opta 리그 파워랭킹 순서 참고): 리그별 전력 보정 [더할 값, 최고 상한] · 재력(wealth)·주급은 그대로 */
+const LG_STR2={'en-2':[4,82],'pt-1':[3,88],'nl-1':[2,86],'be-1':[1,82],'sa-1':[-2,84],'ar-1':[5,83],'it-2':[4,76],'es-2':[3,77],'de-2':[6,76],'fr-2':[4,74],'at-1':[3,80],'ch-1':[3,78],'dk-1':[3,78],'sc-1':[3,82],'jp-1':[7,79],'kr-1':[6,76],'co-1':[5,75],'uy-1':[5,73],'en-3':[5,71],'es-3':[2,66],'it-3':[4,67],'fr-3':[2,63],'de-3':[6,66],'qa-1':[3,74],'ir-1':[2,67],'cn-1':[5,70],'th-1':[3,67],'jp-2':[8,68],'uz-1':[4,64],'id-1':[2,62]}; /* 국내 2부는 시작 밸런스 때문에 그대로 */
 const LG_ADJ={'kr-1':[4.5,2.1,1.25],'kr-2':[2.5,1.6,1.15],'cn-1':[-6.5,0.55,0.62],'qa-1':[-2,0.9,1],'ir-1':[-0.5,1,1]}; // 한국 3위 · 중국 8위 (AFC 2025-26)
 (function genClubs(){
   const PAL=['#c0392b','#2980b9','#27ae60','#8e44ad','#f39c12','#16a085','#2c3e50','#d35400','#e84393','#1abc9c','#7f8c8d','#f1c40f','#111111','#ffffff','#6d4c41','#0d47a1'];
@@ -1617,6 +1619,7 @@ const LG_ADJ={'kr-1':[4.5,2.1,1.25],'kr-2':[2.5,1.6,1.15],'cn-1':[-6.5,0.55,0.62
   Object.values(CLUBS).forEach(c=>{ const A=LG_ADJ[c.homeDiv]; if(!A) return; c.str=Math.round(c.str+A[0]); c.rep=Math.round(c.rep*A[1]/10)*10; c.wage=Math.max(40,Math.round(c.wage*A[2]/10)*10); });
   Object.values(CLUBS).forEach(c=>{ if(!c.nat&&c.wage>600) c.wage=wageCmp(c.wage); }); /* v84: 빅리그 주급을 실제 수준으로 (EPL 빅클럽 스타 주급 약 5~7억) */
   Object.values(CLUBS).forEach(c=>{ if(c.wealth==null) c.wealth=clamp(Math.round((c.str-46)/9),1,5); });
+  Object.values(CLUBS).forEach(c=>{ const A=LG_STR2[c.homeDiv]; if(!A||c.nat) return; c.str=Math.min(A[1],c.str+A[0]); }); /* v86 리그 수준 재정비 */
   // 한글 약칭: 영어 약자 대신 '맨레드', '강릉'처럼
   Object.values(CLUBS).forEach(c=>{ c.code=c.short; c.short=kShort(c); }); // 재정: 명문일수록 돈이 많아 전력이 잘 안 떨어짐
 })();
@@ -1896,7 +1899,7 @@ function newGame(name,pos){
   S={
     player:{name,pos,level:1,xp:0,points:5,stats:{...base},money:300,rep:0,skills:['dash'],equip:['dash',null,null,null],items:[],age:18,cond:100,injury:0,natl:{caps:0,goals:0},cups:0,
       career:{apps:0,goals:0,assists:0,ratings:[],titles:0}},
-    v:8, cid:'c'+Date.now().toString(36)+Math.floor(Math.random()*1e4), started:new Date().toISOString().slice(0,10), trophies:[], clubId:'kr-2-0', wage:80, season:1, round:1, divs, tables:{}, fixtures:{}, offers:[], offersFor:null, history:[], lastResults:[], pstats:{}, form:[], awards:[], contractEnd:2, weekAct:null, weekMsg:'', pendingNat:false, natDone:{}, cup:null, cupPending:false, natLog:[],
+    v:9, cid:'c'+Date.now().toString(36)+Math.floor(Math.random()*1e4), started:new Date().toISOString().slice(0,10), trophies:[], clubId:'kr-2-0', wage:80, season:1, round:1, divs, tables:{}, fixtures:{}, offers:[], offersFor:null, history:[], lastResults:[], pstats:{}, form:[], awards:[], contractEnd:2, weekAct:null, weekMsg:'', pendingNat:false, natDone:{}, cup:null, cupPending:false, natLog:[],
   };
   startSeason();
   save();
@@ -2730,15 +2733,16 @@ function formChips(){ const hs=(S.history||[]).filter(m=>!m.injured).slice(-5); 
 
 const TRUST_UP=60, TRUST_DOWN=45;
 function compIdx(){ return S.player.pos==='FW'?11:S.player.pos==='MF'?8:5; }
-function genComp(club){ const i=compIdx(); return {name:playerName(club.id,i),num:i,ovr:Math.max(ovr()+2,Math.round(club.str+irnd(-1,3))),club:club.id}; }
+function genComp(club){ const i=compIdx(); return {name:playerName(club.id,i),num:i,ovr:Math.max(ovr()+2,Math.min(99,Math.round(club.str+irnd(-1,3)+3*eliteF(club)))),club:club.id}; } /* 빅클럽 경쟁자는 스타급 */
 function ensureComp(){ if(!S.comp||S.comp.club!==S.clubId) S.comp=genComp(CLUBS[S.clubId]); return S.comp; }
-function trustStart(club){ const k=roleAt(club).k; return k==='core'?70:k==='starter'?50:30; }
+function trustStart(club){ const k=roleAt(club).k; return k==='core'?70:Math.round((k==='starter'?50:30)-10*eliteF(club)); }
 function updStarter(){ if(S.trust==null) return; const T=trustThr(); if(S.starter==null) S.starter=S.trust>=T.up; if(!S.starter&&S.trust>=T.up) S.starter=true; else if(S.starter&&S.trust<T.down) S.starter=false; }
-function trustReset(club,bonus=0){ S.trust=Math.min(85,trustStart(club)+bonus); S.starter=S.trust>=TRUST_UP; S.comp=genComp(club); S.compIntro=true; }
+function trustReset(club,bonus=0){ S.trust=Math.min(85,trustStart(club)+bonus); S.comp=genComp(club); S.starter=S.trust>=trustThr().up; S.compIntro=true; }
 function trustMigrate(){ const role=S.role||roleAt(CLUBS[S.clubId]).k; const f=S.form||[]; const avg=f.length?f.reduce((a,b)=>a+b,0)/f.length:6.3; S.starter=role!=='prospect'||avg>=6.5; S.trust=Math.round(S.starter?clamp(64+(avg-6.3)*15,60,85):clamp(40+(avg-6.3)*15,20,58)); S.comp=genComp(CLUBS[S.clubId]); }
 function trustAfterMatch(r,ev){ if(S.trust==null||ev.type==='nat'||ev.pro||r.injured) return null; ensureComp(); const was=!!S.starter; updStarter(); const was2=!!S.starter;
   let d=(r.bench?(r.rating-6.0)*14+2:(r.rating-6.3)*12)+(r.goals||0)*4+(r.assists||0)*3+(r.objRes&&r.objRes[0]&&r.objRes[0].done?5:0)+(r.bench&&r.rating>=6.8?4:0)+(ovr()>S.comp.ovr?2:ovr()<S.comp.ovr-6?-1:0);
-  { const base=clamp(58+(trustThr().gap+2)*3,15,90); d+=(base-S.trust)*0.07; if(S.trust>75&&d>0) d*=0.6; } // 능력치가 모자라면 신뢰가 서서히 빠짐
+  { const gp=trustThr().gap, E=S.guaranteed&&!S.loan?0:eliteF(CLUBS[S.clubId]); if(d>0) d*=(1-0.5*E)*clamp(1-Math.max(0,-gp-6)*0.06,0.35,1); /* v86 빅클럽·능력치 열세면 신뢰가 천천히 오름 */
+    const base=clamp(58+(gp+2)*3,15,90); d+=(base-S.trust)*(0.07+0.04*E); if(S.trust>75&&d>0) d*=0.6; } /* 능력치가 모자라면 신뢰가 서서히 빠짐 */
   if(r.auto) d*=0.6; d=Math.round(clamp(d,-15,18)); S.trust=clamp(S.trust+d,0,100); updStarter(); trustLog(d,`평점 ${r.rating.toFixed(1)}${r.goals?` · ${r.goals}골`:''}${r.bench?' · 교체':''}`);
   return {d,v:S.trust,up:!was2&&S.starter,down:was2&&!S.starter}; }
 function trustStrip(){ if(S.trust==null) return ''; ensureComp(); const gu=S.guaranteed&&!S.loan; const st=!isBenched();
@@ -2746,7 +2750,7 @@ function trustStrip(){ if(S.trust==null) return ''; ensureComp(); const gu=S.gua
 function compIntroModal(){ const c=CLUBS[S.clubId], cp=ensureComp(); const st=!isBenched();
   const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card ci-card"><div class="row" style="gap:12px;align-items:center">${por('coach',64)}<div><span class="label">${esc(c.name)} 감독</span><h2 style="margin:2px 0 0">주전 경쟁 시작</h2></div>${embHTML(c,40,'margin-left:auto')}</div>
     <p class="ci-q">"${esc(S.player.name)}, 환영한다. ${st?`처음부터 선발로 쓰겠다. 하지만 ${esc(cp.name)} 선수(${cp.num}번)가 네 자리를 노린다.`:`지금 네 자리엔 ${esc(cp.name)} 선수(${cp.num}번, OVR ${cp.ovr})가 있다. 경기에서 보여줘라.`}"</p>
-    <div class="tstrip ${st?'on':''}" style="margin:0"><div class="row between"><b>감독 신뢰</b><span class="tv"><b>${S.trust}</b> / 선발 기준 ${TRUST_UP}</span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${TRUST_UP}%"></u></div></div>
+    <div class="tstrip ${st?'on':''}" style="margin:0"><div class="row between"><b>감독 신뢰</b><span class="tv"><b>${S.trust}</b> / 선발 기준 ${trustThr().up}</span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${trustThr().up}%"></u></div></div>
     <div class="ci-g"><div><b style="color:#178a52">올라가는 것</b><small>경기 평점 · 골·도움 · 감독 목표 달성 · 교체로 들어가 활약 · 훈련(+2) · 능력치가 경쟁자보다 높음</small></div><div><b style="color:#c0392b">내려가는 것</b><small>낮은 평점 · 광고 촬영(−2) · 능력치가 경쟁자보다 많이 낮음</small></div></div>
     <button class="btn primary block" id="ci-ok" style="margin-top:12px">알겠습니다</button></div>`;
   document.body.append(m); m.querySelector('#ci-ok').onclick=()=>m.remove(); }
@@ -3069,35 +3073,31 @@ function renderLeague0(){
 }
 
 /* 이적 */
-/* v85 리그 단계: 한 번에 한 단계씩 올라감 (실력이 확실하면 두 단계) */
+/* 리그 단계: 이적 제한은 없음(바로 빅리그 가능) · 위 단계 리그 제안을 남기는 데만 씀 */
 const LG_TIER={'en-1':5,'es-1':5,'de-1':5,'it-1':5,'fr-1':5, 'en-2':4,'de-2':4,'es-2':4,'it-2':4,'fr-2':4,'sa-1':4,'nl-1':4,'pt-1':4,'be-1':4,'br-1':4,
   'jp-1':3,'sc-1':3,'at-1':3,'dk-1':3,'ch-1':3,'qa-1':3,'ar-1':3,'cn-1':3,'en-3':3,'de-3':3,'es-3':3,'it-3':3,'fr-3':3,
   'kr-1':2,'jp-2':2,'th-1':2,'ir-1':2,'co-1':2,'uy-1':2,'uz-1':2,'id-1':2,'kr-2':1};
 const TIER_NM=['','국내 2부','아시아 1부·중소 리그','J리그·유럽 3부·중소 리그','빅리그 2부·네덜란드·포르투갈 등','유럽 5대 리그'];
 function tierOfDiv(d){ return LG_TIER[d]||2; }
 function tierOfClub(c){ const d=c&&divOf(c.id); return d?tierOfDiv(d.id):2; }
-function myTier(){ let t=tierOfClub(CLUBS[S.loan?S.loan.parent:S.clubId]); if(S.loan) t=Math.max(t,tierOfClub(CLUBS[S.clubId])); (S.seasonLog||[]).slice(-3).forEach(x=>{ if(x.div&&(x.apps||0)>=8) t=Math.max(t,tierOfDiv(x.div)); }); return t; } /* 최근 3시즌 동안 8경기 이상 뛴 가장 높은 단계 */
 const GATE5=new Set(['en-2','de-2','es-2','it-2','fr-2','nl-1','pt-1','be-1','br-1']);
 function stepOf(c){ const d=(divOf(c.id)||{}).id; return tierOfClub(c)+(GATE5.has(d)?0.5:0); } /* 같은 단계라도 5대 리그 관문(유럽 2부·포르투갈 등)이 한 칸 위 */
-function gate5(){ return (S.seasonLog||[]).some(x=>x.div&&(GATE5.has(x.div)||tierOfDiv(x.div)>=5)&&(x.apps||0)>=15); }
-function tierWhy(c){ return tierOfClub(c)>=5&&!gate5()?'빅리그 2부·네덜란드·포르투갈·벨기에·브라질(15경기 이상)':TIER_NM[Math.min(5,tierOfClub(c)-1)]; }
-function tierOk(c){ const t=tierOfClub(c), m=myTier(), o=ovr(); if(t>=5&&o<c.str+2&&!gate5()) return false; /* 5대 리그: 빅리그 2부·네덜란드·포르투갈 등에서 한 시즌(15경기+) 뛰어야(사우디는 해당 없음) */ if(t<=m+1) return true; return t===m+2&&o>=c.str+2; }
 function clubInterested(c){
   const p=S.player, o=ovr();
   const repNeed=c.rep*(hasItem('jet')?0.7:1);
-  return p.rep>=repNeed && o>=c.str-(tierOfClub(c)>=5?5:9) && tierOk(c);
+  return p.rep>=repNeed && o>=c.str-9;
 }
 
 /* ---------- 스카우트 · 이적시장 2번 · 보스만 · 임대 ---------- */
 function ensureScout(){ if(!S.scout) S.scout={f:{},visit:null}; return S.scout; }
 function scoutRefresh(){ const sc=ensureScout(), p=S.player, o=ovr(), mine=CLUBS[S.clubId]; const parent=S.loan?CLUBS[S.loan.parent]:mine;
-  Object.keys(sc.f).forEach(id=>{ const c=CLUBS[id]; if(!c||id===S.clubId||(S.loan&&id===S.loan.parent)||(c.wage<=parent.wage&&stepOf(c)<=stepOf(parent))||!tierOk(c)) delete sc.f[id]; });
+  Object.keys(sc.f).forEach(id=>{ const c=CLUBS[id]; if(!c||id===S.clubId||(S.loan&&id===S.loan.parent)||(c.wage<=parent.wage&&stepOf(c)<=stepOf(parent))) delete sc.f[id]; });
   const ids=Object.keys(sc.f); if(ids.length>=3) return;
-  const cand=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&!(S.loan&&c.id===S.loan.parent)&&!sc.f[c.id]&&(c.wage>parent.wage*1.2||stepOf(c)>stepOf(parent))&&c.rep<=Math.max(160,p.rep*2.4+120)&&c.str<=o+16&&tierOk(c))
+  const cand=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&!(S.loan&&c.id===S.loan.parent)&&!sc.f[c.id]&&(c.wage>parent.wage*1.2||stepOf(c)>stepOf(parent))&&c.rep<=Math.max(160,p.rep*2.4+120)&&c.str<=o+16)
     .sort((a,b)=>a.rep-b.rep+(Math.random()-0.5)*a.rep*0.6);
   const big=c=>c.country!==parent.country||c.homeDiv.endsWith('-1')&&!parent.homeDiv.endsWith('-1');
   if(!Object.keys(sc.f).some(id=>big(CLUBS[id]))){ // 꿈의 구단 한 곳: 해외나 1부
-    const dream=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&!sc.f[c.id]&&big(c)&&(c.wage>parent.wage*1.5||stepOf(c)>stepOf(parent))&&c.rep<=p.rep*5+500&&c.str<=o+14&&tierOk(c)); if(dream.length){ const c=dream[Math.floor(Math.random()*Math.min(dream.length,6))]; sc.f[c.id]=irnd(5,12); } }
+    const dream=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&!sc.f[c.id]&&big(c)&&(c.wage>parent.wage*1.5||stepOf(c)>stepOf(parent))&&c.rep<=p.rep*5+500&&c.str<=o+14); if(dream.length){ const c=dream[Math.floor(Math.random()*Math.min(dream.length,6))]; sc.f[c.id]=irnd(5,12); } }
   for(const c of cand){ if(Object.keys(sc.f).length>=3) break; sc.f[c.id]=irnd(8,22); } }
 function scoutLabel(v){ return v>=70?'정식 제안 준비':v>=40?'꾸준히 지켜보는 중':v>=20?'관심 시작':'이름만 아는 정도'; }
 function scheduleVisit(){ const sc=ensureScout(); if(sc.visit||S.player.injury>0) return; const ids=Object.keys(sc.f); if(!ids.length) return;
@@ -3124,7 +3124,7 @@ function loanOptions(){ const o=ovr(), mine=CLUBS[S.clubId]; return Object.value
 function benchCount(){ return (S.history||[]).filter(m=>m.season===S.season&&m.bench).length; }
 function winterWindow(notes){ const sc=ensureScout(); const offers=[]; const o=ovr(); const mine=CLUBS[S.clubId];
   // 스카우트 관심 70+ 구단
-  Object.keys(sc.f).forEach(id=>{ if(sc.f[id]>=70&&o>=CLUBS[id].str-(tierOfClub(CLUBS[id])>=5?5:11)&&tierOk(CLUBS[id])){ const c=CLUBS[id]; const q=clamp((o-(c.str-14))/28,0,1); offers.push({clubId:id,wage:Math.round(c.wage*(0.75+0.9*q)*(hasItem('agent')?1.2:1)),years:irnd(2,3),scouted:true}); } });
+  Object.keys(sc.f).forEach(id=>{ if(sc.f[id]>=70&&o>=CLUBS[id].str-11){ const c=CLUBS[id]; const q=clamp((o-(c.str-14))/28,0,1); offers.push({clubId:id,wage:Math.round(c.wage*(0.75+0.9*q)*(hasItem('agent')?1.2:1)),years:irnd(2,3),scouted:true}); } });
   // 보스만: 계약 마지막 시즌 + 재계약 안 함 → 해외 구단과 사전 계약 (이적료 없음, 시즌 끝나고 합류)
   if(isLastYear()&&S.lastYearChoice!=='renew'){ const myC=mine.country; Object.values(CLUBS).filter(c=>!c.nat&&c.country!==myC&&clubInterested(c)&&c.wage>mine.wage).sort((a,b)=>b.wage-a.wage).slice(0,2).forEach(c=>{ if(offers.some(x=>x.clubId===c.id)) return; const q=clamp((o-(c.str-14))/28,0,1); offers.push({clubId:c.id,wage:Math.round(c.wage*(0.75+0.9*q)),years:irnd(2,3),pre:true}); }); }
   else if(hasItem('agent')) makeOffers().filter(x=>!x.renew).slice(0,2).forEach(x=>{ if(!offers.some(y=>y.clubId===x.clubId)) offers.push(x); });
@@ -3147,7 +3147,7 @@ function makeOffers(){
   const underContract=S.season<S.contractEnd; const mine0=CLUBS[S.clubId]; const sc=ensureScout();
   Object.values(CLUBS).forEach(c=>{
     if(c.id===S.clubId||c.nat) return;
-    const scouted=(sc.f[c.id]||0)>=70&&o>=c.str-(tierOfClub(c)>=5?5:11)&&tierOk(c);
+    const scouted=(sc.f[c.id]||0)>=70&&o>=c.str-11;
     if(!clubInterested(c)&&!scouted) return;
     if(underContract&&!scouted&&((c.wage<mine0.wage*1.1&&stepOf(c)<=stepOf(mine0))||clubBudget(c)<marketValue())) return; /* 계약 중이면 이적료를 낼 수 있는 구단만 · 한 단계 위 리그면 주급이 적어도 제안 */
     const q=clamp((o-(c.str-14))/28,0,1);
@@ -3194,20 +3194,21 @@ function renderTransfer(){
   box.append(revCard()); box.append(offerGrid());
   if(S.offersFor==='mid'){ const wl=winLeft(); const d=h(`<div class="tr-hold"><button class="btn block" id="tr-hold">결정 보류하고 경기 계속${wl?` · 이적시장 ${wl}라운드 남음`:''}</button><button class="btn ghost block" id="tr-noall">모두 거절하고 잔류</button></div>`); d.querySelector('#tr-hold').onclick=()=>{ tab='home'; renderHub(); }; d.querySelector('#tr-noall').onclick=()=>{ (S.offers||[]).forEach(o=>{ if(!o.renew&&!o.loan&&!o.back){ S.rejected=S.rejected||[]; S.rejected.push({clubId:o.clubId,o:{...o},s:S.season}); } }); S.offers=[]; S.offersFor=null; save(); toast(winOpen()?'모두 거절 · 이적시장 안에 조건을 올려 다시 올 수도 있어요':'모두 거절하고 잔류'); tab='home'; renderHub(); }; box.append(d); }
 }
-function needOf(c){ const p=S.player; const rn=Math.max(0,Math.round(c.rep*(hasItem('jet')?0.7:1)-p.rep)), on=Math.max(0,c.str-(tierOfClub(c)>=5?5:9)-ovr()); return {rn,on,tier:!tierOk(c)}; }
-function needTxt(c){ const {rn,on,tier}=needOf(c); const B=t=>`<span style="font-weight:600">${t}</span>`; return `${rn?`명성 ${B(rn.toLocaleString()+' 부족')}`:'명성 ✓'} · ${on?`OVR ${B(on+' 부족')}`:'OVR ✓'}${tier?` · ${B(tierWhy(c)+'에서 먼저 증명')}`:''}${!rn&&!on&&!tier?' · '+B('이적시장에서 제안 가능'):''}`; }
+function needOf(c){ const p=S.player; const rn=Math.max(0,Math.round(c.rep*(hasItem('jet')?0.7:1)-p.rep)), on=Math.max(0,c.str-9-ovr()); return {rn,on}; }
+function needTxt(c){ const {rn,on}=needOf(c); const B=t=>`<span style="font-weight:600">${t}</span>`; return `${rn?`명성 ${B(rn.toLocaleString()+' 부족')}`:'명성 ✓'} · ${on?`OVR ${B(on+' 부족')}`:'OVR ✓'}${roleAt(c).k==='prospect'?` · ${B('가면 벤치 출발')}`:''}${!rn&&!on?' · '+B('이적시장에서 제안 가능'):''}`; }
 function transferGoal(ids,sc){ const p=S.player; const half=Math.ceil(seasonLen(divOf(S.clubId).id)/2); const when=S.round<=half?`❄️ 겨울 이적시장 · ${half-S.round+1}라운드 뒤`:'☀️ 여름 이적시장 · 시즌 종료 후';
   const top=ids[0]&&CLUBS[ids[0]], tv=top?sc.f[ids[0]]:0; const tg=(S.goalClub&&CLUBS[S.goalClub]&&S.goalClub!==S.clubId)?CLUBS[S.goalClub]:nextTargets()[0];
   let line1, todo;
   if(top&&tv>=70){ line1=`<b>${esc(top.name)}</b> 정식 제안 준비 완료`; todo='지금처럼만 뛰면 이적시장 때 연락 와요'; }
   else if(top&&tv>=40){ line1=`<b>${esc(top.name)}</b> 스카우트 관심 ${tv}/70`; todo=`스카우트가 온 경기에서 평점 7.0+ → 관심 +${10}~ (70이면 제안)`; }
-  else if(tg){ const {rn,on,tier}=needOf(tg); line1=`<b>${esc(tg.name)}</b> (${esc(divName(divOf(tg.id).id))}) 제안 받기`; todo=on?`훈련으로 OVR +${on} (지금 ${ovr()})`:rn?`좋은 경기로 명성 +${rn.toLocaleString()}`:tier?`${tierWhy(tg)} 구단에서 먼저 뛰기`:'조건 충족! 이제 이적시장만 기다리면 돼요'; }
+  else if(tg){ const {rn,on}=needOf(tg); line1=`<b>${esc(tg.name)}</b> (${esc(divName(divOf(tg.id).id))}) 제안 받기`; todo=on?`훈련으로 OVR +${on} (지금 ${ovr()})`:rn?`좋은 경기로 명성 +${rn.toLocaleString()}`:'조건 충족! 이제 이적시장만 기다리면 돼요'; }
   else return null;
-  return h(`<div class="card hi tr-goal"><span class="label">🎯 다음 이적 목표</span><div style="font-size:1rem;margin:2px 0 6px">${line1}</div><div class="eff-line">할 일: <b>${todo}</b></div><small class="muted">${when} · 리그 단계 ${myTier()}/5 (한 번에 한 단계씩, 실력이 확실하면 두 단계)</small></div>`); }
+  return h(`<div class="card hi tr-goal"><span class="label">🎯 다음 이적 목표</span><div style="font-size:1rem;margin:2px 0 6px">${line1}</div><div class="eff-line">할 일: <b>${todo}</b></div><small class="muted">${when}${eliteF(tg||CLUBS[S.clubId])>0.4?' · 빅클럽은 주전 경쟁이 치열해요':''}</small></div>`); }
 function nextTargets(){
   const p=S.player; return Object.values(CLUBS).filter(c=>!c.nat&&!clubInterested(c)).sort((a,b)=>a.rep-b.rep).slice(0,4);
 }
-function roleAt(club){ const d=ovr()-club.str; return d>=5?{k:'core',t:'핵심 선수',c:'good',desc:'확실한 주전, 팀의 중심'}:d>=-4?{k:'starter',t:'주전 경쟁',c:'acc',desc:'평점이 낮으면 벤치'}:{k:'prospect',t:'유망주',c:'bad',desc:'벤치 출발이 잦음'}; }
+function eliteF(c){ return c?clamp((c.str-74)/20,0,1):0; } /* 빅클럽 정도: 전력 74 → 0, 94 → 1 */
+function roleAt(club){ const d=ovr()-club.str, e=Math.round(eliteF(club)*4); return d>=5+e?{k:'core',t:'핵심 선수',c:'good',desc:'확실한 주전, 팀의 중심'}:d>=-4+e?{k:'starter',t:'주전 경쟁',c:'acc',desc:'평점이 낮으면 벤치'}:{k:'prospect',t:'유망주',c:'bad',desc:'벤치 출발이 잦음'}; }
 function acceptOffer(o){
   const p=S.player, from=CLUBS[S.clubId], to=CLUBS[o.clubId]; const rest=(S.offers||[]).filter(x=>x!==o&&!x.renew&&!x.loan&&!x.pre); const wasEnd=S.offersFor==='end';
   if(o.loan){ adaptStart(from,to); S.loan={parent:S.clubId,club:o.clubId,season:S.season}; S.clubId=o.clubId; S.role=roleAt(to).k; S.form=[]; trustReset(to,10); S.offers=[]; S.offersFor=null; ensureScout().visit=null; toast(`${to.name}로 임대! 시즌이 끝나면 ${from.name}로 돌아가요`); save(); tab='home'; renderHub(); return; }
@@ -6199,13 +6200,14 @@ function migrateV4(){ if((S.v||0)>=4) return;
     for(let r=0;r<S.round-1;r++){ (S.fixtures[id][r]||[]).forEach(([a,b])=>{ const [ga,gb]=simMatch(CLUBS[a].str,CLUBS[b].str); applyResult(id,a,b,ga,gb); attributeSimGoals(a,ga); attributeSimGoals(b,gb); simExtras(a,gb); simExtras(b,ga); }); } });
   S.v=4; if(added) setTimeout(()=>toast('잉글랜드·스페인·이탈리아·독일·프랑스에 3부 리그가 생겼어요'),300); }
 function migrateV6(){ if((S.v||0)>=6) return; S.baseStr=S.baseStr||{}; Object.values(CLUBS).forEach(c=>{ const A=LG_ADJ[c.homeDiv]; if(!A) return; const d=Math.round(A[0]); if(S.baseStr[c.id]!=null) S.baseStr[c.id]=Math.round(S.baseStr[c.id]+d); if(S.cstr&&S.cstr[c.id]!=null){ c.str=clamp(Math.round(S.cstr[c.id]+d),20,99); } }); S.v=6; setTimeout(()=>toast('K리그 수준이 올라가고(아시아 3위권) 중국 리그가 내려갔어요'),500); }
+function migrateV9(){ if((S.v||0)>=9) return; S.baseStr=S.baseStr||{}; Object.values(CLUBS).forEach(c=>{ const A=LG_STR2[c.homeDiv]; if(!A||c.nat) return; if(S.baseStr[c.id]!=null) S.baseStr[c.id]=Math.min(A[1],S.baseStr[c.id]+A[0]); if(S.cstr&&S.cstr[c.id]!=null){ S.cstr[c.id]=clamp(S.cstr[c.id]+A[0],20,Math.max(A[1],S.cstr[c.id])); c.str=S.cstr[c.id]; } }); if(S.comp&&CLUBS[S.comp.club]){ const A=LG_STR2[CLUBS[S.comp.club].homeDiv]; if(A) S.comp.ovr+=A[0]; } S.v=9; setTimeout(()=>toast('리그 수준을 다시 맞췄어요 · K리그·J리그·유럽 2부·중소 리그 전력 상향'),600); }
 function migrateV8(){ if((S.v||0)>=8) return; const k=id=>{ const c=CLUBS[id]; if(!c) return 1; const raw=wageRaw(c.wage); return raw>0?c.wage/raw:1; }; S.wage=Math.round(S.wage*k(S.loan?S.loan.parent:S.clubId)/10)*10||S.wage; (S.offers||[]).forEach(o=>{ o.wage=Math.round(o.wage*k(o.clubId)/10)*10; }); if(S.preContract) S.preContract.wage=Math.round(S.preContract.wage*k(S.preContract.clubId)/10)*10; S.v=8; }
 function migrateV7(){ if((S.v||0)>=7) return; try{ if(S.buddy&&CLUBS[S.buddy.club]&&S.buddy.i!=null) S.buddy.name=playerName(S.buddy.club,S.buddy.i); if(S.comp&&CLUBS[S.comp.club]&&S.comp.num!=null) S.comp.name=playerName(S.comp.club,S.comp.num); }catch(e){} S.v=7; } // 선수 이름 생성 방식 변경(v79) → 저장된 동료·경쟁자 이름도 새 이름으로
 function migrateV2(){ if((S.v||0)>=2) return;
   const placed=new Set(); Object.values(S.divs).forEach(d=>d.clubs.forEach(c=>placed.add(c)));
   Object.values(CLUBS).forEach(c=>{ if(c.nat||placed.has(c.id)||!S.divs[c.homeDiv]) return; S.divs[c.homeDiv].clubs.push(c.id); });
   S.v=2; startSeason(); toast('리그가 실제 규모로 확장되어 이번 시즌을 1라운드부터 다시 시작해요'); }
-el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); restoreStr(); migrateV3(); migrateV4(); migrateV5(); migrateV6(); migrateV7(); migrateV8(); hcHome(); hcApply(); renameComps(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.conts) compInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } if(S.prologue){ proResume(); return; } if(S.trust==null) trustMigrate(); tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
+el('btn-continue').addEventListener('click',()=>{ S=load(); if(!S) return; migrateV2(); restoreStr(); migrateV3(); migrateV4(); migrateV5(); migrateV6(); migrateV7(); migrateV8(); migrateV9(); hcHome(); hcApply(); renameComps(); nextEvent(); save(); S.pstats=S.pstats||{}; S.form=S.form||[]; while(S.player.equip.length<4) S.player.equip.push(null); S.awards=S.awards||[]; const P=S.player; P.age=P.age||18; P.cond=P.cond==null?100:P.cond; P.injury=P.injury||0; P.natl=P.natl||{caps:0,goals:0}; P.cups=P.cups||0; S.contractEnd=S.contractEnd||S.season+1; S.natDone=S.natDone||{}; S.natLog=S.natLog||[]; if(!S.cup) cupInit(); if(!S.conts) compInit(); if(!S.number) S.number=S.player.pos==='FW'?9:S.player.pos==='MF'?8:4; S.seasonLog=S.seasonLog||[]; S.baseStr=S.baseStr||{}; if(!S.baseStr.__set){ Object.values(CLUBS).forEach(c=>{ if(!c.nat&&S.baseStr[c.id]==null) S.baseStr[c.id]=c.str; }); S.baseStr.__set=1; } if(S.prologue){ proResume(); return; } if(S.trust==null) trustMigrate(); tab=S.offers&&S.offers.length?'transfer':'home'; show('screen-hub'); renderHub(); });
 document.querySelectorAll('#tabs .ti').forEach(t=>t.innerHTML=icon(t.dataset.i,22));
 initTitle(); sprInit();
 
@@ -6360,7 +6362,7 @@ function adaptStart(from,to){ if(!from||!to) return; const gap=(to.str-from.str)
 function adaptTick(){ const A=S.adaptL; if(!A) return null; A.left--; if(A.left<=0){ S.adaptL=null; return '✅ 리그 적응 완료 · 능력치가 제대로 나와요'; } return null; }
 
 /* ⑥ 선발 선택: 신뢰만으로 고정되지 않음 (능력치 차이·컨디션·일정·경쟁자 폼으로 로테이션·명단 제외) */
-function trustThr(){ const cp=S.comp; const gap=cp?ovr()-adaptPen()-cp.ovr:0; const k=Math.max(0,-gap-5)*2.5; return {up:Math.min(92,TRUST_UP+k),down:Math.min(80,TRUST_DOWN+k),gap}; }
+function trustThr(){ const cp=S.comp; const gap=cp?ovr()-adaptPen()-cp.ovr:0; const k=Math.max(0,-gap-5)*2.5, E=S.guaranteed&&!S.loan?0:eliteF(CLUBS[S.clubId]); return {up:Math.round(Math.min(92,TRUST_UP+k+10*E)),down:Math.round(Math.min(80,TRUST_DOWN+k+6*E)),gap}; } /* 빅클럽: 선발 기준 최대 +10 */
 function selFor(ev){ if(!ev||ev.type==='nat'||ev.pro||ev.practice) return null;
   const n=(S.history||[]).length; if(S.trust!=null) updStarter(); if(selOk(S.sel)&&S.sel.t===ev.type) return S.sel;
   const p=S.player, base=isBenched0(); let k=base?'bench':'start', why=base?'신뢰 부족':'';
@@ -6368,9 +6370,9 @@ function selFor(ev){ if(!ev||ev.type==='nat'||ev.pro||ev.practice) return null;
     S.compForm=clamp((S.compForm||0)*0.7+(hash(S.season*977+S.round*31+n*7)-0.5)*0.9,-1,1);
     const R=hash(S.season*131+S.round*17+n*5+(ev.type.length)*3+p.level);
     const R2=hash(S.season*313+S.round*29+n*11+7);
-    if(k==='start'){ let rot=0.035+(p.cond<55?(55-p.cond)/90:0)+((ev.type==='cup'||ev.type==='cc')&&gap<2?0.07:0)+(gap<-5?(-gap-5)*0.03:0)+(S.compForm>0.55?0.05:0)-(S.trust>85?0.025:0);
+    if(k==='start'){ let rot=0.035+(p.cond<55?(55-p.cond)/90:0)+((ev.type==='cup'||ev.type==='cc')&&gap<2?0.07:0)+(gap<-5?(-gap-5)*0.03:0)+(S.compForm>0.55?0.05:0)-(S.trust>85?0.025:0)+0.05*eliteF(CLUBS[S.clubId]);
       if(gu) rot=p.cond<40?0.5:0; if(R<rot){ k='bench'; why=p.cond<55?'컨디션 관리':(ev.type==='cup'||ev.type==='cc')?'로테이션 (컵 일정)':S.compForm>0.55?`경쟁자 ${cp.name} 폼이 좋음`:gap<-5?'능력치 열세':'로테이션'; } }
-    else { if((ev.type==='cup')&&gap>-6&&R<0.45){ k='start'; why='컵 경기 기회'; }
+    else { if((ev.type==='cup')&&gap>-6-6*eliteF(CLUBS[S.clubId])&&R<0.45){ k='start'; why='컵 경기 기회'; }
       else { const out=Math.min(0.45,(gap<-6?0.2+(-gap-6)*0.03:0.04)*(S.trust<30?1.4:1)*(p.cond<40?1.6:1)); if(!gu&&R2<out){ k='out'; why=p.cond<40?'체력 회복 (명단 제외)':gap<-6?'능력치 열세로 명단 제외':'감독 선택 (명단 제외)'; } } } }
   S.sel={n,s:S.season,r:S.round,t:ev.type,k,why,st:!!S.starter,lk:S.startLock||0,gu:!!S.guaranteed,c:S.clubId}; return S.sel; }
 function selOk(s){ return !!(s&&s.n===(S.history||[]).length&&s.s===S.season&&s.r===S.round&&s.st===!!S.starter&&s.lk===(S.startLock||0)&&s.gu===!!S.guaranteed&&s.c===S.clubId); }
@@ -6657,7 +6659,6 @@ function revFA(){ return S.season>=S.contractEnd&&!S.loan; }
 function revEval(c,dm){ const p=S.player, o=ovr(), g=o-c.str; let pr=clamp(0.55+g*0.08,0.03,0.92), why='';
   if(c.id===S.clubId) return {p:0,why:'지금 소속팀이에요'};
   if(g<-8){ pr=0.01; why='아직 우리 팀 수준엔 모자라요'; }
-  if(!tierOk(c)&&c.id!==S.homeClub){ pr=Math.min(pr,0.02); why=why||`${tierWhy(c)}에서 먼저 증명해 달래요`; }
   const rn=c.rep*(hasItem('jet')?0.7:1); if(p.rep<rn*0.6){ pr*=0.5; why=why||'이름값이 아직 부족해요'; } else if(p.rep<rn) pr*=0.8;
   if(p.age>=31){ if(g<=2){ pr*=Math.max(0.25,1-(p.age-30)*0.12); why=why||'나이가 부담된다고 해요'; } else pr=Math.min(0.95,pr*1.1); }
   const home=c.id===S.homeClub, former=playedFor(c.id); if(home) pr=Math.min(0.97,pr+0.35); else if(former) pr=Math.min(0.95,pr+0.2);

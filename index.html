@@ -2333,7 +2333,7 @@ function renderHome(){
   const p=S.player, club=CLUBS[S.clubId], d=divOf(S.clubId);
   const box=el('tab-home'); box.innerHTML='';
   const st=standings(d.id);
-  if(S.compIntro){ S.compIntro=false; setTimeout(()=>{ if(!el('screen-hub').hidden&&tab==='home') compIntroModal(); else S.compIntro=true; },120); }
+  if(S.compIntro){ S.compIntro=false; setTimeout(()=>{ if(!el('screen-hub').hidden&&el('screen-cer').hidden&&tab==='home'&&!document.querySelector('.hub-modal')) compIntroModal(); else S.compIntro=true; },120); /* 시상식·다른 팝업 위에 겹쳐 뜨지 않게 */ }
   if(S.byeNote){ S.byeNote=false; if(ev) setTimeout(()=>toast('휴식 라운드: 우리 팀은 이번 라운드 경기가 없어요'),50); }
   { const cc=contractCard(); if(cc) box.append(cc); }
   if(S.loan) box.append(h(`<div class="card slim"><small>🔁 <b>${esc(club.name)}</b> 임대 중 · 시즌이 끝나면 <b>${esc(CLUBS[S.loan.parent].name)}</b>로 복귀</small></div>`));
@@ -2749,7 +2749,7 @@ function trustStrip(){ if(S.trust==null) return ''; ensureComp(); const gu=S.gua
   return `<div class="tstrip ${st?'on':''}"><div class="row between"><b>${st?'✅ 선발 출전':'🪑 벤치 출발 · 60분 교체 투입'}</b><span class="tv">감독 신뢰 <b>${S.trust}</b></span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${trustThr().up}%"></u></div><small>${gu?'출전 보장 · ':''}경쟁자 ${esc(S.comp.name)} OVR ${S.comp.ovr} · ${gu?'신뢰 25 아래면 벤치':st?`신뢰 ${trustThr().down} 아래면 벤치`:`신뢰 ${trustThr().up} 넘으면 선발`}</small></div>`; }
 function compIntroModal(){ const c=CLUBS[S.clubId], cp=ensureComp(); const st=!isBenched();
   const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card ci-card"><div class="row" style="gap:12px;align-items:center">${por('coach',64)}<div><span class="label">${esc(c.name)} 감독</span><h2 style="margin:2px 0 0">주전 경쟁 시작</h2></div>${embHTML(c,40,'margin-left:auto')}</div>
-    <p class="ci-q">"${esc(S.player.name)}, 환영한다. ${st?`처음부터 선발로 쓰겠다. 하지만 ${esc(cp.name)} 선수(${cp.num}번)가 네 자리를 노린다.`:`지금 네 자리엔 ${esc(cp.name)} 선수(${cp.num}번, OVR ${cp.ovr})가 있다. 경기에서 보여줘라.`}"</p>
+    <p class="ci-q">"${esc(S.player.name)}, 환영한다. ${st?`처음부터 선발로 쓰겠다. 하지만 ${esc(cp.name)} 선수(${cp.num}번)가 네 자리를 노린다.`:`지금 네 자리엔 ${esc(cp.name)} 선수(${cp.num}번, OVR ${cp.ovr})가 있다. 경기에서 보여줘라.`}${eliteF(c)>0.4?' 여긴 이름값으로 뛰는 곳이 아니다.':''}"</p>
     <div class="tstrip ${st?'on':''}" style="margin:0"><div class="row between"><b>감독 신뢰</b><span class="tv"><b>${S.trust}</b> / 선발 기준 ${trustThr().up}</span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${trustThr().up}%"></u></div></div>
     <div class="ci-g"><div><b style="color:#178a52">올라가는 것</b><small>경기 평점 · 골·도움 · 감독 목표 달성 · 교체로 들어가 활약 · 훈련(+2) · 능력치가 경쟁자보다 높음</small></div><div><b style="color:#c0392b">내려가는 것</b><small>낮은 평점 · 광고 촬영(−2) · 능력치가 경쟁자보다 많이 낮음</small></div></div>
     <button class="btn primary block" id="ci-ok" style="margin-top:12px">알겠습니다</button></div>`;

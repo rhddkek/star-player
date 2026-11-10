@@ -545,6 +545,19 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'5'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
     const pool=k=>{ let ok2=0,n=0; ['T0','T1'].forEach(T=>{ const v=P2&&P2[T+' '+k]; if(!v) return; const m=v.match(/(\d+)% \(([\d.]+)/); if(m){ ok2+=(+m[1])*(+m[2]); n+=(+m[2]); } }); return n?ok2/n:0; };
     ok('v80 패스 성공률(AI끼리 5경기, 두 팀 합산): 전체 70% 이상 · 짧은 패스 76% 이상', pool('all')>=70&&pool('short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']})); }
+  // v82: 개인기 버튼 · 커리어 후반 · 역오퍼 · 고향 구단 (별도 프로세스)
+  { const {execFileSync}=require('child_process'); const HTML=FILE.replace('file://',''); let V=null, ve='';
+    try{ const o=execFileSync('node',[__dirname+'/v82check.js',HTML],{encoding:'utf8',timeout:400000}); const i=o.lastIndexOf('\nerrs '); V=JSON.parse(o.slice(0,i)); ve=o.slice(i+6).trim(); }catch(e){ ve=String(e).slice(0,200); }
+    const A=V&&V.atk;
+    ok('v82 개인기 버튼: 탭=페인트 · 뒤로 탭=드래그백 · 꾹=등지기(천천히, 페인트 안 나감)', !!A&&A.f1.moves>=1&&A.f1.cd&&A.f2.moves===A.f1.moves+1&&A.f2.vy>0&&A.shieldFrames>=10&&A.shieldSpd<A.max*0.6&&A.noFeintAfterHold, JSON.stringify(A));
+    ok('v82 등지기: 수비 둘이 4초 압박해도 거의 안 뺏김 (없으면 8번 중 3번 이상)', !!V&&V.shield.with<=1&&V.shield.without>=3, JSON.stringify(V&&V.shield));
+    ok('v82 지연 수비(꾹): 골문 쪽 2m 안팎에서 마주 봄 · 탭=몸싸움', !!V&&V.def.on&&V.def.goalSide&&V.def.d<=2.6&&V.def.face>0.8&&V.def.duels>=15&&/지연/.test(V.hud.d)&&/개인기/.test(V.hud.a), JSON.stringify(V&&{...V.def,hud:V.hud}));
+    ok('v82 노쇠: 스피드·체력부터 떨어지고 패스는 노련미 +, 자기 관리는 하락 절반 · 나이 한계(36세 스피드 84)는 훈련으로 못 넘음', !!V&&V.cap&&V.cap.spd36===84&&V.cap.pass36===93&&V.cap.coachAtCap===84&&V.cap.p30===99&&V.age.to36.spd<=-8&&V.age.to36.pass>=1&&V.age.care36.spd>V.age.to36.spd+3, JSON.stringify(V&&V.age.to36)+' care '+JSON.stringify(V&&V.age.care36));
+    ok('v82 베테랑 특성: 30세에 3개 중 하나 · 33세 칸은 잠김 · 스타일 없이도 효과', !!V&&V.vet.opn===3&&V.vet.after===2&&V.vet.lock33===0&&V.vet.drain<0.9&&V.vet.ts===2, JSON.stringify(V&&V.vet));
+    ok('v82 고향 구단: 후원 전력+ · 지분 51%↑ 구단주 · 투자·시설 · 시즌 배당·기록 · 저장 반영', !!V&&V.hc.s1===V.hc.s0+2&&V.hc.own&&V.hc.sh>=60&&V.hc.s2>V.hc.s1&&V.hc.w>=2&&V.hc.tabs===4&&V.hc.log===1&&V.hc.divd>0&&V.hc.saved, JSON.stringify(V&&V.hc));
+    ok('v82 역오퍼: 고향팀 수락 → 제안 추가 · 같은 구단 재요청 막힘 · 이적시장당 3번', !!V&&V.rev.ok&&V.rev.offered&&V.rev.dup&&V.rev.n===3&&V.rev.pill&&V.rev.dmN===3, JSON.stringify(V&&V.rev));
+    ok('v82 33세 FA: 고향팀의 부름 · 베테랑은 1년 계약', !!V&&V.call.home&&V.call.yrs.every(y=>y===1), JSON.stringify(V&&V.call));
+    ok('v82 은퇴 투어 발표 → 시즌 끝 은퇴식 · 레전드 등급', !!V&&V.fw.fc&&V.fw.fw&&V.fw.screen&&V.fw.legend&&V.fw.lines>=1&&ve==='[]', JSON.stringify(V&&V.fw)+' '+ve); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

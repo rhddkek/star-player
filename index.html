@@ -6522,7 +6522,7 @@ function ptSum(v,n){ let s=0; for(let i=0;i<n;i++) s+=ptCost(v+i); return s; }
 /* ⑤ 리그 적응: 더 높은 리그·해외로 가면 처음 몇 경기는 몸이 따라오지 않는다 */
 function adaptPen(){ const A=S&&S.adaptL; if(!A||A.left<=0) return 0; return Math.ceil(A.pen*A.left/A.n); }
 function lgLvOf(c){ return clamp(Math.round((lgAvgOf(c)-46)/4.4),1,10); } /* v91: 제안 카드에 리그 수준 표시 (lgStars와 같은 기준) */
-function lgAvgOf(c){ const dv=divOf(c.id); const ids=(dv&&S.divs&&S.divs[dv.id])?S.divs[dv.id].clubs:[c.id]; const st=ids.map(id=>CLUBS[id].str).sort((a,b)=>b-a).slice(0,8); return st.reduce((a,b)=>a+b,0)/Math.max(1,st.length); }
+function lgAvgOf(c){ let dv=null; try{ dv=divOf(c.id); }catch(e){} const did=dv?dv.id:c.homeDiv; let ids=(did&&S.divs&&S.divs[did])?S.divs[did].clubs:Object.values(CLUBS).filter(x=>!x.nat&&x.homeDiv===did).map(x=>x.id); if(!ids.length) ids=[c.id]; const st=ids.map(id=>CLUBS[id].str).sort((a,b)=>b-a).slice(0,8); return st.reduce((a,b)=>a+b,0)/Math.max(1,st.length); }
 function adaptPenOf(from,to){ const gl=lgAvgOf(to)-lgAvgOf(from), gc=to.str-from.str; const abroad=from.country!==to.country; return clamp(Math.round(Math.max(0,gl)/3)+(abroad?2:0)+(gc>=10&&gl>=-2?1:0),0,9); } /* v91: 적응 부담은 '리그 수준' 차이로 (EPL 중위권 → 네덜란드 강팀은 해외 이동 부담만) */
 function adaptStart(from,to){ if(!from||!to) return; let pen=adaptPenOf(from,to); if(pen<=0){ S.adaptL=null; return; }
   const n=clamp(5+pen-staffLv('analyst'),3,14); S.adaptL={pen,n,left:n,to:to.id}; }

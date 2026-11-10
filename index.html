@@ -10,6 +10,28 @@
 <meta name="apple-mobile-web-app-title" content="스타 플레이어">
 <title>스타 플레이어</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>/* v92: PC에서 모바일 화면 — 'sp_view'가 mp(세로)/ml(가로)면 이 문서 나머지를 실행하지 않고, 같은 게임을 휴대폰 크기 틀(iframe) 안에 띄움 */
+(function(){ var v=null; try{ v=localStorage.getItem('sp_view'); }catch(e){}
+  if(window.__SP_FRAMED){ document.documentElement.classList.add('fm'); return; }
+  var pc=false; try{ pc=matchMedia('(pointer:fine)').matches&&Math.min(screen.width,screen.height)>=600; }catch(e){}
+  window.__SP_PC=pc; if(!pc||(v!=='mp'&&v!=='ml')) return;
+  window.__SP_SHELL=v; document.write('<plaintext id="sp-src" style="display:none">');
+  document.addEventListener('DOMContentLoaded',function(){ var srcEl=document.getElementById('sp-src'); var src=srcEl?srcEl.textContent:''; if(srcEl) srcEl.remove();
+    var st=document.createElement('style'); st.textContent='html,body{margin:0;height:100%;background:#070d1b;overflow:hidden;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}#sp-stage{position:fixed;left:0;right:0;top:0;bottom:64px;display:flex;align-items:center;justify-content:center}#sp-box{position:relative}#sp-dev{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:34px;padding:12px;background:#1a1f2b;box-shadow:0 0 0 2px #2c3448,0 20px 60px #000a}#sp-dev iframe{display:block;border:0;border-radius:24px;background:#0e1830}#sp-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;background:#111a2e;border:1px solid #2a3b5e;border-radius:999px;padding:6px 8px;color:#a9b6cc;font-size:13px}#sp-bar span{padding:0 6px}#sp-bar button{font:inherit;color:#eef3f8;background:transparent;border:1px solid transparent;border-radius:999px;padding:7px 14px;cursor:pointer}#sp-bar button:hover{background:#1b2b4b}#sp-bar button.on{background:#f3b43a;color:#1a1200;font-weight:700}';
+    document.head.appendChild(st);
+    var stage=document.createElement('div'); stage.id='sp-stage'; stage.innerHTML='<div id="sp-box"><div id="sp-dev"><iframe id="sp-if" title="스타 플레이어 모바일 화면" allow="fullscreen; autoplay"></iframe></div></div>'; document.body.appendChild(stage);
+    var bar=document.createElement('div'); bar.id='sp-bar'; bar.innerHTML='<span>화면</span><button data-vw="pc">🖥 PC</button><button data-vw="mp">📱 모바일 세로</button><button data-vw="ml">📱 모바일 가로</button>'; document.body.appendChild(bar);
+    var ifr=document.getElementById('sp-if'), dev=document.getElementById('sp-dev'), box=document.getElementById('sp-box');
+    function fit(){ var land=window.__SP_SHELL==='ml', w=land?844:390, h=land?390:844, P=24; ifr.style.width=w+'px'; ifr.style.height=h+'px';
+      var k=Math.min((innerWidth-40)/(w+P),(innerHeight-64-30)/(h+P),1.3); k=Math.max(0.3,k); dev.style.transform='scale('+k+')'; box.style.width=((w+P)*k)+'px'; box.style.height=((h+P)*k)+'px';
+      [].forEach.call(bar.querySelectorAll('button'),function(b){ b.classList.toggle('on',b.dataset.vw===window.__SP_SHELL); }); }
+    bar.addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; var m=b.dataset.vw; try{ localStorage.setItem('sp_view',m); }catch(x){}
+      if(m==='pc'){ location.reload(); return; } window.__SP_SHELL=m; fit(); try{ ifr.contentWindow.dispatchEvent(new Event('resize')); }catch(x){} setTimeout(function(){ try{ ifr.contentWindow.focus(); }catch(x){} },50); });
+    addEventListener('resize',fit); fit();
+    ifr.srcdoc='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><script>window.__SP_FRAMED=1;document.documentElement.classList.add("fm")<\/script>'+src;
+    ifr.addEventListener('load',function(){ try{ ifr.contentWindow.focus(); }catch(x){} });
+  });
+})();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Black+Han+Sans&family=Noto+Serif+KR:wght@500;900&family=Noto+Sans+KR:wght@400;500;700&family=Barlow+Condensed:wght@600;800&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
@@ -120,9 +142,9 @@ h3{font-size:1.05rem;color:var(--accent)}
 @keyframes cerPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 .cf{position:absolute;top:-10px;width:7px;height:11px;border-radius:2px;animation:cfFall 1.8s ease-in forwards;pointer-events:none}@keyframes cfFall{to{transform:translateY(520px) rotate(540deg);opacity:0}}
 .tt-pitch{background:repeating-linear-gradient(180deg,#2f7a3a 0 34px,#2a6e34 34px 68px);border-radius:12px;padding:10px 6px;display:flex;flex-direction:column;gap:10px;border:2px solid #ffffff55}
-.tt-row{display:flex;justify-content:space-around;gap:4px}.tt-p{display:flex;flex-direction:column;align-items:center;min-width:0;flex:1;color:#fff;text-align:center}.tt-p b{font-size:.72rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-shadow:0 1px 2px #000}.tt-p small{font-size:.62rem;opacity:.8}.tt-p.me b{color:#7dfff0}
+.tt-row{display:flex;justify-content:space-around;gap:4px}.tt-p{display:flex;flex-direction:column;align-items:center;min-width:0;flex:1;color:#fff;text-align:center}.tt-p b{font-size:.72rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-shadow:0 1px 2px #000}.tt-p small{font-size:.7rem;opacity:.8}.tt-p.me b{color:#7dfff0}
 .cer-mine{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.cab{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.cab-i{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 4px;border-radius:12px;background:var(--panel3);min-width:0}.cab-i b{font-size:.74rem;line-height:1.2;margin-top:2px}.cab-i .num{font-size:1.1rem;color:var(--accent)}.cab-i small{font-size:.62rem;color:var(--muted);line-height:1.2}.cab-i.gold{background:linear-gradient(180deg,#fff3c4,#f4d675)}.cab-i img{image-rendering:pixelated}
+.cab{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.cab-i{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 4px;border-radius:12px;background:var(--panel3);min-width:0}.cab-i b{font-size:.74rem;line-height:1.2;margin-top:2px}.cab-i .num{font-size:1.1rem;color:var(--accent)}.cab-i small{font-size:.7rem;color:var(--muted);line-height:1.2}.cab-i.gold{background:linear-gradient(180deg,#fff3c4,#f4d675)}.cab-i img{image-rendering:pixelated}
 .hof-c{margin-bottom:8px}
 .emb{display:inline-block;flex:0 0 auto;background-image:var(--emb);background-repeat:no-repeat;vertical-align:middle}.emb-x{display:inline-block;flex:0 0 auto;border-radius:50%;border:2px solid;vertical-align:middle}
 .crest{width:38px;height:38px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-family:var(--font-num);font-weight:600;font-size:.9rem;border:2px solid rgba(255,255,255,.18)}
@@ -172,7 +194,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .score .c{padding:4px 8px;font-weight:600;font-size:1rem;color:var(--accent);min-width:50px;text-align:center;white-space:nowrap}
 .bars{position:absolute;top:calc(56px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));width:120px;display:flex;flex-direction:column;gap:5px}
 .bars .bar{height:6px;background:#0008;border:1px solid #ffffff22}
-.bars .label{color:#fff;opacity:.85;font-size:.65rem;text-shadow:0 1px 2px #000}
+.bars .label{color:#fff;opacity:.85;font-size:.7rem;text-shadow:0 1px 2px #000}
 .ctl{position:absolute;right:max(10px,env(safe-area-inset-right,0px));bottom:calc(max(14px,env(safe-area-inset-bottom,0px)) + var(--bb,0px));display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:none;transform:scale(var(--bs,1));transform-origin:bottom right;opacity:var(--ba,1)}
 .ctl .skrow{display:flex;gap:6px;align-items:flex-end;margin-right:2px}
 .ctl .skrow button{width:48px;height:48px}
@@ -302,7 +324,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .gslots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .gslot{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;border:1px solid var(--line);background:var(--panel2,#16231c);color:var(--fg);font:inherit;cursor:pointer;min-width:0}
 .gslot.on{border-color:#3cb48c;box-shadow:0 0 0 2px #7ff0c866}
-.gslot .gi{font-size:1.3rem}.gslot b{font-size:.72rem;white-space:nowrap}.gslot small{font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.gslot .gi{font-size:1.3rem}.gslot b{font-size:.72rem;white-space:nowrap}.gslot small{font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .gslot .dur{display:block;width:80%;height:4px;background:#0006;border-radius:2px;overflow:hidden;margin-top:2px}.gslot .dur i{display:block;height:100%}
 .gdeal{display:flex;flex-direction:column;gap:2px;padding:8px 10px;margin-bottom:10px;border-radius:10px;background:#dff3ea;font-size:.85rem}
 .gdeal.offer{background:#fff1c9;border:1px solid #e3b44a}.gdeal small{color:var(--muted)}
@@ -372,7 +394,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .cos-sw{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 6px;border:2px solid transparent;border-radius:12px;background:rgba(0,0,0,.04);cursor:pointer;font:inherit;color:inherit;min-width:0}
 .cos-sw .sw{display:block;width:30px;height:30px;border-radius:8px;border:2px solid #0003;font-style:normal;font-size:1.3rem;line-height:28px;text-align:center}.cos-sw .sw.fx{border:0;background:none}
 .cos-sw small{font-size:.72rem;line-height:1.15;text-align:center;word-break:keep-all}
-.cos-sw em{position:absolute;top:2px;right:4px;font-style:normal;font-size:.62rem;color:var(--muted)}.cos-sw em.ck{color:#fff;background:#2f9e74;border-radius:999px;padding:0 4px;font-weight:700}
+.cos-sw em{position:absolute;top:2px;right:4px;font-style:normal;font-size:.66rem;color:var(--muted)}.cos-sw em.ck{color:#fff;background:#2f9e74;border-radius:999px;padding:0 4px;font-weight:700}
 .cos-sw.on{border-color:#2f9e74}.cos-sw.pv{border-color:var(--accent);background:rgba(0,0,0,.07)}.cos-sw.lockd{opacity:.55}
 .cap-c{margin-top:8px}.cap-ck{font-size:.8rem;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.05);color:var(--muted)}.cap-ck.ok{color:#0e7c62;background:rgba(14,124,98,.10)}
 .pos-l,.hc-l{display:flex;flex-direction:column;gap:3px;margin:6px 0 8px;font-size:.84rem}.pos-l span,.hc-l span{display:inline-block;min-width:58px;color:var(--muted)}
@@ -400,7 +422,8 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .tstrip{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff1ee;border:1.5px solid #f2b8ad}.tstrip.on{background:#e9f8f1;border-color:#9fe3c8}
 .tstrip b{font-size:.95rem}.tstrip .tv{font-size:.84rem}.tstrip small{display:block;margin-top:4px;font-size:.8rem;color:#5b6168}
 .tbar{position:relative;height:8px;border-radius:4px;background:#e3dccb;margin-top:6px;overflow:visible}.tbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:linear-gradient(90deg,#f3b43a,#3cb48c)}.tbar u{position:absolute;top:-3px;bottom:-3px;width:2px;background:#14304a;text-decoration:none}
-.ci-card{max-width:420px}.ci-q{margin:12px 0;padding:10px 12px;border-radius:10px;background:#f4efe2;font-weight:600;line-height:1.55}
+.ci-card{max-width:420px}
+@media (orientation:landscape) and (max-height:520px){ .hub-modal .ci-card{max-width:680px;padding:12px 16px} .ci-card .ci-q{margin:6px 0;font-size:.86rem} .ci-card .ci-g small{font-size:.74rem} .ci-card #ci-ok{margin-top:8px!important} }.ci-q{margin:12px 0;padding:10px 12px;border-radius:10px;background:#f4efe2;font-weight:600;line-height:1.55}
 .ci-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.ci-g div{padding:8px;border-radius:8px;background:#f7f2e6}.ci-g small{display:block;font-size:.78rem;color:#5b6168;margin-top:2px}
 .tpromo{border:2px solid #9fe3c8;background:linear-gradient(135deg,#e9f8f1,#fffaf0)}.tpromo.up{animation:proPop .5s ease both,tGlow 1.6s ease 2}.tpromo.down{border-color:#f2b8ad;background:#fff1ee}
 .tpromo b{display:block;margin-top:2px;line-height:1.5}
@@ -447,7 +470,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .gp-head{display:grid;grid-template-columns:72px 1fr auto auto;gap:10px;align-items:center}
 .gp-head canvas{width:72px;height:auto;border-radius:8px;image-rendering:pixelated;border:2px solid #cdbf9e}
 .ptsbox{background:#fffaf0;border:2px solid #d9cfb6;border-radius:10px;padding:4px 10px;text-align:center}
-.ptsbox span{display:block;font-size:.66rem;font-weight:600;color:var(--muted)}
+.ptsbox span{display:block;font-size:.7rem;font-weight:600;color:var(--muted)}
 .ptsbox b{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-num);font-size:1.6rem;line-height:1}
 .ptsbox i{font-style:normal;width:22px;height:22px;border-radius:50%;background:#f3b43a;color:#1a1200;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;border:2px solid #b9821a}
 .subtabs{display:flex;gap:0;border:2px solid #d9cfb6;border-radius:10px;overflow:hidden;background:#efe8d6}
@@ -477,7 +500,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .slot .sic{width:30px;height:30px;flex:0 0 30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff}
 .slot>span:last-child{display:flex;flex-direction:column;min-width:0;line-height:1.15}
 .slot b{font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.slot small{font-size:.66rem;color:var(--muted)}
+.slot small{font-size:.72rem;color:var(--muted)}
 .slot.lock .sic{background:#9aa1ad!important}
 .slot.pick{border-color:#3cb48c;box-shadow:0 0 0 3px #7ff0c866;animation:pulse .7s infinite alternate}
 .ftabs{display:flex;border:2px solid #d9cfb6;border-radius:10px;overflow:hidden;background:#efe8d6;margin:12px 0 10px}
@@ -502,7 +525,7 @@ tr.me td{background:#c9f3e4;color:#0b5e49;font-weight:600}
 .stadium canvas{height:96px!important}
 .wk-home .wk-quick .btn{min-height:50px!important}.wk-home .wk-quick{grid-template-columns:repeat(3,1fr)!important}
 .wk-h{margin-bottom:6px}
-.wk-o.r1{display:grid;grid-template-columns:1fr 64px;gap:10px;align-items:center}.wk-o.r1 .wk-h{display:block;margin:0;text-align:left}.wk-o.r1 .wk-h *{text-align:left!important}.wk-o.r1 .wk-h>span{display:block;font-size:.84rem;margin-top:2px}.wk-o.r1 .wk-h em{display:inline;text-align:left;margin-left:4px}.wk-o.r1 .btn{padding:8px 4px;min-height:40px}
+.wk-o.r1{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.wk-o.r1>.btn{white-space:nowrap;min-width:72px}.wk-pick{display:block;text-align:center;margin:10px 0 2px}.wk-o.r1 .wk-h{display:block;margin:0;text-align:left}.wk-o.r1 .wk-h *{text-align:left!important}.wk-o.r1 .wk-h>span{display:block;font-size:.84rem;margin-top:2px}.wk-o.r1 .wk-h em{display:inline;text-align:left;margin-left:4px}.wk-o.r1 .btn{padding:8px 4px;min-height:40px}
 .hm{padding:12px!important}.hm-me{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center}.hm-me canvas{width:52px!important;height:auto;border-radius:8px}.hm-mi{min-width:0}.hm .pc-name{font-size:1.15rem}.hm-sub{font-size:.86rem;color:#3d4a50;margin-top:2px}.hm .ovrbox{min-width:52px;padding:2px 8px 4px}.hm .ovrbox b{font-size:1.5rem}
 .hm-next{margin-top:10px;padding-top:10px;border-top:1px solid #e3dac4}.hm-h{display:flex;justify-content:space-between;align-items:baseline}.hm-h small{color:var(--muted);font-size:.78rem}
 .hm-vs{display:flex;align-items:center;gap:8px;margin-top:6px}.hm-vs b{font-family:var(--font-display);font-weight:400;font-size:1.15rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hm-vs b:last-of-type{text-align:right}.hm-vs .vs{font-size:.8rem;color:var(--muted);font-weight:600}
@@ -648,7 +671,7 @@ details.mpinfo{font-size:.82rem;margin:0 0 8px}details.mpinfo summary{cursor:poi
 .wkmini .hm-row{border-top:1px solid #ece3cd;border-bottom:0;padding:8px 2px 0}.wkmini .hm-row.wk-one{border-top:0;padding:0 2px 6px}
 .sgoal .sg{padding:6px 0}.sgoal .sg+.sg{border-top:1px dashed #e0d6bf}.sgoal .sg span{font-weight:600;font-size:.9rem}.sgoal .sg b{font-family:var(--font-num);font-size:1rem}.sgoal .sg.done b{color:#0e7c62}.sgoal .bar.m{margin-top:4px}
 .vow{margin-top:8px;padding:8px 10px;border-radius:10px;background:#fff6dc;border:1px solid #f0d58a}.vow small{display:block;font-weight:600;color:#6b5a2a;margin-bottom:6px}.vow .btn{flex:1;flex-direction:column;gap:0;white-space:normal;line-height:1.2}.vow .btn small{margin:0;font-weight:600;color:#6b5a2a;font-size:.7rem}
-.inbox .nw{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:start;padding:7px 0;border-top:1px solid #ece3cd}.inbox .nw:first-of-type{border-top:0}.inbox .nw i{font-style:normal;font-size:1.15rem;line-height:1.3}.inbox .nw b{display:block;font-size:.86rem;line-height:1.35}.inbox .nw small{display:block;color:#5f6878;font-size:.78rem}.inbox .nw em{font-style:normal;font-size:.66rem;color:#8a8070;font-weight:600;white-space:nowrap}.inbox .nw.u b::before{content:'●';color:#e25c5c;font-size:.6rem;margin-right:4px;vertical-align:2px}
+.inbox .nw{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:start;padding:7px 0;border-top:1px solid #ece3cd}.inbox .nw:first-of-type{border-top:0}.inbox .nw i{font-style:normal;font-size:1.15rem;line-height:1.3}.inbox .nw b{display:block;font-size:.86rem;line-height:1.35}.inbox .nw small{display:block;color:#5f6878;font-size:.78rem}.inbox .nw em{font-style:normal;font-size:.72rem;color:#8a8070;font-weight:600;white-space:nowrap}.inbox .nw.u b::before{content:'●';color:#e25c5c;font-size:.6rem;margin-right:4px;vertical-align:2px}
 .wk-evt .por{margin-right:6px}
 /* 주간 준비 */
 #wk-card .wk3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -662,7 +685,7 @@ details.mpinfo{font-size:.82rem;margin:0 0 8px}details.mpinfo summary{cursor:poi
 #wk-ok{margin-top:12px}
 .wk-more{margin-top:12px;padding-top:4px;border-top:1px dashed #d4c9ad}
 .wk-done{display:grid;grid-template-columns:minmax(0,180px) 1fr;gap:12px;align-items:center}.wk-done canvas{width:100%;height:auto;border-radius:10px;image-rendering:pixelated}
-@media (max-width:640px){ #wk-card .wk3{grid-template-columns:1fr 1fr 1fr;gap:6px} .wk-o.big .wk-l b{font-size:.9rem} .wk-o.big .wk-l em{font-size:.68rem;line-height:1.25} .wk-o.big>small{font-size:.66rem} .wk-stats .wk-btns{grid-template-columns:repeat(4,1fr)} .wk-done{grid-template-columns:110px 1fr} }
+@media (max-width:640px){ #wk-card .wk3{grid-template-columns:1fr 1fr 1fr;gap:6px} .wk-o.big .wk-l b{font-size:.9rem} .wk-o.big .wk-l em{font-size:.68rem;line-height:1.25} .wk-o.big>small{font-size:.72rem} .wk-stats .wk-btns{grid-template-columns:repeat(4,1fr)} .wk-done{grid-template-columns:110px 1fr} }
 /* 성장 */
 .grow .hero-gr{min-height:300px}.ovr-move{display:flex;align-items:center;gap:8px;margin-top:8px}.ovr-move b{font-size:2rem;color:#fff;line-height:1}.ovr-move b.nx{color:#7ff0c8;background:#0e7c6255;padding:0 8px;border-radius:8px}.ovr-move .ar{color:#7ff0c8;font-weight:600;font-size:1.3rem}
 .ptsbox2{margin-top:8px;display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-radius:10px;background:#c9f3e2;color:#0c3b2e;font-weight:600}.ptsbox2 b{font-size:1.6rem;line-height:1}
@@ -724,7 +747,7 @@ tr.now td{background:#fff3c9}
 .res-top{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:760px){ .res-top{grid-template-columns:minmax(220px,38%) 1fr} .hero-res{min-height:330px} }
 .hero-res{min-height:200px}.hero-res .rp{display:flex;align-items:center;gap:10px}.hero-res .rp>b{font-family:var(--font-display);font-weight:400;font-size:1.4rem}.hero-res .rp>span{color:#9fb0cc;font-weight:600;font-size:.84rem;flex:1}
-.rt-b{border-radius:10px;padding:2px 12px 4px;text-align:center;color:#fff;line-height:1}.rt-b small{display:block;font-size:.66rem;font-weight:600}.rt-b b{font-size:2rem}
+.rt-b{border-radius:10px;padding:2px 12px 4px;text-align:center;color:#fff;line-height:1}.rt-b small{display:block;font-size:.72rem;font-weight:600}.rt-b b{font-size:2rem}
 .res-main{position:relative;text-align:center;padding-top:26px}
 .res-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);padding:5px 30px;border-radius:12px;font-family:var(--font-display);font-size:1.6rem;color:#0c2b22;background:linear-gradient(180deg,#8ff3cf,#5fe0b5);box-shadow:0 3px 0 #0006;white-space:nowrap}.res-badge.l{background:linear-gradient(180deg,#ffb1a4,#e7786a);color:#3a0d06}.res-badge.d{background:linear-gradient(180deg,#e5dcc6,#cfc4a8);color:#3a3a2a}
 .res-sc{display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:center;gap:8px;margin:10px 0}.res-sc b{font-family:var(--font-display);font-weight:400;font-size:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.res-sc .sc{font-size:3rem;line-height:1;background:#c9f3e2;color:#0c2b22;border-radius:12px;padding:4px 14px}
@@ -770,7 +793,9 @@ tr.now td{background:#fff3c9}
 .tt-logo{font-family:var(--font-display);font-size:3.4rem;line-height:1;color:#fff;font-style:italic;text-shadow:0 4px 0 #0a1428;position:relative}.tt-logo .st{position:absolute;left:58%;top:-26px;color:#5fe0b5;font-size:2rem;font-style:normal}.tt-logo small{display:block;font-family:var(--font-body);font-style:normal;font-size:1rem;font-weight:600;color:#b8c4d8;letter-spacing:.3em;margin-top:10px}
 .tt-cont{display:block;color:#b8c4d8;margin-top:6px;font-size:.84rem}.tt-cont b{color:#fff}
 .btn.ghost2{background:transparent;border:2px solid #dfe7f5;color:#fff}
-.tt-links{display:flex;gap:14px}.tt-links .lnk,.tc-head .lnk{color:#b8c4d8;font-weight:600;font-size:.86rem}
+.tt-links{display:flex;gap:14px}
+.tt-view{display:flex;align-items:center;gap:4px;margin-top:10px;padding:4px 6px;border:1px solid #ffffff22;border-radius:999px;background:#0008;font-size:.82rem;color:#cfd8e6;width:max-content;max-width:100%}
+.tt-view span{padding:0 6px;opacity:.8}.tt-view button{padding:5px 10px!important;border-radius:999px;color:#eef3f8!important;text-decoration:none!important}.tt-view button.on{background:#f3b43a;color:#1a1200!important;font-weight:700}.tt-links .lnk,.tc-head .lnk{color:#b8c4d8;font-weight:600;font-size:.86rem}
 .tt-help{color:#8a97ad;font-size:.74rem;margin:0}
 .tt-create{width:min(940px,100%)}
 .tc-head{display:flex;align-items:center;gap:12px;color:#fff}.tc-head b{font-family:var(--font-display);font-weight:400;font-size:1.6rem}
@@ -838,13 +863,15 @@ tr.now td{background:#fff3c9}
 .fkp .fk-g em{position:absolute;left:55%;width:23%;top:0;bottom:0;background:#2ee6d644;border-left:1px solid #2ee6d6;border-right:1px solid #2ee6d6}
 .fkp .fk-g i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#7ff0c8,#ffd25a 70%,#ff6b5a)}
 .fkp .fk-st{font-size:.68rem;font-weight:600;min-height:1.1em}
-.fkp .fk-h{font-size:.64rem;opacity:.75;margin:4px 0 6px;line-height:1.35}
+.fkp .fk-h{font-size:.7rem;opacity:.75;margin:4px 0 6px;line-height:1.35}
 .fkp #fk-x{width:100%;border:1px solid #ffffff33;background:transparent;color:#ffd0c8;border-radius:8px;padding:5px;font-size:.7rem;font-weight:600;font-family:inherit;touch-action:none}
 #screen-match.fkon .bars{visibility:hidden}
 #screen-match:not(.land) .fkp:not([hidden]){top:calc(54px + env(safe-area-inset-top,0px))}
 @media (max-height:420px){ .fkp canvas{height:52px} .fkp .fk-h{display:none} }
 #screen-match.land .banner{top:24%;font-size:2.5rem;letter-spacing:.02em}#screen-match.land .banner small{font-size:.85rem}
 .banner.chb{transition:opacity .12s}
+.banner.mini{top:12%!important;font-size:1.45rem!important;letter-spacing:0}.banner.mini small{font-size:.76rem!important}.banner.mini.show{padding:3px 0 6px;border-width:1px}
+#screen-match.land .banner.mini{top:15%!important}
 #screen-match.land .banner.show{background:linear-gradient(90deg,transparent,rgba(8,14,30,.88) 16%,rgba(8,14,30,.88) 84%,transparent);padding:6px 0 10px;border-top:2px solid #ffd25a99;border-bottom:2px solid #ffd25a99;animation:banIn .35s ease-out}
 @keyframes banIn{0%{transform:scaleY(.15);opacity:0}100%{transform:none;opacity:1}}
 
@@ -893,7 +920,7 @@ tr.now td{background:#fff3c9}
 .cfl{font-size:.8em;margin-right:3px}
 .cmr{font-size:.84rem;padding:3px 0;gap:6px}.cmr.me{font-weight:600;color:#0e5c46}.cmr>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:42%}
 .cmfs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}.cmfs::-webkit-scrollbar{display:none}
-.cmf{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:4px 7px;border-radius:8px;background:#f0e9d8;font-size:.72rem;font-weight:600;border-bottom:3px solid #c9c2ad;white-space:nowrap}.cmf small{font-size:.62rem;color:var(--muted)}.cmf.W{border-color:#22c55e}.cmf.L{border-color:#e25c5c}.cmf.D{border-color:#9aa3ab}.cmf.N{border-color:#3b82f6;background:#e8f0ff}
+.cmf{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:4px 7px;border-radius:8px;background:#f0e9d8;font-size:.72rem;font-weight:600;border-bottom:3px solid #c9c2ad;white-space:nowrap}.cmf small{font-size:.7rem;color:var(--muted)}.cmf.W{border-color:#22c55e}.cmf.L{border-color:#e25c5c}.cmf.D{border-color:#9aa3ab}.cmf.N{border-color:#3b82f6;background:#e8f0ff}
 tr.out td{opacity:.45}
 .stars.s10{font-size:.58rem;letter-spacing:-1.5px;align-items:center}.stars.s10 b{letter-spacing:0;margin-left:5px;font-size:.78rem;color:#c98a0a;font-family:var(--font-num)}.stars.s10.big{font-size:.8rem}
 svg.emb-s{flex:0 0 auto}
@@ -933,6 +960,7 @@ svg.emb-s{flex:0 0 auto}
   .lgp-l{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:start}.lgp-h{grid-column:1/-1}
   .overlay{padding-top:calc(6px + env(safe-area-inset-top,0px));padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
   .toast{bottom:calc(12px + env(safe-area-inset-bottom,0px))!important}
+.toast.top{top:calc(14px + env(safe-area-inset-top,0px));bottom:auto!important}
 }
 @media (orientation:landscape) and (max-height:520px) and (max-width:700px){
   .lay.l2r{grid-template-columns:minmax(0,1fr)}
@@ -1158,6 +1186,12 @@ body[data-hint="0"] #screen-match.land .joyg::after,body[data-hint="1"] #screen-
 .skchip{box-shadow:0 2px 8px rgba(0,0,0,.35)!important}
 /* 손가락으로 쓰는 기기에선 PC 키 안내 숨김 */
 @media (pointer:coarse){ .keyhint,.kbd-hint,.pc-only{display:none!important} }
+/* v92: PC의 모바일 화면(틀 안) = 터치 기기와 같은 표시 */
+html.fm .keyhint,html.fm .kbd-hint,html.fm .pc-only,html.fm .tt-help{display:none!important}
+html.fm .ctl .mainrow button small{display:none}
+html.fm .ctl button .gest,html.fm .ctl button .gest2,html.fm .ctl button#k-pass.slg .gest{display:block!important}
+html.fm body{cursor:default}
+html body .ctl.nogest button .gest,html body .ctl.nogest button .gest2,html.fm body .ctl.nogest button .gest,html.fm body .ctl.nogest button .gest2{display:none!important}
 /* 결과 화면 버튼: 주 1 + 보조 1, 나머지는 글자 링크 */
 .res-go .btn.res-link{flex:0 1 auto!important;min-height:40px;padding-inline:10px!important;background:transparent!important;border:0!important;box-shadow:none!important;color:var(--u-fg2)!important;text-decoration:underline;text-underline-offset:3px;font-weight:500!important}
 /* 둥글기 단계 */
@@ -1178,7 +1212,7 @@ details>summary>.sec{white-space:nowrap;flex-wrap:wrap;row-gap:2px;justify-conte
 .ctl.gapw .mainrow #k-pass{translate:-10px 0}.ctl.gapw .mainrow #k-thru{translate:-8px -8px}.ctl.gapw .mainrow #k-sprint{translate:0 -10px}.ctl.gapw .skrow{gap:10px}
 .ctl.gapn .mainrow #k-pass{translate:6px 0}.ctl.gapn .mainrow #k-thru{translate:5px 5px}.ctl.gapn .mainrow #k-sprint{translate:0 6px}.ctl.gapn .skrow{gap:3px}
 .joy{width:calc(120px*var(--js,1));height:calc(120px*var(--js,1))}
-.srow .pc-n{grid-column:1/-1;justify-self:end;font-size:.66rem;color:var(--muted);margin-top:-2px}
+.srow .pc-n{grid-column:1/-1;justify-self:end;font-size:.72rem;color:var(--muted);margin-top:-2px}
 .co-m .co-card{max-width:620px;width:100%}
 .co-sub{display:block;margin:2px 0 8px;line-height:1.35}
 .co-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -1292,6 +1326,7 @@ body.land-fit .rv-list{max-height:calc(100dvh - 200px)}
       <button class="btn ghost2 big block" id="go-create">＋ 새 커리어</button>
       <div class="tt-links"><button class="lnk" id="btn-hof" hidden>🏛️ 명예의 전당</button><button class="lnk" id="btn-import">📂 백업 불러오기</button></div>
       <p class="tt-help">PC: 방향키/WASD 이동 · Z 패스 · F 스루 · X 슛 · C·V·B·N 스킬 · 모바일: 왼쪽 드래그로 이동, 오른쪽 버튼</p>
+      <div class="tt-view" id="tt-view" hidden><span>화면</span><button class="lnk" data-vw="pc">🖥 PC</button><button class="lnk" data-vw="mp">📱 모바일 세로</button><button class="lnk" data-vw="ml">📱 모바일 가로</button></div>
     </div>
     <div class="tt-panel tt-create" id="tt-create" hidden>
       <div class="tc-head"><button class="lnk" id="tc-back">‹ 뒤로</button><b>선수 만들기</b></div>
@@ -1904,7 +1939,19 @@ function clamp(v,a,b){ return v<a?a:v>b?b:v; }
 function hash(n){ let x=(n*2654435761)>>>0; x=(x^(x>>>13))>>>0; x=(x*0x5bd1e995)>>>0; x=(x^(x>>>15))>>>0; return x/4294967296; }
 function fmtMoney(m){ m=Math.round(m); const s=m<0?'-':''; m=Math.abs(m); if(m>=10000){ const eok=Math.floor(m/10000), man=m%10000; return s+eok+'억'+(man?' '+man.toLocaleString()+'만':''); } return s+m.toLocaleString()+'만'; }
 function poisson(l){ let L=Math.exp(-l),k=0,p=1; do{k++;p*=Math.random();}while(p>L); return k-1; }
-function toast(msg){ const t=document.getElementById('toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+function spView(){ let v=null; try{ v=localStorage.getItem('sp_view'); }catch(e){} return v==='mp'||v==='ml'?v:'pc'; }
+function setSpView(v){ try{ localStorage.setItem('sp_view',v); }catch(e){} try{ if(typeof save==='function'&&S) save(); }catch(e){}
+  if(window.__SP_FRAMED){ try{ const P=window.parent; const b=P.document.querySelector('#sp-bar [data-vw="'+v+'"]'); if(b){ b.click(); return; } }catch(e){} }
+  location.reload(); }
+document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('[data-vw]'); if(!b||b.closest('#sp-bar')) return; e.preventDefault(); setSpView(b.dataset.vw); });
+function ttViewInit(){ const t=document.getElementById('tt-view'); if(!t) return; t.hidden=!(window.__SP_PC&&!window.__SP_FRAMED); t.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.vw===spView())); }
+setTimeout(ttViewInit,0);
+function toast(msg){ const t=document.getElementById('toast'); if(!t) return; t.textContent=msg;
+  /* v92: 대화창이 열려 있으면 위쪽, 허브에선 아래 탭 바로 위 — 버튼·탭 글자를 가리지 않음 */
+  try{ const modal=document.querySelector('.hub-modal'); const hub=document.getElementById('screen-hub'); const tb=document.getElementById('tabs'); t.classList.toggle('top',!!modal);
+    let bt=''; if(!modal&&hub&&!hub.hidden&&tb){ const r=tb.getBoundingClientRect(); if(r.height>0&&r.top>innerHeight*0.6&&r.width>innerWidth*0.5) bt=Math.round(innerHeight-r.top+10)+'px'; }
+    if(bt) t.style.setProperty('bottom',bt,'important'); else t.style.removeProperty('bottom'); }catch(e){}
+  t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
 function el(id){ return document.getElementById(id); }
 function h(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -2444,9 +2491,9 @@ function weekCardEl(){ const p=S.player; const tg=trainGain(); const tgOf=k=>(p.
       ${bd?`<button class="wk-o big ${sel==='buddy'?'on':''}" data-wsel="buddy" ${bd.chem>=100?'disabled':''}>${heroHTML('train',{x:0.38,sz:0.92,fx:0.75,mate:{x:0.64,ch:'f2'}},200,140)}<span class="wk-l"><b>🤝 동료와 연습</b><em>${esc(josa(bd.name,'과','와'))} 호흡 ${bd.chem} → ${Math.min(100,bd.chem+10)}</em></span><small>컨디션 −8</small></button>`:`<button class="wk-o big ${sel==='mp'?'on':''}" data-wsel="mp" ${(p.mpMax||100)>=200?'disabled':''}>${heroHTML('rest',{x:0.6,sz:0.92,fx:0.6},200,140)}<span class="wk-l"><b>🧘 기력 수련</b><em>최대 기력 ${p.mpMax||100}${(p.tgMp||0)+tg>=100?` → ${Math.min(200,(p.mpMax||100)+4)}`:` · 게이지 ${p.tgMp||0}→${Math.min(99,(p.tgMp||0)+tg)}%`}</em></span><small>컨디션 −10</small></button>`}
     </div>
     ${sel==='train'?`<div class="wk-stats"><small>훈련 능력치</small><div class="wk-btns">${STATS.map(([k,n])=>`<button class="btn sm ${sk===k?'on':''}" data-wstat="${k}">${n}<small>${tgOf(k)+tg>=100?`${p.stats[k]} → <b>${p.stats[k]+1}</b>`:`${p.stats[k]} · ${tgOf(k)}→${Math.min(99,tgOf(k)+tg)}%`}</small></button>`).join('')}</div></div>`:''}
-    <button class="btn primary block big" id="wk-ok" ${sel&&(sel!=='train'||sk)?'':'disabled'} data-tr="${sel==='train'?(sk||''):(sel||'')}">${sel==='train'&&!sk?'훈련 능력치 선택':sel==='train'?`${(STATS.find(x=>x[0]===sk)||['',''])[1]} 훈련 시작 ›`:sel==='rest'?'휴식 선택 ›':sel==='buddy'?'연계 훈련 시작 ›':sel==='mp'?'기력 수련 시작 ›':'활동 선택'}</button>
+    ${sel?'':'<small class="muted wk-pick">활동 카드 선택</small>'}<button class="btn primary block big" id="wk-ok" ${sel?'':'hidden'} ${sel&&(sel!=='train'||sk)?'':'disabled'} data-tr="${sel==='train'?(sk||''):(sel||'')}">${sel==='train'&&!sk?'훈련 능력치 선택':sel==='train'?`${(STATS.find(x=>x[0]===sk)||['',''])[1]} 훈련 시작 ›`:sel==='rest'?'휴식 선택 ›':sel==='buddy'?'연계 훈련 시작 ›':sel==='mp'?'기력 수련 시작 ›':'활동 선택'}</button>
     <div class="wk-more">
-      ${bd?`<div class="wk-o r1"><div class="wk-h"><b>🧘 기력 수련</b><span>최대 기력 <b>${p.mpMax||100}</b>${(p.tgMp||0)+tg>=100?` → <b>${Math.min(200,(p.mpMax||100)+4)}</b>`:` · 게이지 ${p.tgMp||0}→${Math.min(99,(p.tgMp||0)+tg)}%`}</span><em>컨디션 −10</em></div><button class="btn sm block" data-tr="mp" ${(p.mpMax||100)>=200?'disabled':''}>${(p.mpMax||100)>=200?'최대':'기력 수련'}</button></div>`:''}
+      ${bd?`<div class="wk-o r1"><div class="wk-h"><b>🧘 기력 수련</b><span>최대 기력 <b>${p.mpMax||100}</b>${(p.tgMp||0)+tg>=100?` → <b>${Math.min(200,(p.mpMax||100)+4)}</b>`:` · 게이지 ${p.tgMp||0}→${Math.min(99,(p.tgMp||0)+tg)}%`}</span><em>컨디션 −10</em></div><button class="btn sm block" data-tr="mp" ${(p.mpMax||100)>=200?'disabled':''}>${(p.mpMax||100)>=200?'최대':'수련 선택'}</button></div>`:''}
       ${q?`<div class="wk-o r1"><div class="wk-h"><b>📩 ${q.ic} ${esc(q.t)}</b><span>${reqDesc(q)}</span><em>거절해도 손해 없음</em></div><button class="btn sm block" data-tr="req">수락</button></div>`:''}
       <div class="wk-o r1"><div class="wk-h"><b>📸 광고 촬영</b><span><b>+${fmtMoney(adShootPay())}</b> · 명성 +${adRepGain()}</span><em>컨디션 −8${S.trust!=null?' · 신뢰 −2':''}</em></div>${p.rep>=100?`<button class="btn sm block" data-tr="ad">촬영 선택</button>`:`<button class="btn sm block" disabled>명성 100부터</button>`}</div>
     </div></div>`);
@@ -2692,6 +2739,7 @@ function drawStadiumBanner(cv0,tier,c1){ const x=cv0.getContext('2d'), w=cv0.wid
 function openSettings(){ const m=document.createElement('div'); m.className='hub-modal';
   const draw=()=>{ m.innerHTML=`<div class="card"><div class="row between"><h2>설정</h2><button class="btn sm" id="st-x">닫기</button></div><div class="list" style="margin-top:12px">
     ${[['st-mute','소리',!S.mute],['st-shake','화면 흔들림',!S.noShake],['st-run','추천 위치',runHintOn()],['st-act','조작 힌트',actHintOn(),hintModeLabel()],['st-rp','골 리플레이',!S.noReplay],['st-tilt','가로 시점',!S.noTilt,S.noTilt?'탑뷰':'원근'],['st-tempo','경기 속도',S.tempo!=='real',S.tempo==='real'?'느리게':'빠르게']].map(([id,t,on,lb])=>`<div class="row between"><b>${t}</b><button class="btn sm st-v ${on?'primary':''}" id="${id}">${lb||(on?'켬':'끔')}</button></div>`).join('')}
+    ${window.__SP_PC||window.__SP_FRAMED?`<div class="row between"><b>화면</b><span class="row" style="gap:4px">${[['pc','PC'],['mp','모바일 세로'],['ml','모바일 가로']].map(([k,n])=>`<button class="btn sm st-vw ${spView()===k?'primary':''}" data-vw="${k}">${n}</button>`).join('')}</span></div>`:''}
     <div class="row between" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--line)"><b>커리어 백업</b><span class="row" style="gap:6px"><button class="btn sm" id="st-exp">백업 저장</button><button class="btn sm" id="st-imp">백업 불러오기</button></span></div>
     <div class="row between" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--line)"><span><b>커리어 초기화</b><small class="muted" style="display:block">현재 커리어 삭제 · 되돌릴 수 없음</small></span><button class="btn sm danger" id="st-reset">커리어 초기화</button></div></div></div>`;
     m.querySelector('#st-x').onclick=()=>m.remove(); m.querySelector('#st-mute').onclick=()=>{ S.mute=!S.mute; save(); draw(); }; m.querySelector('#st-shake').onclick=()=>{ S.noShake=!S.noShake; save(); draw(); }; m.querySelector('#st-tilt').onclick=()=>{ S.noTilt=!S.noTilt; save(); draw(); try{ resize(); }catch(e){} };
@@ -2778,7 +2826,7 @@ function trustAfterMatch(r,ev){ if(S.trust==null||ev.type==='nat'||ev.pro||r.inj
 function trustStrip(){ if(S.trust==null) return ''; ensureComp(); const gu=S.guaranteed&&!S.loan; const st=!isBenched();
   return `<div class="tstrip ${st?'on':''}"><div class="row between"><b>${st?'✅ 선발 출전':'🪑 벤치 출발 · 60분 교체 투입'}</b><span class="tv">감독 신뢰 <b>${S.trust}</b></span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${trustThr().up}%"></u>${gu?'':`<u style="left:${trustThr().down}%;opacity:.4"></u>`}</div><small>${gu?'출전 보장 · ':''}경쟁자 ${esc(S.comp.name)} OVR ${S.comp.ovr} · ${gu?'선발 보장 계약 · 부상·컨디션 40 미만만 쉼':st?`선발 유지 ${trustThr().down} (이 아래로 떨어지면 벤치)`:`선발 진입 ${trustThr().up} · 선발이 되면 ${trustThr().down}까지 유지`}</small></div>`; }
 function compIntroModal(){ const c=CLUBS[S.clubId], cp=ensureComp(); const st=!isBenched();
-  const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card ci-card"><div class="row" style="gap:12px;align-items:center">${por('coach',64)}<div><span class="label">${esc(c.name)} 감독</span><h2 style="margin:2px 0 0">주전 경쟁 시작</h2></div>${embHTML(c,40,'margin-left:auto')}</div>
+  const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card ci-card"><div class="row" style="gap:12px;align-items:center">${por('coach',64)}<div><span class="label">${esc(c.name)} 감독 · 주급 ${fmtMoney(S.wage)}</span><h2 style="margin:2px 0 0">주전 경쟁 시작</h2></div>${embHTML(c,40,'margin-left:auto')}</div>
     <p class="ci-q">"${esc(S.player.name)}, 환영한다. ${st?`처음부터 선발로 쓰겠다. 하지만 ${esc(cp.name)} 선수(${cp.num}번)가 네 자리를 노린다.`:`지금 네 자리엔 ${esc(cp.name)} 선수(${cp.num}번, OVR ${cp.ovr})가 있다. 경기에서 보여줘라.`}${eliteF(c)>0.4?' 여긴 이름값으로 뛰는 곳이 아니다.':''}"</p>
     <div class="tstrip ${st?'on':''}" style="margin:0"><div class="row between"><b>감독 신뢰</b><span class="tv"><b>${S.trust}</b> / 선발 진입 ${trustThr().up} · 유지 ${trustThr().down}</span></div><div class="tbar"><i style="width:${S.trust}%"></i><u style="left:${trustThr().up}%"></u><u style="left:${trustThr().down}%;opacity:.4"></u></div></div>
     <div class="ci-g"><div><b style="color:#178a52">올라가는 것</b><small>경기 평점 · 골·도움 · 감독 목표 달성 · 교체로 들어가 활약 · 훈련(+2) · 능력치가 경쟁자보다 높음</small></div><div><b style="color:#c0392b">내려가는 것</b><small>낮은 평점 · 광고 촬영(−2) · 능력치가 경쟁자보다 많이 낮음</small></div></div>
@@ -3907,7 +3955,7 @@ function practiceMenu(){ const m=document.createElement('div'); m.className='hub
     <div class="a10m"><b>🔟 10초 공격 <small>나 + 동료 1명 vs 수비 2명 + 키퍼 · 10번 공격</small></b><div class="row" style="gap:6px;flex-wrap:nowrap;margin-top:6px">${Object.values(DEF_STY).map(D=>`<button class="btn" style="flex:1;flex-direction:column;gap:0;padding:7px 4px;font-size:.78rem" data-pm="a10:${D.k}"><span style="font-size:1.1rem">${D.ic}</span>${D.n.replace(' 수비','')}<small class="muted" style="font-size:.66rem">${S.a10best&&S.a10best[D.k]!=null?'최고 '+S.a10best[D.k]+'골':'기록 없음'}</small></button>`).join('')}</div></div>
     <div class="list" style="gap:8px"><button class="btn block" data-pm="free" style="justify-content:flex-start;text-align:left"><b>🆓 자유 연습</b>&nbsp;<small class="muted">슛·스킬 마음껏</small></button>
     ${CHALS.filter(c=>!c.hidden).map(c=>`<button class="btn block ${chalCleared(c.id)?'':'primary'}" data-pm="${c.id}" style="flex-direction:column;align-items:flex-start;gap:2px;text-align:left"><span><b>${c.ic} ${c.name}</b> ${chalCleared(c.id)?`<span class="pill good">클리어 ${S.chal[c.id]}회</span>`:`<span class="pill acc">첫 클리어 +${fmtMoney(c.rew)}</span>`}</span><small style="font-weight:600;white-space:normal;line-height:1.3">${c.desc}</small></button>`).join('')}</div></div>`;
-  m.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(b.id==='pm-x'){ m.remove(); return; } const k=b.dataset.pm; if(!k) return; m.remove(); if(k.startsWith('a10:')){ PR_A10=k.slice(4); startPractice(null); setTimeout(()=>{ if(M&&M.a10){ const D0=DEF_STY[M.a10.sty]; banner(`${D0.ic} ${D0.n}`,D0.tip); } },150); return; } startPractice(k==='free'?null:k); });
+  m.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(b.id==='pm-x'){ m.remove(); return; } const k=b.dataset.pm; if(!k) return; m.remove(); if(k.startsWith('a10:')){ PR_A10=k.slice(4); startPractice(null); setTimeout(()=>{ if(M&&M.a10){ const D0=DEF_STY[M.a10.sty]; banner(`${D0.ic} ${D0.n}`,D0.tip,1); } },150); return; } startPractice(k==='free'?null:k); });
   document.body.append(m); }
 function practiceEvent(){ const nx=nextEvent(); if(nx&&nx.pro) return {type:'league',label:'워밍업',home:true,me:HS_ME,opp:HS_OPP,practice:true}; const me=CLUBS[S.clubId]; let opp=nx&&nx.opp; if(!opp){ const d=divOf(S.clubId); const oid=(S.divs[d.id].clubs||[]).find(c=>c!==S.clubId); opp=CLUBS[oid]; } return {type:'league',label:'연습장',home:true,me,opp,practice:true}; }
 let PR_CHAL=null;
@@ -3937,8 +3985,8 @@ function startMatch(highlight,practice){ try{ el('screen-match').classList.remov
     for(let g=0;g<M.score[1];g++){ const i=pickRoster(opp.id,{FW:5,MF:2,DF:1}); M.events.push({min:irnd(3,58),team:1,key:opp.id+'-'+i,name:playerName(opp.id,i),assist:null}); }
     M.events.sort((a,b)=>a.min-b.min);
     M.t=100; M.t0=100; M.min=60; M.min0=60; M.half2=true; simTeamStats(0.66,M.score[0],M.score[1]);
-    kickoff(Math.random()<0.5?0:1); M.freeze=2.2; setTimeout(()=>{ if(M) banner("60' 교체 투입",S.player.name+' 들어가요'); },50);
-  } else if(M.practice){ practiceReset(); setTimeout(()=>{ if(M) banner('연습장','공을 잃거나 골이 나면 다시 공을 받아요'); },80); } else kickoff(M.firstKick);
+    kickoff(Math.random()<0.5?0:1); M.freeze=2.2; setTimeout(()=>{ if(M) banner("60' 교체 투입",S.player.name+' 들어가요',1); },50);
+  } else if(M.practice){ practiceReset(); setTimeout(()=>{ if(M) banner('연습장','공을 잃거나 골이 나면 다시 공을 받아요',1); },80); } else kickoff(M.firstKick);
   if(S.echo&&S.echo.left>0){ setTimeout(()=>{ if(M) banner(S.echo.neg?'야유':'환호',S.echo.neg?`해설: 지난 인터뷰 "${S.echo.said}" 발언이 아직 화제예요`:`해설: "${S.echo.said}" · 팬들이 ${S.player.name}을 연호해요`); },1100); }
   show('screen-match');
   resize();
@@ -4006,7 +4054,7 @@ function pickKit(club,avoid){ const okKit=(c,av)=>colorDist(c,'#ffffff')>=170&&c
   return [club.c1,club.c2].concat(['#d6332b','#1f4fd1','#111111','#8e2fc0','#ff7a00','#e0218a']).find(c=>okKit(c,avoid))||'#d6332b'; }
 function kit2(club,c1){ const L=rgbHsl(...hexRgb(c1))[2]; return [club.c2,L<0.5?'#f2f2f2':'#151515'].find(c=>colorDist(c,c1)>=180)||'#f2f2f2'; }
 function colorDist(a,b){ const p=c=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)]; const A=p(a),B=p(b); return Math.abs(A[0]-B[0])+Math.abs(A[1]-B[1])+Math.abs(A[2]-B[2]); }
-function ctlHelp(full){ const sk=S&&SKILLS.find(x=>x.id===S.player.equip[0]); const pc=typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches;
+function ctlHelp(full){ const sk=S&&SKILLS.find(x=>x.id===S.player.equip[0]); const pc=!window.__SP_FRAMED&&typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches;
   const L=full?[
     `🕹️ <b>이동</b> 화면 왼쪽 드래그 · 💨 <b>달리기</b> 누르는 동안`,
     `🪄 <b>개인기</b> 탭 = <b>페인트</b>(수비 반대쪽으로 빠짐) · 방향을 뒤로 두고 탭 = <b>드래그백</b> · 방향 없이 탭 = <b>스텝오버</b> · 꾹 = <b>등지기</b>(천천히 움직이며 공 지킴, 피지컬이 셀수록 단단) · 달리기 두 번도 페인트 · 반대 방향으로 확 꺾기 = <b>턴</b>`,
@@ -4118,7 +4166,7 @@ function kickoff(team){
   fw.x=W/2; fw.y=H/2+(team===0?0.8:-0.8);
   const fw2=fws[1]; if(fw2){ fw2.x=W/2+3; fw2.y=fw.y; }
   setOwner(fw,{clean:true}); planReset(team,'restart'); if(team===0&&!fw.isUser){ fw.kickoffPassT=M.t; } M.freeze=1.0; M.state='play'; sfx('whistle');
-  if(M.t===0&&!M.bench){ const tn=TACTICS.find(t=>t.id===M.tactic[1]); banner('킥오프',`상대 ${M.opp.short}: ${tn.name} · ${tn.desc}`); }
+  if(M.t===0&&!M.bench){ const tn=TACTICS.find(t=>t.id===M.tactic[1]); banner('킥오프',`상대 ${M.opp.short}: ${tn.name} · ${tn.desc}`,1); }
 }
 function setOwner(pl,opts={}){ const b=M.ball; if(pl&&M.possTeam!==pl.team){ M.possTeam=pl.team; planReset(pl.team,M.setPiece||M.freeze>0?'restart':pl.role==='GK'?'gk':'steal'); } b.knock=null; b.longP=b.split=b.laser=b.curlP=b.crossH=b.hdr=false; b.curlTo=null; b.thunder=b.meteor=b.bike=false; b.knuckle=b.flick=b.nolook=b.pHead=b.lift=b.triple=b.delivery=b.dragon=false; const inSp=b.speedAtTake||0; if(pl&&pl.role==='GK'&&b.lastKicker&&b.lastKicker.team!==pl.team&&!M.setPiece){ const hd=rnd(1.3,2.1); pl.gkHoldUntil=M.t+hd; pl.inHands=true; pl.catchT=Math.max(pl.catchT||0,0.5); if(!M.practice){ popup(pl.x,pl.y-1.9,'잡았다!','#fff'); if(!(M._svT>M.t)){ M._svT=M.t+8; tick(`🧤 캐치 · ${playerName((pl.team===0?M.me:M.opp).id,pl.i)}`); } } } b.owner=pl; if(pl){ pl.protT=pl.isUser?0.8:0.45; pl.gotT=M.t; if(pl.gkHoldUntil>M.t) pl.protT=pl.gkHoldUntil-M.t+0.2; } if(pl&&pl.team===1&&M.recv){ if(M.t-M.recv.t<1.2){ M.stats.quickLoss=(M.stats.quickLoss||0)+1; } M.recv=null; } if(pl&&pl.team===0&&!pl.isUser&&M.recv&&M.t-M.recv.t>0.3) M.recv=null; // 잡은 직후 잠깐은 뺏기지 않음
   b.vx=b.vy=b.vz=0; b.z=0; b.curve=0; b.fire=false; b.saveChecked=false; b.passTarget=null; if(pl){ pl.recvFrom=(b.lastKicker&&b.lastKicker!==pl&&b.lastKicker.team===pl.team)?b.lastKicker:null; pl.composeT=null; b.lastKicker=pl; }
@@ -5558,7 +5606,7 @@ function a10End(){ const A=M.a10; A.done=true; M.paused=true; if(el('pr-a10')) e
     <div class="a10-log">${A.log.map((c,i)=>`<i class="${c.res==='골'?'g':''}">${i+1}. ${c.res}${c.res==='골'?` ${c.sec}초`:''}${c.beats?` · 제침${c.beats}`:''}${c.gg?' · 원투':''}</i>`).join('')}</div>
     <p class="muted" style="font-size:.8rem;margin:6px 0 0">골까지 평균 ${avg}초 · 💡 ${D.tip}</p>
     <div class="list" style="margin-top:10px"><button class="btn primary" id="a10-again">같은 수비로 다시</button><div class="row" style="gap:6px;flex-wrap:nowrap">${Object.keys(DEF_STY).filter(k=>k!==A.sty).map(k=>`<button class="btn" style="flex:1;font-size:.8rem" data-a10="${k}">${DEF_STY[k].ic} ${DEF_STY[k].n}</button>`).join('')}</div><button class="btn" id="a10-end">연습 종료</button></div>`);
-  const go=k=>{ M.a10={sty:k,n:0,goals:0,log:[],cur:null}; M.defSty=k; el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); practiceReset(); setTimeout(()=>{ if(M&&M.a10) banner(`${DEF_STY[k].ic} ${DEF_STY[k].n}`,DEF_STY[k].tip); },80); };
+  const go=k=>{ M.a10={sty:k,n:0,goals:0,log:[],cur:null}; M.defSty=k; el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); practiceReset(); setTimeout(()=>{ if(M&&M.a10) banner(`${DEF_STY[k].ic} ${DEF_STY[k].n}`,DEF_STY[k].tip,1); },80); };
   el('a10-again').onclick=()=>go(A.sty); el('m-overlay').querySelectorAll('[data-a10]').forEach(b=>b.onclick=()=>go(b.dataset.a10)); el('a10-end').onclick=()=>endPractice(); }
 
 /* ===== v69 찬스 모드: 경기는 빠른 중계(FMH식 점 화면), 중요한 찬스만 직접 ===== */
@@ -5851,7 +5899,7 @@ function draw(){ if(M&&M.chance&&M.chance.phase==='sim'){ drawSimView(); return;
     ctx.lineWidth=6; ctx.strokeStyle='#000'; ctx.strokeText(c.name,tx,ty); ctx.fillStyle='#fff'; ctx.fillText(c.name,tx,ty); ctx.fillStyle=c.col; ctx.globalAlpha=0.9; ctx.fillText(c.name,tx+2,ty+2); ctx.globalAlpha=1; ctx.fillStyle='#fff'; ctx.fillText(c.name,tx,ty);
     ctx.font='bold 12px "Noto Sans KR",sans-serif'; ctx.fillStyle=c.col; ctx.fillText(`${S.player.name} · 필살기`,tx+2,ty+fs*0.72); ctx.restore(); }
   // 미니맵 (확대)
-  let mw=LD?Math.min(92,cw*0.12):Math.min(78,cw*0.2), mh=LD?mw*W/H:mw*H/W, mx=LD?cw/2-mw/2:cw-mw-12, my=LD?(el('sc-s').getBoundingClientRect().bottom-cv.getBoundingClientRect().top+18||52):108; if(OVon){ mw=Math.min(98,cw*0.12); mh=mw*W/H; mx=cw/2-mw/2; my=ch-mh-10; ctx.globalAlpha=0.82; }
+  let mw=LD?Math.min(92,cw*0.12):Math.min(64,cw*0.16), mh=LD?mw*W/H:mw*H/W, mx=LD?cw/2-mw/2:cw-mw-10, my=LD?(el('sc-s').getBoundingClientRect().bottom-cv.getBoundingClientRect().top+18||52):108; if(!LD) ctx.globalAlpha=0.8; /* v92: 세로에선 미니맵이 시야를 덜 가리게 */ if(OVon){ mw=Math.min(98,cw*0.12); mh=mw*W/H; mx=cw/2-mw/2; my=ch-mh-10; ctx.globalAlpha=0.82; }
   const mm=o=>LD?[mx+(o.x+H)/H*mw,my+o.y/W*mh]:[mx+o.x/W*mw,my+o.y/H*mh];
   ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(mx-3,my-14,mw+6,mh+17); ctx.fillStyle='rgba(60,140,70,.75)'; ctx.fillRect(mx,my,mw,mh);
   ctx.strokeStyle='rgba(255,255,255,.45)'; ctx.lineWidth=1; ctx.strokeRect(mx,my,mw,mh); ctx.beginPath(); if(LD){ ctx.moveTo(mx+mw/2,my); ctx.lineTo(mx+mw/2,my+mh); } else { ctx.moveTo(mx,my+mh/2); ctx.lineTo(mx+mw,my+mh/2); } ctx.stroke();
@@ -6038,14 +6086,14 @@ function drawFanBanners(ctx){ if(!M||M.practice||!M.vgfx||M.vgfx.tier<1) return;
   ban(sx,H*0.5,9,2.6,'#'+num,col,'#fff',side*-Math.PI/2);
   if(lv>=2){ ban(sx,H*0.28,11,2.4,nm+' '+num,'#fff',col,side*-Math.PI/2); ban(W*0.5,H+5.6,12,2.4,'GO '+nm+'!','#ffd23a','#1a1a1a',0); }
   if(lv>=3){ ctx.save(); ctx.globalAlpha=0.85; for(let i=0;i<5;i++){ ctx.fillStyle=i%2?col:'#fff'; ctx.fillRect(W*0.2+i*2.4,-7.4,2.4,3.2); } ctx.restore(); ban(W*0.5,-5.8,13,2.6,'★ '+nm+' ★','#1a1a1a','#ffd23a',0); ban(sx,H*0.72,9,2.4,'LEGEND','#ffd23a','#1a1a1a',side*-Math.PI/2); } }
-function venueIntro(){ if(!M||!M.venue) return; if(M.practice){ M.introT=1.4; M.freeze=Math.max(M.freeze||0,1.4); banner('⚽ 연습장','슛·스킬 마음껏 연습, 보상·기록 없음'); return; } M.introT=2.6; M.freeze=Math.max(M.freeze||0,2.6); banner(M.venue.name,`${M.venue.kind} · 관중 ${M.venue.att.toLocaleString()}명`); const sv=M.ev.type!=='nat'&&S.scout&&S.scout.visit&&CLUBS[S.scout.visit]; if(sv){ const chip=el('scout-chip'); chip.textContent=`👀 ${sv.name} 스카우트 관전 중`; chip.hidden=false; setTimeout(()=>{ chip.hidden=true; },6000); } }
+function venueIntro(){ if(!M||!M.venue) return; if(M.practice){ M.introT=1.4; M.freeze=Math.max(M.freeze||0,1.4); banner('⚽ 연습장','슛·스킬 마음껏 연습, 보상·기록 없음',1); return; } M.introT=2.6; M.freeze=Math.max(M.freeze||0,2.6); banner(M.venue.name,`${M.venue.kind} · 관중 ${M.venue.att.toLocaleString()}명`,1); const sv=M.ev.type!=='nat'&&S.scout&&S.scout.visit&&CLUBS[S.scout.visit]; if(sv){ const chip=el('scout-chip'); chip.textContent=`👀 ${sv.name} 스카우트 관전 중`; chip.hidden=false; setTimeout(()=>{ chip.hidden=true; },6000); } }
 function hintLv(){ if(!S) return 2; if(S.hintMode==null&&S.noActHint) S.hintMode='off'; const m=S.hintMode; if(m==='on') return 2; if(m==='off') return 0; const a=(S.player&&S.player.career&&S.player.career.apps)||0; return a<6?2:a<16?1:0; }
 function hintModeLabel(){ return S.hintMode==='on'?'항상':S.hintMode==='off'?'끔':'자동'; }
 function hintModeNext(){ S.hintMode=S.hintMode==='on'?'off':S.hintMode==='off'?'auto':'on'; S.noActHint=undefined; save(); }
 function actHintOn(){ return hintLv()>0; }
 function hintPick(h){ if(!h) return null; const lv=hintLv(); if(lv>=2) return h; if(lv<=0) return null; return (h.pri||h.c)?h:null; } // 1단계: 색이 있는 핵심 안내(슛 찬스·크로스·압박·원터치)만
 function actHint(){ // 지금 가장 쓸모 있는 행동 하나만
-  const u=M.user, b=M.ball, has=b.owner===u; const pc=actHint.pc!=null?actHint.pc:(actHint.pc=typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches); const K=(m,k)=>pc?`${k} ${m}`:m;
+  const u=M.user, b=M.ball, has=b.owner===u; const pc=actHint.pc!=null?actHint.pc:(actHint.pc=!window.__SP_FRAMED&&typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches); const K=(m,k)=>pc?`${k} ${m}`:m;
   if(has&&u.touchT>0.05) return {t:'트래핑',c:'rgba(20,60,90,.88)',pri:2};
   if(has&&M.charge) return null;
   if(has){ const gd=dist(u,goalOf(0)); const [,od]=nearest(M.players.filter(q=>q.team===1&&q.role!=='GK'),u);
@@ -6089,13 +6137,13 @@ function halftimeShow(){ if(!M||M.over) return; M.paused=true; const t=M.tstats,
     M._subPick=M._subPick||new Set(); el('m-overlay').querySelectorAll('[data-htsub]').forEach(b=>b.onclick=()=>{ const q=M.players.find(x=>x.team===0&&x.i===+b.dataset.htsub); if(!q) return; if(M._subPick.has(q)) M._subPick.delete(q); else if(M._subPick.size<2) M._subPick.add(q); draw(); });
     el('ht-go').onclick=()=>{ if(!M) return; if(M._subPick&&M._subPick.size){ M._subPick.forEach(q=>subPlayer(q,true)); M._subPick=null; } if(pick==='atk') M.tactic[0]='press'; else if(pick==='hold') M.tactic[0]='counter'; else { M.mp=Math.min(M.mpMax||100,M.mp+15); M.players.forEach(q=>{ if(q.team===0&&q.sta!=null) q.sta=Math.min(1,q.sta+0.15); }); } M.htOrder=pick; el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); if(pick!=='keep'){ M.tacSwT=M.t+50; } tick(pick==='atk'?'⚔️ 후반: 공격 앞으로 (적응 중, 잠시 패스 흔들림)':pick==='hold'?'🛡 후반: 리드 지키기 (적응 중)':'🧩 후반: 지금처럼'); }; };
   draw(); }
-function banner(t,sub){ const b=el('banner'); b.innerHTML=`${esc(t)}<small>${esc(sub)}</small>`; b.classList.add('show'); M.bannerT=2.2; }
+function banner(t,sub,mini){ const b=el('banner'); b.innerHTML=`${esc(t)}<small>${esc(sub)}</small>`; b.classList.toggle('mini',!!mini); b.classList.add('show'); M.bannerT=mini?1.7:2.2; }
 function updateScore(){ el('sc-s').textContent=`${M.score[0]} - ${M.score[1]}`; }
 
 /* ---------- HUD / INPUT ---------- */
 const BS=[1,0.85,1.15], BA=[1,0.8,0.6];
-function pcHudOn(){ if(S&&S.pcHud!=null) return !!S.pcHud; try{ return matchMedia('(pointer:fine)').matches&&!matchMedia('(pointer:coarse)').matches; }catch(e){ return false; } }
-function applyBtnPrefs(){ const c=document.querySelector('.ctl'); const kh=pcHudOn(); c.classList.toggle('gapw',S.btnGap===1); c.classList.toggle('gapn',S.btnGap===2); { const sm=el('screen-match'); if(sm) sm.style.setProperty('--js',joyK()); } c.style.setProperty('--bs',BS[S.btnSize||0]*(kh?0.68:1)); c.style.setProperty('--ba',BA[S.btnAlpha||0]); c.style.setProperty('--bb',['0px','40px','84px'][S.btnPos||0]); c.classList.toggle('mir',!!S.btnMirror); c.classList.toggle('keys',kh); }
+function pcHudOn(){ if(window.__SP_FRAMED) return false; if(S&&S.pcHud!=null) return !!S.pcHud; try{ return matchMedia('(pointer:fine)').matches&&!matchMedia('(pointer:coarse)').matches; }catch(e){ return false; } }
+function applyBtnPrefs(){ const c=document.querySelector('.ctl'); const kh=pcHudOn(); c.classList.toggle('gapw',S.btnGap===1); c.classList.toggle('gapn',S.btnGap===2); { const sm=el('screen-match'); if(sm) sm.style.setProperty('--js',joyK()); } c.style.setProperty('--bs',BS[S.btnSize||0]*(kh?0.68:1)); c.style.setProperty('--ba',BA[S.btnAlpha||0]); c.style.setProperty('--bb',['0px','40px','84px'][S.btnPos||0]); c.classList.toggle('mir',!!S.btnMirror); c.classList.toggle('keys',kh); c.classList.toggle('nogest',hintLv()<2); }
 function setupHUD(){
   el('sc-t').textContent="0'"; el('objs').innerHTML=''; el('scout-chip').hidden=true; el('live-rt').hidden=true; M._lr=null; M._lrT=null; el('b-sta').style.width='100%'; el('b-mp').style.width='100%'; el('banner').classList.remove('show'); M._objT=0;
   const hN=el('sc-h'), aN=el('sc-a');
@@ -6285,7 +6333,7 @@ function showProOffers(){ const P=S.prologue, R=P.r; const col=el('pro-col'); sh
   col.onclick=e=>{ const b=e.target.closest('button[data-pj]'); if(b) proJoin(+b.dataset.pj); }; col.parentElement.scrollTop=0; }
 function proJoin(i){ const P=S.prologue; const o=P.offers[i]; const c=CLUBS[o.club];
   S.clubId=c.id; S.wage=o.wage; S.contractEnd=S.season+o.years-1; S.role=roleAt(c).k; S.form=[]; const pb=clamp(Math.round((((P.r&&P.r.rating)||6.5)-6.5)*6)+((P.r&&P.r.goals)||0)*3,0,12); S.trust=o.trust0+pb; S.proBonus=pb; S.starter=S.trust>=TRUST_UP; S.comp=o.comp; S.compIntro=true; S.proDone={club:c.id,...P.r}; S.prologue=null;
-  try{ S.rival=pickRival(); }catch(e){} save(); tab='home'; show('screen-hub'); renderHub(); toast(`${c.name} 입단! 주급 ${fmtMoney(o.wage)}`); }
+  try{ S.rival=pickRival(); }catch(e){} save(); tab='home'; const ci0=!!S.compIntro; show('screen-hub'); renderHub(); if(!document.querySelector('.hub-modal')&&!ci0) toast(`${c.name} 입단! 주급 ${fmtMoney(o.wage)}`); } /* v92: 첫 감독 대화창과 입단 알림이 한꺼번에 뜨지 않게 — 주급은 대화창 머리에 */
 function proSkipAll(i=0){ if(CUT){ CUT.end=true; CUT=null; } if(typeof M!=='undefined'&&M){ try{ cancelAnimationFrame(raf); ambience(false); }catch(e){} M=null; } S.prologue={stage:'offers',r:{my:2,op:1,win:true,pk:false,rating:6.8,goals:1,assists:0},offers:proOffers({rating:6.8,goals:1,assists:0})}; proJoin(Math.min(i,S.prologue.offers.length-1)); }
 function startNewCareer(){ const name=el('in-name').value.trim()||'선수'; if(newMode==='chal'){ const def=CHALLENGES.find(x=>x.id===newChal)||CHALLENGES[0]; chalStart(def,name,pos); posnGive(); S.look=LOOKS[newLook]; S.hsKit=newKit; S.number=newNum; save(); renderHub(); return; } newGame(name,pos); posnGive(); S.look=LOOKS[newLook]; S.hsKit=newKit; S.number=newNum; applyHsKit(); try{ const L=JSON.parse(localStorage.getItem('sp_legacy')||'null'); if(L){ localStorage.removeItem('sp_legacy'); S.player.rep+=L.rep; S.player.money+=L.money; S.legacy=L; toast(`${L.parent}의 후계자, 명성 +${L.rep.toLocaleString()} · ${fmtMoney(L.money)} 상속`); } }catch(e){} proStart(); }
 el('btn-new').addEventListener('click',()=>{ const sv=load(); if(!(sv&&sv.player)) return startNewCareer();
@@ -6877,7 +6925,7 @@ function hcModal(){ const m=document.createElement('div'); m.className='hub-moda
 
 function fitFill(col){ col.querySelectorAll('.fl-fill').forEach(x=>x.classList.remove('fl-fill')); col.querySelectorAll('.fl-scroll').forEach(x=>x.classList.remove('fl-scroll')); col.querySelectorAll('.fl-mid').forEach(x=>x.classList.remove('fl-mid')); if(col.scrollHeight<=col.clientHeight+4) return;
   const vis=[...col.children].filter(k=>!k.classList.contains('fl-off')&&!k.classList.contains('fl-tabs')&&!k.classList.contains('hero')); const big=vis.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(!big) return; big.classList.add('fl-fill');
-  let t=big; for(let d=0;d<3;d++){ const kids=[...t.children]; if(!kids.length) break; const k=kids.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(k.offsetHeight<big.offsetHeight*0.45) break; t=k; if(k.matches('.list,.tbl,table,.skl,ul,#div-table,.jour-r,.wk3')||k.children.length>3) break; } if(t!==big){ t.classList.add('fl-scroll'); for(let m=t.parentElement;m&&m!==big;m=m.parentElement) m.classList.add('fl-mid');
+  let t=big; for(let d=0;d<3;d++){ const kids=[...t.children]; if(!kids.length) break; const k=kids.sort((a,b)=>b.offsetHeight-a.offsetHeight)[0]; if(k.offsetHeight<big.offsetHeight*0.45) break; t=k; if(k.matches('.list,.tbl,table,.skl,ul,#div-table,.jour-r,.wk3')||k.children.length>3) break; } if(t.matches('.wk3')) t=big; /* v92: 주간 카드 3장은 줄여 넣지 않고 카드 전체를 넘김 */ if(t!==big){ t.classList.add('fl-scroll'); for(let m=t.parentElement;m&&m!==big;m=m.parentElement) m.classList.add('fl-mid');
     if(big.scrollHeight>big.clientHeight+4||(t.clientHeight<120&&t.scrollHeight>t.clientHeight+4)){ t.classList.remove('fl-scroll'); big.querySelectorAll('.fl-mid').forEach(x=>x.classList.remove('fl-mid')); } } } // 안쪽 목록만 넘기기가 안 맞는 칸(접는 카드, 다른 내용이 많은 칸)은 칸 전체를 넘김 // fl-fill과 fl-scroll 사이 칸도 세로 flex로 이어야 표 안 스크롤이 생김
 function fitTabs(col,id){ const old=col.querySelector(':scope>.fl-tabs'); if(old) old.remove(); [...col.children].forEach(k=>k.classList.remove('fl-off'));
   const kids=[...col.children].filter(k=>!k.classList.contains('hero')); if(kids.length<2||col.scrollHeight<=col.clientHeight+4) return;

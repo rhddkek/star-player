@@ -596,6 +596,19 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let V=null; try{ const o=require('child_process').execFileSync('node',[__dirname+'/v91check.js',FILE.replace('file://',''),'30','1.6'],{encoding:'utf8',timeout:400000}); V=JSON.parse(o.slice(o.indexOf('{'),o.indexOf('\n'))); }catch(e){ V={err:String(e).slice(0,200)}; }
     ok('v91 크로스: 1.6m 붙은 수비가 발끝에서 바로 줍지 않음(이전 95%+) · 공격 쪽 첫 경합·슈팅 나옴 · 동료가 띄운 공은 여유 있으면 잡아 둠', !!V&&!V.err&&(V.first.defCtrl||0)<=V.n*0.6&&V.att1st>=1&&V.shot>=2&&V.hdr&&V.hdr.ctrl===V.hdr.n, JSON.stringify(V));
   }
+  // v92: 알림 위치 · 경기 버튼 보조 글씨 · PC 모바일 화면
+  { const tt=await pg.evaluate(()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); show('screen-hub'); tab='home'; renderHub(); toast('테스트 알림'); const t=el('toast').getBoundingClientRect(), tb=el('tabs').getBoundingClientRect();
+      const ap=S.player.career.apps; S.player.career.apps=12; S.hintMode='auto'; applyBtnPrefs(); const ng=document.querySelector('.ctl').classList.contains('nogest'); S.player.career.apps=0; applyBtnPrefs(); const ng0=document.querySelector('.ctl').classList.contains('nogest'); S.player.career.apps=ap;
+      return {tb:Math.round(t.bottom),tabTop:Math.round(tb.top),ng,ng0}; });
+    ok('v92 알림이 아래 탭을 가리지 않음 · 경기 버튼 보조 글씨는 처음 6경기만', tt.tb<=tt.tabTop&&tt.ng&&!tt.ng0, JSON.stringify(tt)); }
+  { const cP=await b.newContext({viewport:{width:1366,height:820}}); const pP=await cP.newPage(); const eP=[]; pP.on('pageerror',e=>eP.push(e.message));
+    await pP.goto(FILE); await pP.waitForTimeout(400); const v0=await pP.evaluate(()=>!el('tt-view').hidden);
+    await pP.click('#tt-view [data-vw="mp"]'); await pP.waitForTimeout(1500);
+    const fr=pP.frames().find(f=>f!==pP.mainFrame()); let a=null, c=null, d=null;
+    if(fr){ a=await fr.evaluate(()=>({w:innerWidth,h:innerHeight,fm:document.documentElement.classList.contains('fm'),pcHud:pcHudOn(),go:!!el('go-create')})); await fr.click('#go-create'); await fr.click('#btn-new'); await fr.waitForTimeout(600);
+      await pP.click('#sp-bar [data-vw="ml"]'); await pP.waitForTimeout(500); c=await fr.evaluate(()=>({w:innerWidth,h:innerHeight,land:isLand()})); }
+    await pP.click('#sp-bar [data-vw="pc"]'); await pP.waitForTimeout(1200); d=await pP.evaluate(()=>({frame:!!document.getElementById('sp-if'),game:typeof startMatch==='function',view:localStorage.getItem('sp_view')}));
+    ok('v92 PC에서 모바일 화면: 타이틀 하단 선택 → 휴대폰 틀(390×844, 터치 화면) · 가로(844×390) 전환 · PC로 복귀', v0&&!!a&&a.w===390&&a.h===844&&a.fm&&!a.pcHud&&a.go&&c&&c.w===844&&c.h===390&&c.land&&d&&!d.frame&&d.game&&d.view==='pc'&&eP.length===0, JSON.stringify({v0,a,c,d,e:eP.slice(0,2)})); await cP.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

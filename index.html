@@ -3847,7 +3847,8 @@ const cv=el('cv'); let ctx=cv.getContext('2d'); const CTX1=ctx, cv2=el('cv2'), C
 let M=null; // match state
 let raf=0, lastT=0;
 /* v89: 화면 갱신(requestAnimationFrame)이 멈추거나 아주 느린 브라우저(원격·저사양)에서도 경기가 흐르게 하는 보조 타이머 · 탭이 숨겨지면 멈춤 */
-setInterval(()=>{ try{ if(typeof M==='undefined'||!M||M.over||document.hidden) return; const sm=el('screen-match'); if(!sm||sm.hidden) return; const now=performance.now(); if(now-lastT>260){ cancelAnimationFrame(raf); loop(now); } }catch(e){} },130);
+const RAF0=window.requestAnimationFrame;
+setInterval(()=>{ try{ if(typeof M==='undefined'||!M||M.over||document.hidden||(window.requestAnimationFrame!==RAF0&&!window.WD_FORCE)) return; /* 테스트가 rAF를 바꿔 직접 돌릴 땐 끼어들지 않음 */ const sm=el('screen-match'); if(!sm||sm.hidden) return; const now=performance.now(); if(now-lastT>260){ cancelAnimationFrame(raf); loop(now); } }catch(e){} },130);
 const keys={};
 const input={passMod:null,passSide:0,jx:0,jy:0,joyActive:false,passHold:false,passRelease:false,shotHold:false,shotRelease:false,thruHold:false,thruRelease:false,shotMod:null,curlSide:0,sk:[false,false,false,false],sprint:false};
 

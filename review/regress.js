@@ -545,6 +545,9 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'5'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
     const pool=k=>{ let ok2=0,n=0; ['T0','T1'].forEach(T=>{ const v=P2&&P2[T+' '+k]; if(!v) return; const m=v.match(/(\d+)% \(([\d.]+)/); if(m){ ok2+=(+m[1])*(+m[2]); n+=(+m[2]); } }); return n?ok2/n:0; };
     ok('v80 패스 성공률(AI끼리 5경기, 두 팀 합산): 전체 70% 이상 · 짧은 패스 76% 이상', pool('all')>=70&&pool('short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']})); }
+  { let V=null; try{ const o=execFileSync('node',[__dirname+'/v87check.js',HTML,'40'],{encoding:'utf8',timeout:400000}); V=JSON.parse(o.slice(o.indexOf('{'),o.indexOf('\n'))); }catch(e){ V={err:String(e).slice(0,200)}; }
+    const air=V&&V.first?((V.first.attHead||0)+(V.first.defHead||0)+(V.first.claim||0))/V.n:0;
+    ok('v87 코너킥: 머리 높이로 떨어져 공중볼 경합(80%+) · 슈팅 25%+ · 골 1~20% · 패스 속도 1.2배 · 코너·빌드업 찬스', !!V&&air>=0.8&&V.shot/V.n>=0.25&&V.goal/V.n>=0.01&&V.goal/V.n<=0.2&&V.passK===1.2&&V.chNames.includes('corner')&&V.chNames.includes('build'), JSON.stringify(V&&{n:V.n,first:V.first,shot:V.shot,goal:V.goal,headGoal:V.headGoal,passK:V.passK,err:V.err})); }
   // v82: 개인기 버튼 · 커리어 후반 · 역오퍼 · 고향 구단 (별도 프로세스)
   { const {execFileSync}=require('child_process'); const HTML=FILE.replace('file://',''); let V=null, ve='';
     try{ const o=execFileSync('node',[__dirname+'/v82check.js',HTML],{encoding:'utf8',timeout:400000}); const i=o.lastIndexOf('\nerrs '); V=JSON.parse(o.slice(0,i)); ve=o.slice(i+6).trim(); }catch(e){ ve=String(e).slice(0,200); }

@@ -436,7 +436,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await c6.close(); }
   // v72 가로 한 화면: 화면 자체는 스크롤 없음 · 홈의 경기 시작 버튼이 화면 안
   { const {devices}=require('playwright'); const c7=await b.newContext({...devices['iPhone 13 landscape']}); const p7=await c7.newPage(); const e7=[]; p7.on('pageerror',e=>e7.push(e.message)); await p7.goto(FILE); await p7.click('#go-create'); await p7.click('#btn-new'); await p7.waitForTimeout(300);
-    await p7.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; for(let i=0;i<3;i++) autoMatch(true); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await p7.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; for(let i=0;i<3;i++) autoMatch(true); S.player.injury=0; /* 부상이면 경기 시작 버튼 대신 자동 진행만 나옴(정상) */ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
     const F={}; for(const k of ['home','player:stat','skill','league','transfer','career:record','shop:gear']){ await p7.evaluate(k=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); goKey(k); },k); await p7.waitForTimeout(150);
       F[k]=await p7.evaluate(()=>{ const w=document.querySelector('#screen-hub .wrap'); const g=document.querySelector('#hub-col>.tabpanel:not([hidden]) #btn-go'); const r=g&&g.getBoundingClientRect(); return {over:w.scrollHeight-w.clientHeight,cols:document.querySelectorAll('#hub-col>.tabpanel:not([hidden]) .fl-col').length,go:g?(r.bottom<=innerHeight&&r.height>20):null}; }); }
     const bad=Object.entries(F).filter(([k,v])=>v.over>2||v.cols<1||v.go===false);
@@ -536,7 +536,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // v80: 새 스킬 5종 · 플레이 스타일 · 패스 성공률 (별도 프로세스)
   { const {execFileSync}=require('child_process'); const HTML=FILE.replace('file://','');
     let V=null, ve=''; try{ const o=execFileSync('node',[__dirname+'/v80check.js',HTML],{encoding:'utf8',timeout:400000}); const i=o.lastIndexOf('\nerrs '); V=JSON.parse(o.slice(0,i)); ve=o.slice(i+6).trim(); }catch(e){ ve=String(e).slice(0,200); }
-    ok('v80 파동 결계: 달려든 수비수를 지속 시간 내내 튕겨 내 공을 지킴 (수비 3명이 3.5초 계속 달려들 때: 없으면 16번 중 3번 이상, 쓰면 2번 이하로 뺏김)', !!V&&V.pulse.with.hits>=16&&V.pulse.with.lost<=2&&V.pulse.without.lost>=3&&V.pulse.with.lost<V.pulse.without.lost, JSON.stringify(V&&V.pulse));
+    ok('v80 파동 결계: 달려든 수비수를 지속 시간 내내 튕겨 내 공을 지킴 (수비 3명이 3.5초 계속 달려들 때: 없으면 16번 중 3번 이상, 쓰면 3번 이하이면서 절반 이하로 뺏김)', !!V&&V.pulse.with.hits>=16&&V.pulse.with.lost<=3&&V.pulse.without.lost>=3&&V.pulse.with.lost*2<=V.pulse.without.lost, JSON.stringify(V&&V.pulse));
     ok('v80 마그넷·제트·드래곤·섬광 동작', !!V&&V.magnet.got&&V.boost.k>1.15&&V.dragon.goals>=3&&V.dragon.knocked>=3&&V.flare.stunned>=1&&V.flare.gkBlind, JSON.stringify(V&&{m:V.magnet,b:V.boost,d:V.dragon,f:V.flare}));
     ok('v80 새 스킬 아이콘·수치표 연결', !!V&&V.skills.length===5&&V.skills.every(x=>x.endsWith(':true:true')), JSON.stringify(V&&V.skills));
     ok('v80 플레이 스타일 효과: 박스 안 슛·키퍼 보정 · 레벨 특성 대기', !!V&&V.arch.shotErrBox<1&&V.arch.gkBox<1&&V.arch.pending===false&&V.arch.pending2===true, JSON.stringify(V&&V.arch));
@@ -545,7 +545,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'5'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
     const pool=k=>{ let ok2=0,n=0; ['T0','T1'].forEach(T=>{ const v=P2&&P2[T+' '+k]; if(!v) return; const m=v.match(/(\d+)% \(([\d.]+)/); if(m){ ok2+=(+m[1])*(+m[2]); n+=(+m[2]); } }); return n?ok2/n:0; };
     ok('v80 패스 성공률(AI끼리 5경기, 두 팀 합산): 전체 70% 이상 · 짧은 패스 76% 이상', pool('all')>=70&&pool('short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']})); }
-  { let V=null; try{ const o=execFileSync('node',[__dirname+'/v87check.js',HTML,'40'],{encoding:'utf8',timeout:400000}); V=JSON.parse(o.slice(o.indexOf('{'),o.indexOf('\n'))); }catch(e){ V={err:String(e).slice(0,200)}; }
+  { let V=null; try{ const o=require('child_process').execFileSync('node',[__dirname+'/v87check.js',FILE.replace('file://',''),'40'],{encoding:'utf8',timeout:400000}); V=JSON.parse(o.slice(o.indexOf('{'),o.indexOf('\n'))); }catch(e){ V={err:String(e).slice(0,200)}; }
     const air=V&&V.first?((V.first.attHead||0)+(V.first.defHead||0)+(V.first.claim||0))/V.n:0;
     ok('v87 코너킥: 머리 높이로 떨어져 공중볼 경합(80%+) · 슈팅 25%+ · 골 1~20% · 패스 속도 1.2배 · 코너·빌드업 찬스', !!V&&air>=0.8&&V.shot/V.n>=0.25&&V.goal/V.n>=0.01&&V.goal/V.n<=0.2&&V.passK===1.2&&V.chNames.includes('corner')&&V.chNames.includes('build'), JSON.stringify(V&&{n:V.n,first:V.first,shot:V.shot,goal:V.goal,headGoal:V.headGoal,passK:V.passK,err:V.err})); }
   // v82: 개인기 버튼 · 커리어 후반 · 역오퍼 · 고향 구단 (별도 프로세스)

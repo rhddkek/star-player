@@ -609,6 +609,13 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       await pP.click('#sp-bar [data-vw="ml"]'); await pP.waitForTimeout(500); c=await fr.evaluate(()=>({w:innerWidth,h:innerHeight,land:isLand()})); }
     await pP.click('#sp-bar [data-vw="pc"]'); await pP.waitForTimeout(1200); d=await pP.evaluate(()=>({frame:!!document.getElementById('sp-if'),game:typeof startMatch==='function',view:localStorage.getItem('sp_view')}));
     ok('v92 PC에서 모바일 화면: 타이틀 하단 선택 → 휴대폰 틀(390×844, 터치 화면) · 가로(844×390) 전환 · PC로 복귀', v0&&!!a&&a.w===390&&a.h===844&&a.fm&&!a.pcHud&&a.go&&c&&c.w===844&&c.h===390&&c.land&&d&&!d.frame&&d.game&&d.view==='pc'&&eP.length===0, JSON.stringify({v0,a,c,d,e:eP.slice(0,2)})); await cP.close(); }
+  // v94: 소모품·새 생활 혜택·높은 능력치 훈련 게이지
+  { const cs=await pg.evaluate(()=>{ const sv=JSON.stringify(S); const p=S.player; const oT=toast; toast=()=>{}; p.money=1e7; p.cond=50; p.injury=3; S.wage=500; const r={};
+      goKey('shop:life'); const use=id=>{ const b=document.querySelector(`[data-cs="${id}"]`); if(b) b.click(); return !!b; };
+      r.cond0=p.cond; use('c_cond'); r.cond1=p.cond; use('c_rehab'); r.inj=p.injury; const w=OVR_W[p.pos]; const k=Object.keys(w).sort((a,b)=>w[b]-w[a])[0]; const g0=(p.tg||{})[k]||0, v0=p.stats[k]; use('c_camp'); r.camp=(p.stats[k]>v0)||((p.tg[k]||0)>g0); use('c_camp'); r.campLim=!document.querySelector('[data-cs="c_camp"]');
+      const rp=p.rep; use('c_fan'); r.fan=p.rep>rp&&!document.querySelector('[data-cs="c_fan"]'); r.items=ITEMS.length; r.need=[tgNeed(85),tgNeed(90),tgNeed(70)];
+      p.items=p.items.filter(x=>x!=='gym'); const l0=coachLimit(); p.items.push('gym'); r.gym=coachLimit()-l0; toast=oT; S=JSON.parse(sv); goKey('home'); return r; });
+    ok('v94 소모품(회복·재활·캠프 시즌 2회·팬 미팅 라운드 1회) · 생활 혜택 12종 · 84 이상 훈련 게이지 완만', cs.cond1===80&&cs.inj===1&&cs.camp&&cs.campLim&&cs.fan&&cs.items===12&&cs.need[0]===440&&cs.need[1]===640&&cs.need[2]===300&&cs.gym===1, JSON.stringify(cs)); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

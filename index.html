@@ -1716,6 +1716,7 @@ details.wk-more{margin-top:8px!important;border-top:0!important;padding:0!import
 
 
 
+
 /*<u3>*/
 /* v101: 2차 시안에서 따온 것 */
 .ht-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
@@ -1832,6 +1833,21 @@ details.wk-more{margin-top:8px!important;border-top:0!important;padding:0!import
 }
 .res-lvrow{flex:0 0 auto!important;min-height:0!important}
 @media (orientation:landscape) and (max-height:520px){ body.land-fit .h2res .h2nm{font-size:.95rem!important} }
+/* v105: 넓은 패널 · 결과 상세 탭 · 꾸미기 */
+.rd-tabs,.cos2-t{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin-bottom:8px}.rd-tabs button,.cos2-t button{font:inherit;font-weight:800;color:#16213a;background:#ece6d6;border:1.5px solid #d6cdb6;border-radius:10px;padding:8px 4px;cursor:pointer;white-space:nowrap}.rd-tabs button.on,.cos2-t button.on{background:linear-gradient(180deg,#9af5d6,#74e6c0);border-color:#55cfa6;color:#0c2b22}
+.rd-m .more-b>[hidden]{display:none!important}.rd-m .more-b details>summary{display:none}.rd-m .more-b .np-fold>summary{display:none}
+.more-h h3{font-weight:900!important;color:#16213a!important}
+.cos2{display:grid!important;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:12px;padding:10px!important}
+.cos2-l .cos-pv{display:flex!important;flex-direction:column;align-items:stretch;gap:8px;position:static!important;height:100%;box-shadow:none!important;border:0!important;padding:0!important;background:transparent!important;margin:0!important}.cos2-l .cos-pv canvas{width:100%!important;flex:1 1 auto;min-height:120px;object-fit:cover;border-radius:12px}
+.cos2-r{display:flex;flex-direction:column;min-width:0;min-height:0}.cos2-b{flex:1 1 auto;min-height:0;overflow-y:auto}.cos2-b>.card{box-shadow:none!important;border:0!important;background:transparent!important;padding:0!important;margin:0!important}.cos2-b .sec{font-size:.9rem;margin-bottom:6px}
+.cos2-b .cos-sws{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}.cos2-b .cos-sw{background:#fbf6ea!important;border:2px solid #d6cdb6!important;border-radius:14px!important;padding:12px 4px 8px!important;min-height:86px}.cos2-b .cos-sw .sw{width:44px!important;height:44px!important;border-radius:12px}.cos2-b .cos-sw small{font-size:.9rem!important;font-weight:800;color:#16213a}.cos2-b .cos-sw.on,.cos2-b .cos-sw.pv{background:#dcfce6!important;border-color:#2fbf8c!important}.cos2-b .cos-sw.lockd{background:#e9e6df!important}
+@media (max-width:640px) and (orientation:portrait){ .cos2{grid-template-columns:1fr}.cos2-l .cos-pv{flex-direction:row;align-items:center}.cos2-l .cos-pv canvas{width:110px!important;flex:0 0 110px}.cos2-t button{font-size:.82rem;padding:7px 2px} }
+@media (orientation:landscape) and (max-height:520px){
+  .hub-modal.more-m{padding:6px!important;align-items:center}.hub-modal.more-m>.more-c{max-width:min(900px,96vw)!important;width:min(900px,96vw)!important;max-height:96vh!important;height:96vh;padding:10px 14px!important}
+  .more-m .more-b{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start;flex:1 1 auto}.more-m .more-b>.mood,.more-m .more-b>.np-fold,.more-m .more-b>[data-rk="team"],.more-m .more-b>[data-rk="rate"]{grid-column:1/-1}.more-m .more-b>:only-child{grid-column:1/-1}
+  .rd-tabs{margin-bottom:6px}.rd-tabs button,.cos2-t button{padding:5px 4px;font-size:.9rem}
+  body.land-fit .cos2{padding:8px!important;gap:10px}body.land-fit .cos2-b .cos-sw{min-height:0;padding:6px 4px 5px!important}body.land-fit .cos2-b .cos-sw .sw{width:32px!important;height:32px!important}body.land-fit .cos2-b .cos-sw small{font-size:.8rem!important}body.land-fit .cos2-l .cos-pv canvas{min-height:60px}body.land-fit .cos2-b .sec{margin-bottom:4px}
+}
 
 /*</u3>*/
 </style>
@@ -3600,7 +3616,7 @@ function renderShop(){
   if(sub!=='endo') box.firstElementChild.remove();
   if(sub==='gear'){ renderGear(box); return; }
   if(sub==='life'){ renderLife(box); return; }
-  if(sub==='cos'){ renderCos(box); return; }
+  if(sub==='cos'){ const tmp=document.createElement('div'); renderCos(tmp); cosWrap(box,tmp); return; }
   const E=S.endo; const sp=sponsorOf();
   const nowCard=(()=>{ if(E.offers.length) return null; const mt=gearMaxTier(); const cheap=GEAR_SLOTS.map(sl=>gearPrice(sl.id,Math.max(1,mt-1))).sort((a,b)=>a-b)[0]; const nb=ENDO_BRANDS.filter(b=>b.rep>p.rep).sort((a,b)=>a.rep-b.rep)[0];
     const adBtn=p.injury>0?'<small class="muted">촬영 불가 · 부상 중</small>':S.weekAct?`<small class="muted">이번 주 활동 완료 · ${esc(weekShort())}</small>`:p.rep>=100?`<div class="ad-l"><b>수입 +${fmtMoney(adShootPay())}</b><b>명성 +${adRepGain()}</b></div><div class="ad-l dn">컨디션 −8${S.trust!=null?' · 신뢰 −2':''} · 주간 활동 1회</div><button class="btn primary block" data-ad="1" style="margin-top:6px">촬영 선택</button>`:`<button class="btn block" disabled>광고 촬영 · 명성 ${Math.round(p.rep)}/100</button>`;
@@ -3633,6 +3649,10 @@ function renderShop(){
 function cosOn(slot){ return S&&S.cos&&S.cos.eq?S.cos.eq[slot]||null:null; }
 function cosVal(slot){ const id=cosOn(slot); const it=id&&COS.find(c=>c.id===id); return it?it.v:null; }
 function tagPill(v,txt){ const st=v==='gold'?'background:rgba(150,105,10,.9);border:1.5px solid #ffd25a;color:#fff3c4':v==='neon'?'background:rgba(10,30,50,.9);color:#8ff5ea;box-shadow:0 0 10px #2ee6d6':v==='star'?'background:rgba(60,20,90,.9);border:1.5px solid #c9a6ff;color:#f3e6ff':'background:rgba(8,30,34,.85);border:1.5px solid #2ee6d6;color:#bff8ee'; return `<span class="tagpv" style="${st}">${v==='star'?'★ ':''}${esc(txt)}</span>`; }
+function cosWrap(box,tmp){ const pc=tmp.querySelector('.cos-pv'); const cards=[...tmp.children].filter(c=>c!==pc); if(!pc||!cards.length){ [...tmp.children].forEach(c=>box.append(c)); return; }
+  const tt=cards.map(c=>{ const s2=c.querySelector('.sec'); return s2?(s2.firstChild.textContent||'').trim():''; }); let cur=renderCos.tab||0; if(renderCos.prev){ const k=cards.findIndex(c=>c.querySelector('[data-cv="'+renderCos.prev+'"]')); if(k>=0) cur=k; } cur=Math.min(cur,cards.length-1); renderCos.tab=cur;
+  const w=h(`<div class="card cos2"><div class="cos2-l"></div><div class="cos2-r"><div class="cos2-t">${tt.map((t,i)=>`<button type="button" class="${i===cur?'on':''}" data-ct="${i}">${esc(t)}</button>`).join('')}</div><div class="cos2-b"></div></div></div>`);
+  w.querySelector('.cos2-l').append(pc); w.querySelector('.cos2-b').append(cards[cur]); w.querySelector('.cos2-t').onclick=e=>{ const b=e.target.closest('[data-ct]'); if(!b) return; renderCos.tab=+b.dataset.ct; renderCos.prev=null; renderHub(); }; box.append(w); }
 function renderCos(box){ const p=S.player, C=S.cos;
   { const pv=renderCos.prev&&COS.find(c=>c.id===renderCos.prev); const ov={}; if(pv&&pv.slot==='boot') ov.boot=pv.v; if(pv&&pv.slot==='sock') ov.sock=pv.v;
     const tagV=pv&&pv.slot==='tag'?pv.v:cosVal('tag'); const trV=pv&&pv.slot==='trail'?pv.v:cosVal('trail'); const TRN={fire:'불꽃',ice:'얼음',gold:'황금',rainbow:'무지개'};
@@ -4399,7 +4419,7 @@ function renderResult(r,g){
       const ex=h(`<div class="res-extra" hidden></div>`); const prsC=col.querySelector(':scope>.card.prs'); if(prsC){ document.querySelectorAll('.prs-m').forEach(x=>x.remove()); const pm=document.createElement('div'); pm.className='hub-modal keep prs-m'; pm.append(prsC); document.body.append(pm); } [...col.children].forEach(c=>{ if(c!==top&&c!==b) ex.append(c); }); { const mn=top.querySelector('.res-main'); if(mn){ [...mn.querySelectorAll(':scope>.chres, :scope>.res-chips, :scope>.label, :scope>.row')].forEach(x=>{ const w=h(`<div class="card"></div>`); w.append(x); ex.prepend(w); }); } }
       top.after(rw); rw.after(ex);
       try{ const sc=top.querySelector('.res-sc.u2'), kp=top.querySelector('.res-kpi.u2'), hb=top.querySelector('.h2res .h2b'); if(sc){ const hd=h(`<div class="res-hd" data-nofit></div>`); hd.append(sc); col.prepend(hd); } if(kp&&hb){ hb.append(kp); } const lvr=rw.querySelector('.rw-lv'); if(lvr){ const row=h(`<div class="card res-lvrow" data-nofit></div>`); row.append(lvr); ex.before(row); } rw.classList.add('rw2'); col.classList.add('res3'); }catch(e){ console.warn(e); }
-      const db=h(`<button class="btn" id="res-detail">${luc('clipboard-list',20)} 상세 기록${pe?' <i class="dotn">!</i>':''}</button>`); db.onclick=()=>{ const m=openExtra('상세 기록',ex); if(m){ const x=m.querySelector('#more-x'); const back=()=>{ [...m.querySelectorAll('.more-b>*')].forEach(c=>ex.append(c)); m.remove(); }; x.onclick=back; m.addEventListener('click',e=>{ if(e.target===m){ e.stopImmediatePropagation(); back(); } },true); } }; b.append(db);
+      const db=h(`<button class="btn" id="res-detail">${luc('clipboard-list',20)} 상세 기록${pe?' <i class="dotn">!</i>':''}</button>`); db.onclick=()=>{ const m=openExtra('상세 기록',ex); if(m){ try{ m.classList.add('rd-m'); const mb=m.querySelector('.more-b'); const cs=[...mb.children]; const kind=c=>c.classList.contains('np-fold')?'news':c.querySelector(':scope>.tbl, :scope .tbl')&&/팀 기록/.test(c.textContent.slice(0,30))?'team':/평점 근거|평점 계산/.test(c.textContent.slice(0,40))?'rate':'sum'; const has={}; cs.forEach(c=>{ let k=kind(c); if(c.children.length===1&&c.firstElementChild.classList.contains('label')) k='none'; c.dataset.rk=k; if(k!=='none') has[k]=1; if(c.tagName==='DETAILS') c.open=true; c.querySelectorAll('details').forEach(d=>d.open=true); }); const T=[['sum','요약'],['rate','평점'],['team','팀 기록'],['news','기사']].filter(t=>has[t[0]]); const bar=h(`<div class="rd-tabs">${T.map(([k,n],i)=>`<button type="button" class="${i===0?'on':''}" data-rt="${k}">${n}</button>`).join('')}</div>`); const setT=k=>{ bar.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.rt===k)); cs.forEach(c=>{ c.hidden=c.dataset.rk!==k; }); mb.scrollTop=0; }; bar.onclick=e=>{ const b=e.target.closest('[data-rt]'); if(b) setT(b.dataset.rt); }; mb.before(bar); setT(T[0][0]); const h3=m.querySelector('.more-h h3'); if(h3) h3.textContent=`평점 ${(+r.rating).toFixed(1)} · ${res}`; }catch(e){ console.warn(e); } const x=m.querySelector('#more-x'); const back=()=>{ [...m.querySelectorAll('.more-b>*')].forEach(c=>{ c.hidden=false; ex.append(c); }); m.remove(); }; x.onclick=back; m.addEventListener('click',e=>{ if(e.target===m){ e.stopImmediatePropagation(); back(); } },true); } }; b.append(db);
       const gbt=b.querySelector('#res-grow'); if(gbt) gbt.innerHTML=luc('trending-up',20)+` 성장 · ${S.player.points}P`; const nb=b.querySelector('#res-next'); if(nb) nb.innerHTML='다음 경기 준비 ▶'; } }catch(e){ console.warn(e); }
   show('screen-result');
   if(S.introSk==='pending'&&giftSkills().length&&!r.injured) setTimeout(()=>giftPick(go),450);
@@ -7072,7 +7092,7 @@ const FIT_SPEC={
   'player:stat':{g:[[0],[1,2]],w:[30,70]},
   'player:week':{g:[[0]],w:[100]},
   'shop:gear':{g:[[0]],w:[100]},
-  'shop:cos':{g:[[0,1],[2,3],[4,5,6,7]],w:[34,33,33]},
+  'shop:cos':{g:[[0]],w:[100]},
   'player:profile':{g:[[0,1],[2],[3,4,5]],w:[32,36,32]},
   'skill':{g:[[0,1,2,3]],w:[100]},
   'league':{g:[[0],[1]],w:[62,38],hide:['lg-ban']},

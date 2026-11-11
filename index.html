@@ -2401,7 +2401,7 @@ function renderHub(){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===nav));
   document.querySelectorAll('.tabpanel').forEach(t=>t.hidden=true);
   el('tab-'+tab).hidden=false; el('hub-title').textContent=TITLE_OF[curKey()]||'';
-  el('hub-col').classList.add('wide'); if(renderHub._lastTab!==curKey()){ const w=document.querySelector('#screen-hub .wrap'); if(w) w.scrollTop=0; if(renderHub._lastTab==='skill') renderSkill.open=false; renderHub._lastTab=curKey(); }
+  el('hub-col').classList.add('wide'); if(renderHub._lastTab!==curKey()){ const w=document.querySelector('#screen-hub .wrap'); if(w) w.scrollTop=0; if(renderHub._lastTab==='skill') renderSkill.open=null; renderHub._lastTab=curKey(); }
   const w0=document.querySelector('#screen-hub .wrap'), keepY=w0&&renderHub._lastTab===curKey()?w0.scrollTop:0; /* v93: 같은 화면을 다시 그릴 때 스크롤 위치 유지 */
   ({home:renderHome,player:renderPlayer,skill:renderSkill,shop:renderShop,league:renderLeague,transfer:renderTransfer,career:renderCareer})[tab]();
   if(keepY&&w0&&w0.scrollTop!==keepY) w0.scrollTop=keepY;

@@ -7393,7 +7393,7 @@ function coachLimit(){ return 2+staffLv('coach')+(hasItem('gym')?1:0); }
 function coachUsed(){ const c=S.coachWk; return c&&c.s===S.season&&c.r===S.round&&c.n2===(S.history||[]).length?c.n:0; }
 function coachCost(k,v){ const disc=(hasItem('mansion')?0.75:1)*(1-staffLv('coach')*0.04); return Math.round(Math.max(40,S.wage*1.2+(v-30)*6)*disc); }
 function coachSim(k,n){ const p=S.player; const cap=statCap(k); let v=p.stats[k], g=(p.tg&&p.tg[k])||0; for(let i=0;i<n&&v<cap;i++){ g+=coachGain(); while(v<cap&&g>=tgNeed(v)){ g-=tgNeed(v); v++; } } return {v,g}; } // 코치 1회 = 그 능력치 게이지 +coachGain() (높은 능력치는 여러 번 해야 +1)
-function coachModal(){ const p=S.player; const plan={}; const m=document.createElement('div'); m.className='hub-modal co-m';
+function coachModal(){ document.querySelectorAll('.co-m').forEach(x=>x.remove()); const p=S.player; const plan={}; const m=document.createElement('div'); m.className='hub-modal co-m';
   const left=()=>coachLimit()-coachUsed()-Object.values(plan).reduce((a,b)=>a+b,0);
   const costOf=k=>{ let c=0; const n=plan[k]||0; for(let i=0;i<n;i++) c+=coachCost(k,coachSim(k,i).v); return c; };
   const total=()=>STATS.reduce((a,[k])=>a+costOf(k),0)+(plan.mp?Array.from({length:plan.mp},(_,i)=>mpCost(i)).reduce((a,b)=>a+b,0):0);

@@ -589,7 +589,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const tr=await pg.evaluate(()=>{ const sv=JSON.stringify(S); const r={}; const oT=toast, oR=renderHub; toast=()=>{}; renderHub=()=>{};
       const DV=c=>(divOf(c.id)||{}).id; /* 앞 테스트에서 시즌이 돌아 승강이 있었을 수 있어 지금 소속 리그로 고름 */ const wolves=Object.values(CLUBS).filter(c=>!c.nat&&DV(c)==='en-1').sort((a,b)=>a.str-b.str)[Math.floor(Object.values(CLUBS).filter(c=>!c.nat&&DV(c)==='en-1').length/2)]; const nl=Object.values(CLUBS).filter(c=>!c.nat&&DV(c)==='nl-1').sort((a,b)=>b.str-a.str)[0]; S.clubId=wolves.id; S.loan=null;
       const A=adaptPreview(nl); r.pen=A?A.pen:0; r.lv=[lgLvOf(wolves),lgLvOf(nl)]; r.strs=[wolves.str,nl.str];
-      S.player.rep=3000; Object.keys(S.player.stats).forEach(k=>S.player.stats[k]=80); S.round=10; S.offers=[]; S.offersFor=null; S.preContract=null; S.lastYearChoice=null; S.contractEnd=S.season+2; winterWindow([]); r.len=S.win.until-S.round+1;
+      S.movedS=null; S.player.rep=3000; Object.keys(S.player.stats).forEach(k=>S.player.stats[k]=80); S.round=10; S.offers=[]; S.offersFor=null; S.preContract=null; S.lastYearChoice=null; S.contractEnd=S.season+2; winterWindow([]); r.len=S.win.until-S.round+1;
       while(S.offers&&S.offers.length) rejectOffer(0); const oRn=Math.random; Math.random=()=>0.1; let got=0; for(let i=0;i<3;i++){ S.round++; const n=[]; winTick(n); got+=n.filter(x=>/새 이적 제안|다시 연락/.test(x)).length; } Math.random=oRn; r.got=got;
       toast=oT; renderHub=oR; S=JSON.parse(sv); return r; });
     ok('v91 리그 수준: EPL(10) 중위권 → 네덜란드(7) 강팀은 해외 이동 부담(−2)만 · 겨울 시장 5R · 전부 거절해도 시장 중 새 제안', tr.pen<=2&&tr.lv[0]>tr.lv[1]&&tr.len===5&&tr.got>=2, JSON.stringify(tr));
@@ -616,6 +616,28 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const rp=p.rep; use('c_fan'); r.fan=p.rep>rp&&!document.querySelector('[data-cs="c_fan"]'); r.items=ITEMS.length; r.need=[tgNeed(85),tgNeed(90),tgNeed(70)];
       p.items=p.items.filter(x=>x!=='gym'); const l0=coachLimit(); p.items.push('gym'); r.gym=coachLimit()-l0; toast=oT; S=JSON.parse(sv); goKey('home'); return r; });
     ok('v94 소모품(회복·재활·캠프 시즌 2회·팬 미팅 라운드 1회) · 생활 혜택 12종 · 84 이상 훈련 게이지 완만', cs.cond1===80&&cs.inj===1&&cs.camp&&cs.campLim&&cs.fan&&cs.items===12&&cs.need[0]===440&&cs.need[1]===640&&cs.need[2]===300&&cs.gym===1, JSON.stringify(cs)); }
+  // v95: 이적시장당 1회 이적 · 벤치 예상 경고 · 임대 · 추천 분배 · 시즌 요약 · 가로 탭 이름 · 패스 길 판단
+  { const tr=await pg.evaluate(()=>{ const sv=JSON.stringify(S); const oT=toast, oR=renderHub; toast=()=>{}; renderHub=()=>{}; const r={}; const oRn=Math.random;
+      try{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.movedS=null; S.loan=null; S.preContract=null; S.guaranteed=false;
+        const cand=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId)[3];
+        S.offers=[{clubId:cand.id,wage:S.wage*2,years:2}]; S.offersFor='end'; acceptOffer(S.offers[0]); r.moved=S.movedS===S.season; r.done=!!(S.win&&S.win.done);
+        Math.random=()=>0.05; S.offers=[]; S.offersFor=null; S.round=2; const sc=ensureScout(); const c2=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&c.id!==cand.id)[5]; sc.f[c2.id]=95; const n=[]; winTick(n); r.newOff=(S.offers||[]).filter(x=>!x.loan).length;
+        S.round=10; S.offers=[]; S.offersFor=null; winterWindow([]); r.winterNonLoan=(S.offers||[]).filter(x=>!x.loan).length; r.rev=revEval(c2,1).p;
+        S.movedS=null; S.offers=[]; S.offersFor=null; S.history=(S.history||[]).concat([1,2,3].map(i=>({season:S.season,round:i,bench:true,club:S.clubId,type:'league'}))); S.win={k:'summer',s:S.season,until:S.round+3}; const n2=[]; winTick(n2); r.loan=(S.offers||[]).filter(x=>x.loan).length; r.loanOpt=loanOptions().length;
+        Math.random=oRn; const strong=Object.values(CLUBS).filter(c=>!c.nat&&compOvrOf(c)>=ovr()+8)[0]; if(strong){ S.offers=[{clubId:strong.id,wage:100,years:2}]; S.offersFor='mid'; r.pill=/벤치 예상/.test(offerGrid().textContent); } else r.pill='none';
+        const p=S.player; const P=recAlloc(p,30,{}); let cost=0; Object.entries(P).forEach(([k,a])=>{ cost+=ptSum(p.stats[k],a); }); r.rec={cost,up:ovrWith(p,P)-ovr(),n:Object.keys(P).length};
+        r.hof=fitLabel(h('<div class="card hofc"><div class="sh"><b>🏛️ 명예의 전당 점수</b><b class="num">120</b></div></div>')); r.best=fitLabel(h('<div class="row rec-cta" data-fl="개인 최고"><div class="card best"><span>🏆 개인 최고</span><b class="num">17골</b></div></div>')); r.num=fitLabel(h('<div class="card"><b>17골</b></div>'));
+        r.ssum=h(seasonSumHTML()).children.length; p.money=1e7; r.buy=!!buyRec();
+        const from={x:30,y:50}, to={x:30,y:40}; r.lane=[laneRisk(from,to,[{x:35,y:45,vx:0,vy:0,role:'DF'}]),laneRisk(from,to,[{x:35,y:45,vx:-14,vy:0,role:'DF'}])].map(v=>+v.toFixed(2));
+      }catch(e){ r.err=String(e).slice(0,200); } Math.random=oRn; toast=oT; renderHub=oR; S=JSON.parse(sv); return r; });
+    ok('v95 이적: 시즌 끝 이적 → 여름 새 제안 없음 · 겨울엔 임대만 · 역제안 불가 · 벤치 3경기면 임대 제안 · 경쟁자 +8 구단 "벤치 예상"', !tr.err&&tr.moved&&tr.done&&tr.newOff===0&&tr.winterNonLoan===0&&tr.rev===0&&(tr.loan>=1||tr.loanOpt===0)&&(tr.pill===true||tr.pill==='none'), JSON.stringify(tr));
+    ok('v95 추천 분배(포인트 안에서 OVR 상승) · 가로 탭 이름(명예·개인 최고, 숫자만 X) · 시즌 마감 요약 6칸 · 살 만한 것 · 달려드는 수비 예측', !tr.err&&tr.rec.cost<=30&&tr.rec.up>=2&&tr.hof==='명예'&&tr.best==='개인 최고'&&!/^\d+$/.test(tr.num)&&tr.ssum===6&&tr.buy&&tr.lane[1]>tr.lane[0], JSON.stringify({rec:tr.rec,hof:tr.hof,best:tr.best,num:tr.num,ssum:tr.ssum,buy:tr.buy,lane:tr.lane})); }
+  { const cL=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const pL=await cL.newPage(); const eL=[]; pL.on('pageerror',e=>eL.push(e.message)); await pL.goto(FILE); await pL.click('#go-create'); await pL.waitForTimeout(300);
+    const cr=await pL.evaluate(()=>{ const r=el('btn-new').getBoundingClientRect(); return {b:Math.round(r.bottom),h:innerHeight}; }); await pL.click('#btn-new'); await pL.waitForTimeout(400);
+    const L=await pL.evaluate(async()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); proSkipAll(1); S.tutSeen=true; S.compIntro=false; goKey('home'); await new Promise(r=>setTimeout(r,200)); toast('가로 알림 테스트'); const t=el('toast'); const tr=t.getBoundingClientRect();
+      goKey('career:record'); await new Promise(r=>setTimeout(r,300)); const labs=[...document.querySelectorAll('.fl-tabs button')].map(x=>x.textContent.trim()); return {tland:t.classList.contains('tland'),top:Math.round(tr.top),labs}; });
+    ok('v95 가로: 커리어 시작 버튼 화면 안 · 알림은 위쪽 · 기록 옆 탭 이름에 숫자만 있는 탭 없음', cr.b<=cr.h&&L.tland&&L.top<60&&!L.labs.some(x=>/^\d+$/.test(x))&&eL.length===0, JSON.stringify({cr,...L,eL:eL.slice(0,2)}));
+    await cL.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

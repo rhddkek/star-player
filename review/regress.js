@@ -43,7 +43,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   ok('능력치 적용: 2포인트 차감·합계 +2', afterApply.pts===before.pts-2&&afterApply.sum===sumBefore+2, `pts ${before.pts}→${afterApply.pts}, 합 ${sumBefore}→${afterApply.sum}`);
 
   // 2) 스킬 구매 → 강화 → 장착 교체
-  await pg.evaluate(()=>{ S.player.money=99999; S.player.level=12; save(); renderSkill.sel='fire'; renderSkill.f='all'; renderHub(); });
+  await pg.evaluate(()=>{ S.player.money=99999; S.player.level=12; save(); renderSkill.sel='fire'; renderSkill.f='all'; renderSkill.open=true; renderHub(); });
   await pg.click('#tabs button[data-tab="skill"]'); await pg.waitForTimeout(250);
   const m0=await pg.evaluate(()=>S.player.money);
   await pg.click('#sk-buy'); await pg.waitForTimeout(200);
@@ -255,14 +255,14 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('경기 안내: 중복 팝업 버림·선수 위 한 칸 · 버튼 상태(수비/지원) · 따라가기로 잡아도 자동 슛 없음 · 평점 변화 이유', mu.dup&&mu.one&&mu.def==='def'&&mu.sup==='sup'&&mu.passDim&&mu.chase&&mu.noCharge&&mu.lock&&mu.noShot&&/패스 성공 \+/.test(mu.why), JSON.stringify(mu)); }
   // UX 정리: 홈 · 성장 · 스킬 · 스타숍 · 기록
   { const ux=await pg.evaluate(()=>{ const r={}; S.weekAct=null; S.player.injury=0; S.endo.offers=[]; tab='home'; renderHub(); const go=el('btn-go'); r.go=!!go; { const vh=window.innerHeight, gb=go.getBoundingClientRect(); const t=el('tab-home').innerText; r.first=gb.bottom<vh-60&&/다음 경기/.test(t)&&/선발 출전|투입 예정/.test(t)&&/오늘 목표/.test(t)&&/컨디션/.test(t); r.firstInfo=Math.round(gb.bottom)+'/'+vh; r.yellow=[...el('tab-home').querySelectorAll('.btn.primary')].length; r.weekRow=!!el('tab-home').querySelector('[data-row=week]'); } r.modes=document.querySelectorAll('#sel-mode [data-mode]').length>=3; r.noMarket=!el('tab-home').textContent.includes('시장 가치');
-      tab='player'; renderPlayer.sub='stat'; renderPlayer.pend={shot:2}; S.player.points=Math.max(3,S.player.points); renderHub(); r.apply=el('pt-apply').textContent; r.sinfo=document.querySelector('.sinfo').textContent; r.wkDup=!!el('tab-player').querySelector('#wk-card'); const sh=weekSheet(); r.wk=sh.querySelectorAll('#wk-card .wk-o').length; r.wkTxt=/훈련 \+\d+% · 100% 달성 시 능력 \+1/.test(sh.textContent)&&/연계 훈련|휴식/.test(sh.textContent); sh.remove(); renderPlayer.pend={};
+      tab='player'; renderPlayer.sub='stat'; renderPlayer.pend={shot:2}; S.player.points=Math.max(3,S.player.points); renderHub(); r.apply=el('pt-apply').textContent; r.sinfo=document.querySelector('.sinfo').textContent; r.wkDup=!!el('tab-player').querySelector('#wk-card'); const sh=weekSheet(); r.wk=sh.querySelectorAll('#wk-card .wk-o').length; r.wkTxt=/훈련도 \+\d+% · 100% → 능력 \+1/.test(sh.textContent)&&/연계 훈련|휴식/.test(sh.textContent); sh.remove(); renderPlayer.pend={};
       renderPlayer.sub='profile'; renderHub(); r.prof=el('tab-player').textContent.includes('이번 시즌')&&el('tab-player').textContent.includes('시장 가치');
       renderPlayer.sub='records'; renderHub(); r.rs=document.querySelectorAll('#tab-player .rs').length>0||!(S.history||[]).length;
       tab='skill'; renderSkill.sel=null; renderSkill.f='all'; renderHub(); document.querySelector('#tab-skill [data-f="tackle"]').click(); const sel=SKILLS.find(x=>x.id===renderSkill.sel); r.fsel=sel&&sel.type==='tackle'; r.sit=!!document.querySelector('#tab-skill .sk-sit'); const ls=[...document.querySelectorAll('#tab-skill .sk')].map(b=>SKILLS.find(x=>x.id===b.dataset.sk).lvl); r.sorted=ls.every((v,i)=>!i||ls[i-1]<=v); renderSkill.f='all';
       tab='shop'; renderShop.sub='endo'; renderHub(); r.now=!!document.querySelector('#tab-shop [data-ad]')||S.player.rep<100; r.brandFold=S.player.rep>=2500||!!document.querySelector('#tab-shop details');
       renderShop.sub='gear'; renderHub(); r.buy=[...document.querySelectorAll('#tab-shop [data-gb]')].some(b=>/^구매 · |부족$/.test(b.textContent));
       renderShop.sub='cos'; renderCos.prev=null; renderHub(); document.querySelector('#tab-shop [data-cv="b_gold"]').click(); r.prev=renderCos.prev==='b_gold'&&!!document.querySelector('.cos-pv canvas')&&/축구화 · 레전드 골드/.test(document.querySelector('.cos-pv').textContent); renderCos.prev=null; tab='home'; renderHub(); return r; });
-    ok('홈 첫 화면(상태→다음 경기→선발 여부→오늘 목표→경기 시작, 노란 버튼 1개, 이번 주 준비는 한 줄) · 성장(전→후·주간 활동은 시트 하나로) · 스킬(분류↔선택·레벨순·상황 먼저) · 스타숍(지금 할 수 있는 것·구매·미리보기) · 기록(승무패)', ux.go&&ux.first&&ux.yellow===1&&ux.weekRow&&!ux.wkDup&&ux.wk>=4&&ux.wkTxt&&ux.apply&&ux.prof&&ux.rs&&ux.fsel&&ux.sit&&ux.sorted&&ux.now&&ux.buy&&ux.prev&&/배분 적용 · 2P/.test(ux.apply)&&/→/.test(ux.sinfo), JSON.stringify(ux)); }
+    ok('홈 첫 화면(상태→다음 경기→선발 여부→오늘 목표→경기 시작, 노란 버튼 1개, 이번 주 준비는 한 줄) · 성장(전→후·주간 활동은 시트 하나로) · 스킬(분류↔선택·레벨순·상황 먼저) · 스타숍(지금 할 수 있는 것·구매·미리보기) · 기록(승무패)', ux.go&&ux.first&&ux.yellow===1&&ux.weekRow&&!ux.wkDup&&ux.wk>=4&&ux.wkTxt&&ux.apply&&ux.prof&&ux.rs&&ux.fsel&&ux.sit&&ux.sorted&&ux.now&&ux.buy&&ux.prev&&/2P 적용/.test(ux.apply)&&/→/.test(ux.sinfo), JSON.stringify(ux)); }
   // 골키퍼 캐치 · 동료 패스 · 원투 침투 · 스루 강약 · 스킬 연출 · 새 필살기
   { const g2=await pg.evaluate(()=>{ S.noReplay=true; M=null; startMatch(false); el('m-overlay').hidden=true; M.paused=false; M.freeze=0; M.restart=null; M.setPiece=null; cancelAnimationFrame(raf); const r={};
       const gk=M.players.find(p=>p.team===1&&p.role==='GK'); const u=M.user; let caught=0, hold=0;
@@ -598,9 +598,9 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   }
   // v92: 알림 위치 · 경기 버튼 보조 글씨 · PC 모바일 화면
   { const tt=await pg.evaluate(()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); show('screen-hub'); tab='home'; renderHub(); toast('테스트 알림'); const t=el('toast').getBoundingClientRect(), tb=el('tabs').getBoundingClientRect();
-      const ap=S.player.career.apps; S.player.career.apps=12; S.hintMode='auto'; applyBtnPrefs(); const ng=document.querySelector('.ctl').classList.contains('nogest'); S.player.career.apps=0; applyBtnPrefs(); const ng0=document.querySelector('.ctl').classList.contains('nogest'); S.player.career.apps=ap;
+      S.hintMode='auto'; const sv=M; M={practice:false}; applyBtnPrefs(); const ng=document.querySelector('.ctl').classList.contains('nogest'); M={practice:true}; applyBtnPrefs(); const ng0=document.querySelector('.ctl').classList.contains('nogest'); M=sv;
       return {tb:Math.round(t.bottom),tabTop:Math.round(tb.top),ng,ng0}; });
-    ok('v92 알림이 아래 탭을 가리지 않음 · 경기 버튼 보조 글씨는 처음 6경기만', tt.tb<=tt.tabTop&&tt.ng&&!tt.ng0, JSON.stringify(tt)); }
+    ok('v92 알림이 아래 탭을 가리지 않음 · v93 경기 버튼 조작 설명은 연습장에서만', tt.tb<=tt.tabTop&&tt.ng&&!tt.ng0, JSON.stringify(tt)); }
   { const cP=await b.newContext({viewport:{width:1366,height:820}}); const pP=await cP.newPage(); const eP=[]; pP.on('pageerror',e=>eP.push(e.message));
     await pP.goto(FILE); await pP.waitForTimeout(400); const v0=await pP.evaluate(()=>!el('tt-view').hidden);
     await pP.click('#tt-view [data-vw="mp"]'); await pP.waitForTimeout(1500);

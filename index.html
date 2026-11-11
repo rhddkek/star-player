@@ -3002,11 +3002,11 @@ function renderSkill(){
     if(b.id==='sk-try'){ const i=p.equip.indexOf(sk.id); if(i<0||i>=slotCount()){ const e2=p.equip.findIndex((x,j)=>!x&&j<slotCount()); if(e2>=0){ p.equip[e2]=sk.id; save(); } else { toast('먼저 장착 칸에 넣어 주세요'); return; } } if(S.introTry&&S.introSk===sk.id) PR_FIRST={id:sk.id,ok:false,at:null,g0:0}; startPractice(); return; }
     if(b.id==='sk-gift'){ const slot=claimGift(sk.id); if(slot<-1) return; toast(`${sk.name} 습득! ${slot+1}번 칸에 장착 완료`); renderHub(); return; }
     if(b.id==='sk-buy'){ if(p.money<sk.price||p.level<sk.lvl) return; p.money-=sk.price; p.skills.push(sk.id); const empty=p.equip.findIndex((x,i)=>!x&&i<slotCount()); if(empty>=0){ p.equip[empty]=sk.id; toast(`${sk.name} 습득 · ${empty+1}번 칸에 장착`); } else { renderSkill.pick=sk.id; toast(`${sk.name} 습득! 장착할 칸을 눌러 주세요`); } save(); renderHub(); if(sk.id==='onetwo'&&!chalCleared('onetwo')) setTimeout(()=>toast('연습장 ▸ 🔁 원투 돌파 도전에서 바로 써 보세요'),1400); return; }
-    if(b.id==='sk-pick'){ renderSkill.pick=renderSkill.pick===sk.id?null:sk.id; renderHub(); return; }
+    if(b.id==='sk-pick'){ renderSkill.pick=renderSkill.pick===sk.id?null:sk.id; if(renderSkill.pick&&SHEET){ renderSkill.open=false; toast('장착할 칸 선택'); } renderHub(); return; } /* v93: 칸을 고를 땐 상세창을 내려 위 칸이 보이게 */
     if(b.id==='sk-off'){ const i=p.equip.indexOf(sk.id); if(i>=0) p.equip[i]=null; save(); renderHub(); return; }
     if(b.id==='sk-up'){ const R=skUpReq(sk,U.lv); const path=U.path||renderSkill.br; if(!path||p.level<R.lvl||p.money<R.price) return; p.money-=R.price; p.skillUp[sk.id]={lv:U.lv+1,path}; renderSkill.br=null; save(); toast(`${sk.name} Lv.${U.lv+1}!`); renderHub(); return; } };
   card.addEventListener('click',onSk);
-  if(OPEN){ const sh=h(`<div class="sk-sheet-bg"><div class="sk-sheet card" role="dialog" aria-label="${esc(sk.name)} 상세"><div class="sk-sheet-h"><i class="grab"></i><button class="sk-sheet-x" aria-label="닫기">✕ 닫기</button></div>${skdH}</div></div>`); sh.addEventListener('click',onSk); box.append(sh); }
+  if(OPEN){ const sh=h(`<div class="sk-sheet-bg"><div class="sk-sheet card" role="dialog" aria-label="${esc(sk.name)} 상세"><div class="sk-sheet-h"><i class="grab"></i><button class="sk-sheet-x" aria-label="닫기">✕ 닫기</button></div>${skdH}</div></div>`); sh.addEventListener('click',onSk); { const tb=el('tabs'); const r=tb&&tb.getBoundingClientRect(); if(r&&r.height>0&&r.top>innerHeight*0.6) sh.style.bottom=Math.round(innerHeight-r.top)+'px'; } box.append(sh); } /* 하단 메뉴는 가리지 않음 */
 }
 function skillName(id){ const s=SKILLS.find(x=>x.id===id); return s?s.name:'비어 있음'; }
 function typeName(t){ return {shot:'슛',dash:'돌파',tackle:'수비',pass:'패스',buff:'버프',roll:'회피'}[t]; }

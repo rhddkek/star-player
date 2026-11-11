@@ -2961,7 +2961,7 @@ function simulateOthers(){ // 내 경기 제외 전 리그 진행
    HUB UI
    ========================================================= */
 let tab='home';
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.hidden=true); el(id).hidden=false; if(id!=='screen-result') document.querySelectorAll('.prs-m').forEach(x=>x.remove()); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.hidden=true); el(id).hidden=false; try{ const L=el('chal-list'); if(L&&L.classList.contains('open')) chalOpen(false); }catch(e){} if(id!=='screen-result') document.querySelectorAll('.prs-m').forEach(x=>x.remove()); }
 function clubStars(c){ if(!c||c.nat) return 0; return clamp(Math.round((c.str-38)/57*10)/2,0.5,5); }
 function starHTML(c,big){ const n=clubStar10(c); let h=''; for(let i=1;i<=10;i++) h+=`<i class="${n>=i?'f':'e'}">★</i>`; return `<span class="stars s10${big?' big':''}" title="명성 ${n}/10">${h}<b>${n}</b></span>`; }
 function wealthTxt(c){ return ['','재정 열악','재정 보통','재정 안정','부자 구단','초부자 명문'][c.wealth||1]; }

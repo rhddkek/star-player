@@ -49,9 +49,11 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   await pg.click('#sk-buy'); await pg.waitForTimeout(200);
   const bought=await pg.evaluate(()=>({has:S.player.skills.includes('fire'),money:S.player.money,eq:S.player.equip.slice()}));
   ok('스킬 구매: 보유 추가·가격만큼 차감', bought.has&&m0-bought.money===600, `차감 ${m0-bought.money}`);
+  { const uo=await pg.$('.up-open'); if(uo){ await uo.click(); await pg.waitForTimeout(150); } }
   const br=await pg.$('button[data-br="a"]'); if(br){ await br.click(); await pg.waitForTimeout(120); }
   const m1=await pg.evaluate(()=>S.player.money); const upBtn=await pg.$('#sk-up'); if(upBtn){ await upBtn.click(); await pg.waitForTimeout(200); }
   const up=await pg.evaluate(()=>({lv:(S.player.skillUp.fire||{}).lv,path:(S.player.skillUp.fire||{}).path,money:S.player.money}));
+  await pg.evaluate(()=>{ const x=document.querySelector('.up-m .up-x'); if(x) x.click(); });
   ok('스킬 강화: Lv.2·위력 경로·비용 차감', up.lv===2&&up.path==='a'&&m1-up.money>0, JSON.stringify(up));
   await pg.click('#sk-pick'); await pg.waitForTimeout(120); await pg.click('button[data-slot="1"]',{force:true}); await pg.waitForTimeout(150);
   const eq=await pg.evaluate(()=>S.player.equip.slice());
@@ -553,7 +555,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // v88: 첫 스킬 흐름(무료 선물 → 자동 장착 → 써보기 → 한 번 성공) · 신뢰 표시 · 느린 화면에서도 경기 시간
   { const c9=await b.newContext({viewport:{width:430,height:900}}); const p9=await c9.newPage(); const e9=[]; p9.on('pageerror',e=>e9.push(e.message)); await p9.goto(FILE); await p9.click('#go-create'); await p9.click('#btn-new'); await p9.waitForTimeout(300);
     const R=await p9.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.introSk='pending'; S.player.money=10; const r={}; r.goal=nextGoals(3)[0]; r.noMoney=!nextGoals(3).some(x=>/남음|습득 가능/.test(x));
-      giftPick(()=>{ show('screen-hub'); tab='home'; renderHub(); }); r.modal=document.querySelectorAll('.gift-pick .gp-it').length; const id=document.querySelector('.gift-pick .gp-it').dataset.gp; document.querySelector('.gift-pick .gp-it').click(); r.eq=S.player.equip.includes(id); r.sel=renderSkill.sel===id; r.tryBtn=!!document.querySelector('.gift-pick [data-try]');
+      giftPick(()=>{ show('screen-hub'); tab='home'; renderHub(); }); r.modal=document.querySelectorAll('.gift-pick .gp-it').length; const id=document.querySelector('.gift-pick .gp-it').dataset.gsel; document.querySelector('.gift-pick .gp-it').click(); document.querySelector('.gift-pick #gp-go').click(); r.eq=S.player.equip.includes(id); r.sel=renderSkill.sel===id; r.tryBtn=!!document.querySelector('.gift-pick [data-try]');
       document.querySelector('.gift-pick [data-next]').click(); goKey('skill'); r.prim=(el('sk-try')||{}).className||''; r.offSm=((el('sk-off')||{}).className||'').includes('sm'); r.justEq=!!document.querySelector('.sk-justeq');
       el('sk-try').click(); r.pf=!!PR_FIRST&&PR_FIRST.id===id; const sk=SKILLS.find(x=>x.id===id); const u=M.user; setOwner(u,{clean:true}); u.x=W/2; u.y=18; M.mp=100; useSkill(S.player.equip.indexOf(id),true,0,-1); if(sk.type==='shot') M.score[0]++; M.t+=1.2; prFirstTick(); r.ok=!!(PR_FIRST&&PR_FIRST.ok)&&!el('m-overlay').hidden&&!!el('pf-next'); r.introTry=S.introTry; endPractice();
       S.starter=false; S.trust=50; renderHub(); r.trustTxt=[...document.querySelectorAll('.tstrip small')].map(x=>x.textContent).join(' | ');

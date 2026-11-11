@@ -2047,7 +2047,7 @@ details.wk-more{margin-top:8px!important;border-top:0!important;padding:0!import
     <div class="mom" id="mom" title="경기 흐름"><i id="mom-l"></i><i id="mom-r"></i></div>
     <div class="ticker" id="ticker"></div><div class="chbar" id="chbar"><span id="ch-t"></span><button id="ch-ff">⏭ 빠르게</button></div><div class="chfeed" id="chfeed"></div><div class="sit" id="sit"></div><div class="skchip" id="skchip"></div>
     <div class="bars">
-      <div class="hchips" id="hchips"><img id="hc-face" alt=""><span class="hc s"><i id="hc-i1"></i><small>체력</small><b id="hc-sta">100</b></span><span class="hc m"><i id="hc-i2"></i><small>기력</small><b id="hc-mp">100</b></span><span class="hc r"><i id="hc-i3"></i><small>평점</small><b id="hc-rt">6.0</b></span></div>
+      <div class="hchips" id="hchips"><img id="hc-face" alt=""><span class="hc s"><i id="hc-i1"></i><b id="hc-sta">100</b></span><span class="hc m"><i id="hc-i2"></i><b id="hc-mp">100</b></span><span class="hc r"><i id="hc-i3"></i><b id="hc-rt">6.0</b></span></div>
       <div class="label">체력</div><div class="bar g"><i id="b-sta" style="width:100%"></i></div>
       <div class="label" id="l-mp">기력</div><div class="bar b"><i id="b-mp" style="width:100%"></i></div>
       <div id="live-rt" class="live-rt" hidden></div><div id="scout-chip" class="scout-chip" hidden></div>
@@ -5654,7 +5654,7 @@ function requestPass(u){
   M.request=2.5; M.stats.req=(M.stats.req||0)+1;
   const theirs=M.players.filter(p=>p.team===1); const blocked=theirs.some(q=>pointSegDist(q,own,u)<1.4);
   const [,pressD]=nearest(theirs,own); const [,openD]=nearest(theirs,u);
-  if(blocked){ popup(u.x,u.y-1.5,'패스길 막힘','#ffd27f'); M.reqState='blocked'; }
+  if(blocked){ popup(u.x,u.y-1.5,'패스 길목 막힘, 각도를 바꿔요','#ffd27f'); M.reqState='blocked'; }
   else if(openD<2.2){ popup(u.x,u.y-1.5,'마크당하는 중, 떨어져요','#ffd27f'); M.reqState='marked'; }
   else if(pressD<2.0){ popup(u.x,u.y-1.5,'동료가 압박받는 중','#ffd27f'); M.reqState='pressed'; }
   else { popup(u.x,u.y-1.5,'요청!','#9fd0ff'); M.reqState='ok'; }
@@ -6961,7 +6961,7 @@ function actHint(){ // 지금 가장 쓸모 있는 행동 하나만
   if(o&&o.team===1&&!M.chasing&&newbie) return {t:K('슛','X')+' 누르고 있기 = 공 따라가기',c:'rgba(30,50,120,.85)'};
   if(!o&&b.isShot&&b.lastKicker===u) return M.after&&M.after.t>0?{t:'방향키 = 공 휘기 · 아래로 = 띄우기',c:'rgba(120,90,10,.9)'}:null;
   if(!o&&(b.z>1.1||b.vz>3)&&b.passTarget===u) return {t:'점선 원 = 공이 떨어질 곳',c:'rgba(20,90,90,.9)'};
-  if(!o&&dist(b,u)<14) return {t:newbie?'공 따라가기 · '+K('슛','X'):'공 따라가기'};
+  if(!o&&dist(b,u)<14) return {t:newbie?'공을 먼저 잡자! ('+K('슛','X')+' 누르면 자동으로 따라감)':'공을 먼저 잡자!'};
   return null; }
 function ahDom(ah){ const e=el('ahint'); if(!e) return; const t=ah?ah.t:''; if(e._t!==t){ e._t=t; e.textContent=t; e.style.background=(ah&&ah.c)||''; e.classList.toggle('show',!!t); e._p=0; }
   if(t&&!e._p){ const tops=[...document.querySelectorAll('.ctl button')].filter(x=>x.offsetParent&&x.getBoundingClientRect().height>0).map(x=>x.getBoundingClientRect().top); if(tops.length){ e.style.bottom=Math.round(innerHeight-Math.min(...tops)+8)+'px'; e._p=1; } } }

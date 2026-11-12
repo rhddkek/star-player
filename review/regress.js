@@ -55,7 +55,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const up=await pg.evaluate(()=>({lv:(S.player.skillUp.fire||{}).lv,path:(S.player.skillUp.fire||{}).path,money:S.player.money}));
   await pg.evaluate(()=>{ const x=document.querySelector('.up-m .up-x'); if(x) x.click(); });
   ok('스킬 강화: Lv.2·위력 경로·비용 차감', up.lv===2&&up.path==='a'&&m1-up.money>0, JSON.stringify(up));
-  await pg.click('#sk-pick'); await pg.waitForTimeout(120); await pg.click('button[data-slot="1"]',{force:true}); await pg.waitForTimeout(150);
+  await pg.click('#sk-pick'); await pg.waitForTimeout(120); await pg.click('.sl-m [data-sli="1"]'); await pg.click('#sl-ok'); await pg.waitForTimeout(150);
   const eq=await pg.evaluate(()=>S.player.equip.slice());
   ok('장착 위치 변경: 2번 칸에 화염 슛, 중복 없음', eq[1]==='fire'&&eq.filter(x=>x==='fire').length===1, JSON.stringify(eq));
 

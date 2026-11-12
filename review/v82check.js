@@ -43,10 +43,10 @@ const {chromium}=require('playwright');
   // ⑧ 역오퍼: 이적시장 · 고향팀 가능성 · 3번 제한 · 수락 시 제안 추가
   { const P=S.player; P.age=33; S.contractEnd=S.season; S.offers=[]; S.offersFor=null; S.win={k:'winter',s:S.season,until:S.round+2}; S.rev=null; const home=CLUBS[S.homeClub];
     const eHome=revEval(home,1).p; const big=Object.values(CLUBS).filter(c=>!c.nat&&divOf(c.id)).sort((a,b2)=>b2.str-a.str)[0]; const eBig=revEval(big,1);
-    goKey('transfer'); const card=!!document.querySelector('.rv-c'); revModal(); const m=document.querySelector('.rv-m'); m.querySelector('[data-rt="home"]').click(); const hrow=m.querySelector(`[data-rc="${home.id}"]`); hrow&&hrow.click(); const dmN=m.querySelectorAll('[data-dm]').length;
+    renderTransfer.t='offer'; goKey('transfer'); const card=!!document.querySelector('.rv-c'); revModal(); const m=document.querySelector('.rv-m'); m.querySelector('[data-rt="home"]').click(); const hrow=m.querySelector(`[data-rc="${home.id}"]`); hrow&&hrow.click(); const dmN=m.querySelectorAll('[data-dm]').length;
     const res=revSend(home.id,0); const offered=(S.offers||[]).some(o=>o.clubId===home.id&&o.rev&&o.home); const dup=revSend(home.id,0);
     const others=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==home.id&&c.id!==S.clubId&&divOf(c.id)).slice(0,5); others.forEach(c=>revSend(c.id,1)); const n=revState().n; m.remove();
-    goKey('transfer'); const grid=document.querySelectorAll('.ofc').length; const pill=[...document.querySelectorAll('.ofc .pill')].some(x=>/고향팀/.test(x.textContent));
+    goKey('transfer'); const grid=document.querySelectorAll('.ofx-c.hd[data-pick]').length; const pill=[...document.querySelectorAll('.ofx-c.hd .tg')].some(x=>/고향팀/.test(x.textContent));
     S.contractEnd=S.season+2; S.rev=null; const fee=revEval(big,1);
     r.rev={eHome:+eHome.toFixed(2),eBig:+eBig.p.toFixed(2),bigWhy:eBig.why,card,dmN,ok:res&&res.ok,offered,dup:dup===null,n,grid,pill,feeWhy:fee.why.slice(0,20)}; S.offers=[]; S.offersFor=null; S.win=null; }
   // ⑨ 고향팀의 부름: 33세 FA면 시즌 끝 제안에 고향팀

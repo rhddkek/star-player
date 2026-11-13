@@ -2591,6 +2591,86 @@ body.land-fit #tab-home .sgoal[data-pin]{flex:1 1 0!important;min-height:0!impor
 }
 
 /*</u7>*/
+
+
+
+
+
+
+/*<u8>*/
+/* v118 · 결과 화면 진척 */
+.pg3{display:flex;flex-direction:column;gap:5px;margin-top:8px;text-align:left}
+.pg{display:grid;grid-template-columns:auto minmax(0,auto) minmax(40px,1fr) auto;align-items:center;column-gap:8px;font-size:.84rem;padding:4px 8px;border-radius:10px;background:#f6efdf}
+.pg .l{font-size:.7rem;font-weight:800;color:#fff;background:#16284e;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.pg .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pg>b{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;justify-self:end;grid-column:4}
+.pg>b i{font-style:normal;color:#15845a}
+.pg:not(:has(.pgb))>b{grid-column:3 / 5}
+.pg.ok{background:#dcf5e8}.pg.ok .l{background:#15845a}
+.pg.rd .l{background:#8a4b08}
+.pgb{position:relative;height:8px;border-radius:99px;background:#e2d8c2;overflow:hidden}
+.pgb u{position:absolute;inset:0 auto 0 0;background:#9fb6a8;border-radius:99px}
+.pgb em{position:absolute;inset:0 auto 0 0;background:#1fae74;border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.pg.rd .pgb em{background:#e08a1e}
+.pg-n{display:flex;align-items:center;gap:6px;font-size:.84rem;padding:4px 8px;border-radius:10px;background:#fff1cc;color:#7a4a00;border:1.5px dashed #e8b84a}
+.pg-n b{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pg-x{font-size:.78rem;color:#4b5568;display:flex;gap:6px;align-items:baseline;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg-x span{flex:none;font-weight:800;color:#16284e}
+body.land-fit .res-main.has-pg .res-why,body.land-fit .res-main.has-pg .res-tl{display:none!important}
+body.land-fit .res-main.has-pg{justify-content:flex-start!important}
+body.land-fit .res-main.has-pg .res-badge{margin-bottom:2px!important;padding-block:2px!important}
+body.land-fit .pg3{gap:3px;margin-top:4px}
+body.land-fit .pg{padding:2px 6px;font-size:.76rem;column-gap:6px}
+body.land-fit .pg-n{padding:2px 6px;font-size:.76rem}
+body.land-fit .pg-x{font-size:.7rem}
+@media (orientation:landscape) and (max-height:340px){ body.land-fit .pg-x{display:none} body.land-fit .pg .l{display:none} }
+/* v118 · 속보 헤드라인 */
+.hl-m{display:grid;place-items:center;background:rgba(8,14,30,.72);z-index:120}
+.hl-c{width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 20px);overflow-y:auto;background:#fbf7ec;border:3px solid #16213a;border-radius:16px;padding:12px 16px 14px;text-align:center;animation:hlIn .45s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes hlIn{from{transform:scale(.86) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+.hl-mast{display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px double #16213a;padding-bottom:4px;margin-bottom:6px}
+.hl-mast b{font-family:var(--font-display,inherit);font-size:1.05rem;letter-spacing:.02em}
+.hl-mast span{font-size:.72rem;color:#5b6577;font-weight:700}
+.hl-ic{font-size:2.2rem;line-height:1.1}
+.hl-h{margin:2px 0 4px;font-size:1.32rem;line-height:1.25;font-weight:900;color:#16213a;text-wrap:balance}
+.hl-s{font-size:.86rem;color:#4b5568;font-weight:700}
+.hl-q{margin:8px 0 6px;padding:6px 10px;background:#f1e8d2;border-radius:10px;font-weight:700;font-size:.9rem}
+.hl-q cite{display:block;font-style:normal;font-size:.74rem;color:#6b7385;margin-top:2px}
+.hl-r{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:8px}
+.hl-r span{font-size:.74rem;font-weight:800;background:#e6dfcd;border-radius:99px;padding:2px 8px}
+.hl-go{min-height:42px}
+@media (orientation:landscape) and (max-height:420px){ .hl-c{width:min(560px,calc(100vw - 24px));padding:8px 14px 10px} .hl-ic{font-size:1.6rem} .hl-h{font-size:1.15rem} .hl-q{margin:5px 0 4px} }
+/* v118 · 홈 목표 카드: 레이스·레이더 */
+.sg-x small{display:block;font-size:.74rem;color:#5b6577;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-x.rd .bar i{background:#e08a1e!important}
+.sg-x .vz{font-style:normal;font-size:.68rem;font-weight:800;background:#ffe3a6;color:#8a4b08;border-radius:99px;padding:0 6px;margin-left:4px}
+.sgoal.u2c .sg.sg-x{display:block!important}
+.sgoal.u2c .sg.sg-x span{font-size:.95rem!important}
+.sgoal.u2c .sg.sg-x b{font-size:1rem!important}
+body.land-fit #tab-home .sgoal.u2c .sg{padding:4px 0!important}
+body.land-fit #tab-home .sgoal.u2c .sg span{font-size:.92rem!important}
+body.land-fit #tab-home .sgoal.u2c .sg b{font-size:1rem!important}
+body.land-fit #tab-home .sgoal .bar.m{height:6px}
+/* v118 · 아주 낮은 가로(SE): 결과 화면 버튼 한 줄 · 머리줄 얇게 → 가운데 카드 공간 확보 */
+@media (orientation:landscape) and (max-height:340px){
+ body.land-fit #result-col.res3>.res-go{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;gap:6px!important;margin-top:4px!important}
+ body.land-fit #result-col.res3>.res-go .btn{min-height:36px!important;padding:4px 10px!important;font-size:.88rem!important;width:auto!important;grid-column:auto!important}
+ body.land-fit #result-col.res3>.res-go #res-next{order:2}
+ body.land-fit #result-col.res3>.res-go #res-grow{order:1}
+ body.land-fit #result-col.res3>.res-go #res-detail{order:3}
+ body.land-fit #result-col.res3>.res-hd .res-sc.u2 .t{padding-block:2px!important;min-height:0!important}
+ body.land-fit #result-col.res3>.res-hd .res-sc.u2 .sc{font-size:1.5rem!important}
+ body.land-fit #result-col.res3>.res-lvrow{padding:0 10px!important;margin-top:3px!important}
+}
+@media (orientation:landscape) and (max-height:340px){
+ body.land-fit .pg{grid-template-columns:minmax(0,auto) minmax(40px,1fr) auto}
+ body.land-fit .pg>b{grid-column:3}
+ body.land-fit .pg:not(:has(.pgb))>b{grid-column:2 / 4}
+}
+body.land-fit .fl-col>.res-main.has-pg:not(.fl-fill){flex-shrink:0!important}
+#cont-desc{white-space:pre-line}
+
+/*</u8>*/
 </style>
 
 <!-- ============ TITLE / NEW PLAYER ============ -->
@@ -3317,7 +3397,7 @@ function gearPrice(slot,tier){ const sl=GEAR_SLOTS.find(x=>x.id===slot); return 
 function gearMaxTier(){ const d=divOf(S.clubId); const div1=d&&d.id.endsWith('-1'); let t=1; GEAR_TIERS.forEach((x,i)=>{ if(S.player.rep>=x.rep&&(!x.div1||div1)) t=i+1; }); return t; }
 function gearEffect(slot,g){ // 한 장비의 효과
   const t=g.tier, b=GEAR_BRANDS.find(x=>x.id===g.brand), e={st:{},inj:0,sta:0,mp:0,cd:0};
-  const worn=slot==='boots'&&(g.dur!=null&&g.dur<=0)?0.5:1;
+  const worn=slot==='boots'&&(g.dur!=null&&g.dur<=0)?0.8:1;
   if(slot==='boots'){ e.st[b.k]=Math.round([1,2,3,4,5][t-1]*worn); const s2=[0,0,0,1,1][t-1]; if(s2) e.st[b.k2]=(e.st[b.k2]||0)+s2; }
   if(slot==='guard'){ e.inj=[0.1,0.2,0.3,0.4,0.5][t-1]; const tk=[0,0,1,1,1][t-1]; if(tk) e.st.tackle=tk; }
   if(slot==='wear'){ e.sta=[0.05,0.08,0.12,0.16,0.2][t-1]; const s=[0,0,1,1,1][t-1]; if(s) e.st.sta=s; }
@@ -3749,6 +3829,51 @@ function nextAct(ev){ const p=S.player; const L=[];
 function nactCard(ev){ const L=nextAct(ev); const a=L[0]; if(!a) return null; const more=L.length-1;
   const c=h(`<div class="card u2c nact" data-fl="할 일" ${innerWidth>=720?'data-pin':''}><div class="u2h">${luc('target',20)} 지금 할 일${more>0?`<small>외 ${more}개</small>`:''}</div><div class="na-b"><span class="na-ic">${luc(a.ic,26)}</span><div><b>${esc(a.t)}</b><small>${esc(a.d)}</small></div></div><button class="btn block na-go" type="button">${esc(a.b)} ›</button></div>`);
   c.querySelector('.na-go').onclick=()=>a.go(); return c; }
+/* v118: 한 경기만 더 · 목표 사다리·이적 레이더·수상 레이스·헤드라인·다음 화 예고 */
+function raceInfo(){ try{ const p=S.player; if(!p||S.prologue||p.pos==='DF'||!S.clubId||!CLUBS[S.clubId]||CLUBS[S.clubId].nat) return null; const d=divOf(S.clubId); if(!d||!S.pstats||!S.pstats.me) return null; const f=p.pos==='FW'?'g':'a'; const T=scorerTable(d.id,f); const i=T.findIndex(x=>x.me); if(i<0) return null; const me=T[i], top=i===0?T[1]:T[0]; const L=seasonLen(d.id);
+  return {f,lab:f==='g'?'득점':'도움',u:f==='g'?'골':'개',rank:i+1,mine:me[f]||0,other:top?(top[f]||0):0,oname:top?top.name:'',gap:top?((top[f]||0)-(me[f]||0)):0,first:i===0,show:S.round>Math.max(4,Math.floor(L/4))&&(me[f]||0)>0}; }catch(e){ return null; } }
+function raceTxt(R){ if(!R) return ''; if(R.first) return R.gap===0?`${R.lab} 공동 선두 · ${R.oname}`:`${R.lab} 선두 · 2위와 ${-R.gap}${R.u} 차`; return `${R.lab} ${R.rank}위 · 1위 ${josa(R.oname,'과','와')} ${R.gap}${R.u}`; }
+function winRound(){ const d=divOf(S.clubId); return d?Math.ceil(seasonLen(d.id)/2)+1:0; }
+function radarInfo(){ try{ const sc=S.scout; if(!sc||!sc.f||S.prologue) return null; const ids=Object.keys(sc.f).filter(id=>CLUBS[id]&&id!==S.clubId); if(!ids.length) return null; ids.sort((a,b)=>sc.f[b]-sc.f[a]); const id=sc.visit&&ids.includes(sc.visit)?sc.visit:ids[0]; const c=CLUBS[id], v=sc.f[id]||0, left=Math.max(0,70-v); const wr=winRound();
+  return {id,c,v,n:left?Math.max(1,Math.ceil(left/13)):0,ready:v>=70,visit:sc.visit===id,when:S.round<wr?`겨울 이적시장(${wr}R)`:'시즌 종료 후',more:ids.length-1}; }catch(e){ return null; } }
+function radarTxt(R){ if(!R) return ''; if(R.ready) return `제안 준비 · ${R.when}에 연락`; return `${R.visit?'다음 경기 스카우트 참관 · ':''}제안까지 스카우트 앞 좋은 경기(평점 7+) 약 ${R.n}번`; }
+function seasonGoalsNow(){ return (S.history||[]).filter(m=>m.season===S.season&&!m.injured&&m.type!=='nat').reduce((a,m)=>a+(m.goals||0),0); }
+function ladderSnap(){ try{ const p=S.player, c=p.career||{}; const G=sgEnsure(); return {xp:p.xp||0,lv:p.level,cg:c.goals||0,apps:c.apps||0,sg:G?G.goals.map(g=>({pct:sgPct(g),v:sgVal(g)})):[],sc:S.scout&&S.scout.f?{...S.scout.f}:{},race:raceInfo(),sgBest:Math.max(0,...(S.seasonLog||[]).map(l=>l.g||0)),sgNow:seasonGoalsNow(),started:(S.history||[]).some(h=>!h.bench&&!h.injured&&h.type!=='nat'),leg:S.legacy&&S.legacy[S.clubId]?S.legacy[S.clubId].n:0}; }catch(e){ return null; } }
+function goalStreak(){ const H=(S.history||[]).filter(m=>!m.injured&&!m.dnp); let n=0; for(let i=H.length-1;i>=0;i--){ if((H[i].goals||0)>0) n++; else break; } return n; }
+function beatsOf(r,g,pre){ const B=[]; if(!pre||r.injured||r.dnp||S.prologue) return B; const p=S.player, c=p.career||{}, me=r.ev.me, opp=r.opp; const nm=p.name; const sc=`${me.short||me.name} ${g.myG}:${g.oppG} ${opp.short||opp.name}`;
+  const add=(pr,ic,hd,sub,q,who)=>B.push({pr,ic,h:hd,sub,q,who});
+  if(pre.apps===0&&(c.apps||0)>=1) add(100,'🎬',r.goals?`데뷔전 골! ${nm}, 화려한 신고식`:`${p.age}세 ${nm}, 프로 데뷔`,sc,r.goals?'"첫 경기에서 골이라니, 물건이 들어왔다."':'"첫 단추는 끼웠다. 이제 시작이야."','감독');
+  else if(pre.cg===0&&(c.goals||0)>0) add(95,'⚽',`${nm}, 프로 첫 골`,sc,'"이 골은 오래 기억될 거예요."','팬');
+  if((r.goals||0)>=3) add(98,'🎩',`${nm} 해트트릭! 혼자 ${r.goals}골`,sc,'"오늘은 막을 방법이 없었다."','상대 감독');
+  [10,25,50,100,150,200,300,400].forEach(m=>{ if(pre.cg<m&&(c.goals||0)>=m&&m>1) add(90,'🏅',`${nm}, 커리어 ${m}골 돌파`,`${p.age}세 · 통산 ${c.goals}골`,'"숫자가 증명하는 선수."','해설'); });
+  [50,100,200,300,500].forEach(m=>{ if(pre.apps<m&&(c.apps||0)>=m) add(78,'🏟️',`프로 ${m}경기 출전`,`${p.age}세 · 통산 ${c.goals||0}골 ${c.assists||0}도움`,'"꾸준함이 재능이다."','감독'); });
+  if(pre.apps>0&&!pre.started&&!r.bench&&r.ev.type!=='nat') add(85,'⭐',`${nm}, 첫 선발 출전`,sc,'"이제 증명할 차례다."','감독');
+  const sgN=seasonGoalsNow(); if(pre.sgBest>=3&&pre.sgNow<=pre.sgBest&&sgN>pre.sgBest) add(76,'📈',`개인 시즌 최다골 경신 · ${sgN}골`,`이전 최고 ${pre.sgBest}골`,'"매 시즌 한 단계씩 올라가네."','해설');
+  const st=goalStreak(); if((r.goals||0)>0&&st>=3) add(70+Math.min(st,8),'🔥',`${st}경기 연속골`,sc,st>=5?'"골 냄새를 맡는 선수."':'"감이 올라왔다."','팬');
+  const R=raceInfo(); if(R&&R.first&&R.show&&pre.race&&!pre.race.first&&R.mine>=3) add(75,'🏁',`${R.lab} 선두 등극 · ${R.mine}${R.u}`,`2위 ${R.oname} ${R.other}${R.u}`,'"득점왕 레이스가 뜨거워졌다."','해설');
+  if(S.rival&&S.rival.club===opp.id&&(r.goals||0)>0&&g.myG>g.oppG) add(74,'⚔️',`라이벌전 승리, ${nm} 골`,`라이벌 ${S.rival.name} 앞에서 · ${sc}`,`"${S.rival.name}? 오늘은 내가 주인공."`,nm);
+  try{ if(formerClubs().has(opp.id)&&(r.goals||0)>0) add(72,'🔁',`친정 ${opp.short||opp.name}에 비수`,sc,'"세리머니는 자제했어요."',nm); }catch(e){}
+  return B.sort((a,b)=>b.pr-a.pr); }
+function nearMiss(){ const L=[]; try{ const p=S.player, c=p.career||{}; const G=sgEnsure(); if(G) G.goals.forEach(g=>{ if(sgDone(g)||g.k==='rank'||g.k==='avg') return; const left=g.n-sgVal(g); if(left>0&&left<=2) L.push([left,`시즌 목표 ${g.k==='g'?'득점':g.k==='ga'?'공격 포인트':g.k==='apps'?'출전':g.t}까지 ${left}${g.k==='g'?'골':g.k==='apps'?'경기':'개'}`]); });
+  const R=raceInfo(); if(R&&R.show&&!R.first&&R.gap<=2) L.push([R.gap+0.5,`${R.lab} 1위까지 ${R.gap}${R.u} · ${R.rank}위`]);
+  const Q=radarInfo(); if(Q&&!Q.ready&&Q.n===1) L.push([1.2,`${Q.c.short||Q.c.name} 제안까지 좋은 경기 1번`]);
+  const m=[10,25,50,100,150,200,300,400].find(x=>x>(c.goals||0)); if(m&&m-(c.goals||0)<=3&&c.goals>0) L.push([m-(c.goals||0)+0.3,`커리어 ${m}골까지 ${m-(c.goals||0)}골`]);
+  const need=xpNeed(p.level), left=need-Math.max(0,Math.round(p.xp||0)); if(left>0&&left<=need*0.12) L.push([1.5,`Lv.${p.level+1}까지 XP ${left.toLocaleString()}`]);
+  const ln=legN(S.clubId), nt=LEG_T.find(t=>t[0]>ln); if(nt&&nt[0]-ln===1&&ln>0) L.push([2,`${CLUBS[S.clubId].short||CLUBS[S.clubId].name} ${nt[1]}까지 1시즌`]); }catch(e){}
+  return L.sort((a,b)=>a[0]-b[0]).map(x=>x[1])[0]||''; }
+function nextPreview(){ try{ const nx=nextEvent(); if(!nx) return '시즌 마무리 · 시상식'; const bits=[`${nx.home?'홈':'원정'} vs ${nx.opp.short||nx.opp.name}`]; const st=matchStory(nx); if(st) bits.push(st.replace(/^\S+\s/,'')); if(S.scout&&S.scout.visit&&CLUBS[S.scout.visit]) bits.push(`👀 ${CLUBS[S.scout.visit].short||CLUBS[S.scout.visit].name} 스카우트 참관`); const wr=winRound(); if(nx.type==='league'&&S.round<wr&&wr-S.round<=3) bits.push(`이적시장까지 ${wr-S.round}경기`); return bits.join(' · '); }catch(e){ return ''; } }
+function progRows(r,g){ const pre=g.pre||{}; const rows=[]; const bar=(a,b)=>`<div class="pgb"><u style="width:${Math.round(a*100)}%"></u><em data-w="${Math.round(b*100)}" style="width:${Math.round(a*100)}%"></em></div>`;
+  try{ const o=(r.objRes||[]).find(x=>x.main)||(r.objRes||[])[0]; if(o) rows.push(`<div class="pg ${o.done?'ok':''}"><span class="l">경기 목표</span><span class="t">${esc(o.t.replace(/ ?\d+(회|개)$/,''))}</span><b>${o.done?'✓ ':''}${Math.min(o.v||0,o.n)}/${o.n}</b></div>`); }catch(e){}
+  try{ const G=sgEnsure(); if(G){ let best=-1,bi=-1; G.goals.forEach((x,i)=>{ if(x.k==='rank') return; const d=sgPct(x)-((pre.sg&&pre.sg[i])?pre.sg[i].pct:0); const sc=(sgDone(x)?0:1)*2+d*5+sgPct(x); if(sc>best){ best=sc; bi=i; } }); if(bi>=0){ const x=G.goals[bi]; const a=(pre.sg&&pre.sg[bi])?pre.sg[bi].pct:sgPct(x); const dv=sgVal(x)-((pre.sg&&pre.sg[bi])?pre.sg[bi].v:sgVal(x)); rows.push(`<div class="pg ${sgDone(x)?'ok':''}"><span class="l">시즌</span><span class="t">${x.k==='g'?'득점':x.k==='avg'?'평점':x.k==='ga'?'공격 포인트':x.k==='apps'?'출전':esc(x.t)}</span>${bar(a,sgPct(x))}<b>${sgDone(x)?'✓ ':''}${sgFmt(x).replace(/ \/ /,'/')}${dv>0&&x.k!=='avg'?` <i>+${dv}</i>`:''}</b></div>`); } } }catch(e){}
+  try{ const Q=radarInfo(); if(Q){ const v0=pre.sc&&pre.sc[Q.id]!=null?pre.sc[Q.id]:Q.v; rows.push(`<div class="pg rd ${Q.ready?'ok':''}"><span class="l">이적</span><span class="t">${esc(Q.c.short||Q.c.name)}</span>${bar(Math.min(1,v0/70),Math.min(1,Q.v/70))}<b>${Q.ready?'제안 준비':`${Q.v}/70`}${Q.v>v0?` <i>+${Q.v-v0}</i>`:''}</b></div>`); }
+    else { const ln=legN(S.clubId), nt=LEG_T.find(t=>t[0]>ln); const R=raceInfo(); if(R&&R.show) rows.push(`<div class="pg"><span class="l">레이스</span><span class="t">${R.lab} ${R.rank}위</span><b>${esc(raceTxt(R).replace(/^\S+ (\d+위 · |선두 · )?/,''))}</b></div>`); else if(nt&&ln>0) rows.push(`<div class="pg"><span class="l">레거시</span><span class="t">${nt[1]}</span>${bar(ln/nt[0],ln/nt[0])}<b>${ln}/${nt[0]}시즌</b></div>`); } }catch(e){}
+  return rows; }
+function progBlock(r,g){ const rows=progRows(r,g); if(!rows.length) return null; const nm=nearMiss(), np=nextPreview();
+  const el2=h(`<div class="pg3">${rows.join('')}${nm?`<div class="pg-n">${luc('target',16)} <b>${esc(nm)}</b></div>`:''}${np?`<div class="pg-x"><span>다음</span>${esc(np)}</div>`:''}</div>`);
+  setTimeout(()=>el2.querySelectorAll('em[data-w]').forEach(e=>e.style.width=e.dataset.w+'%'),380); return el2; }
+function headlinePop(beats,done){ const top=(beats||[]).filter(b=>b.pr>=70); if(!top.length){ done(); return; } const b=top[0], rest=beats.filter(x=>x!==b).slice(0,3);
+  const m=h(`<div class="hub-modal keep hl-m"><div class="card hl-c"><div class="hl-mast"><b>스타 스포츠</b><span>속보 · 시즌 ${S.season} ${S.round}R</span></div><div class="hl-ic">${b.ic}</div><h2 class="hl-h">${esc(b.h)}</h2><div class="hl-s">${esc(b.sub)}</div><blockquote class="hl-q">${esc(b.q)}<cite>— ${esc(b.who)}</cite></blockquote>${rest.length?`<div class="hl-r">${rest.map(x=>`<span>${x.ic} ${esc(x.h)}</span>`).join('')}</div>`:''}<button class="btn primary block hl-go" type="button">계속 ›</button></div></div>`);
+  const close=()=>{ m.remove(); done(); }; m.querySelector('.hl-go').onclick=close; m.addEventListener('click',e=>{ if(e.target===m) close(); }); document.body.append(m); try{ sfx&&sfx('cheer'); }catch(e){} }
 function renderHome(){
   const ev=nextEvent();
   const p=S.player, club=CLUBS[S.clubId], d=divOf(S.clubId);
@@ -3775,7 +3900,7 @@ function renderHome(){
     const startTxt=(ev.type==='nat'?'🇰🇷 국가대표 경기':outNow?'🚫 명단 제외':benchNow?'🪑 벤치 · 60′ 투입':'선발 출전')+(sel&&sel.why&&ev.type!=='nat'&&!(sel.k==='bench'&&sel.why==='신뢰 부족')?' · '+sel.why:'');
     const trustTxt=S.trust==null?'':gu?'출전 보장 계약':benchNow?`벤치 · 선발 기준 ${TT.up} (−${Math.max(0,TT.up-S.trust)})${TT.up>TRUST_UP?' · 경쟁↑':''}`:`선발 · 유지 기준 ${TT.down}`;
     const du=ev.type!=='nat'?((DUTIES[p.pos]||DUTIES.FW)[tacticOf(ev.me).id]||DUTIES.FW.counter):null; const ov=du?objView(dutyObjs(du)):[];
-    const chips=[]; if(S.rival&&S.rival.club===opp.id) chips.push(`<span class="pill info">라이벌전</span>`); if(S.echo&&S.echo.left>0) chips.push(`<span class="pill ${S.echo.neg?'bad':'good'}">${S.echo.neg?'감독 냉랭':'팬 응원'}</span>`); if(S.startLock>0) chips.push('<span class="pill acc">선발 약속</span>'); if(adaptPen()) chips.push(`<span class="pill bad">적응 중 · 능력치 −${adaptPen()} · ${S.adaptL.left}경기 남음</span>`); if(winOpen()) chips.push(`<span class="pill info">${S.win.k==='summer'?'여름':'겨울'} 이적시장 · ${winLeft()}R 남음</span>`);
+    const chips=[]; if(S.rival&&S.rival.club===opp.id) chips.push(`<span class="pill info">라이벌전</span>`); if(S.echo&&S.echo.left>0) chips.push(`<span class="pill ${S.echo.neg?'bad':'good'}">${S.echo.neg?'감독 냉랭':'팬 응원'}</span>`); if(S.startLock>0) chips.push('<span class="pill acc">선발 약속</span>'); if(S.scout&&S.scout.visit&&CLUBS[S.scout.visit]&&ev.type!=='nat') chips.push(`<span class="pill info">👀 ${esc(CLUBS[S.scout.visit].short||CLUBS[S.scout.visit].name)} 스카우트</span>`); if(adaptPen()) chips.push(`<span class="pill bad">적응 중 · 능력치 −${adaptPen()} · ${S.adaptL.left}경기 남음</span>`); if(winOpen()) chips.push(`<span class="pill info">${S.win.k==='summer'?'여름':'겨울'} 이적시장 · ${winLeft()}R 남음</span>`);
     const MODES=[['chance','찬스',benchNow?'60′ 투입 · 보상 100%':(S.seenChanceTip?'보상 100%':'찬스만 직접 · 보상 100%')],['play','풀경기',benchNow?'60′부터 · 보상 100%':'90분 · 보상 100%'],['auto','자동','보상 45%']].concat(isL?[['batch','5경기','보상 45% · 컵·라이벌전 앞 정지']]:[]);
     const md2=MODES.find(x=>x[0]===mode)||MODES[0];
     const tl=(S.trustLog||[]).slice(0,2);
@@ -3811,9 +3936,10 @@ function renderHome(){
     try{ const C=S.chal; const cd=C&&C.id&&!C.done&&C.season===S.season&&CHALLENGES.find(x=>x.id===C.id); if(cd){ const hs=(S.history||[]).filter(m=>m.season===S.season&&m.type==='league'&&!m.injured); let pr=''; if(C.id==='bench') pr=`선발 ${hs.filter(m=>!m.bench).length}/16경기`; else if(C.id==='invin') pr=C.fail?'실패':`무패 ${hs.length}경기`; else if(C.id==='comeback'){ const rt=hs.filter(m=>m.rating>0); pr=`평점 ${rt.length?(rt.reduce((a,m)=>a+m.rating,0)/rt.length).toFixed(2):'-'} · ${rt.length}/12경기`; } else if(C.id==='golden'){ const me=scorerTable(divOf(S.clubId).id,'g').find(r=>r.me); pr=`${me?me.g:0}골`; } else { const st=standings(divOf(S.clubId).id); pr=`현재 ${st.findIndex(x=>x.c===S.clubId)+1}위`; } const cc=h(`<div class="card u2c chal2" data-pin><div class="ch2-t"><i>${cd.ic}</i><b>${cd.t}</b></div><div class="ch2-p ${C.fail?'f':''}">${pr}</div><small>목표 · ${CHAL_SHORT[C.id]||cd.goal}</small></div>`); (typeof side!=='undefined'&&side?side:box).append(cc); } }catch(e){}
     const gc=h(`<div class="card sgoal u2c" ${innerWidth>=720&&LAND_MQ.matches?'data-pin':''}><div class="u2h">${luc('flag',20)} 시즌 목표<span class="form5 sm sg-f">${formChips().replace(/>승</g,'>W<').replace(/>무</g,'>D<').replace(/>패</g,'>L<')}</span></div><div class="sh" hidden><b>시즌 목표</b><small>${G.vow==='bold'?'🔥 큰소리 · 보상 1.5배':G.vow?'🙂 차분하게':'감독이 정한 목표'} · ${done}/${G.goals.length}</small></div>
       ${G.goals.map(g=>{ const dn=sgDone(g); return `<div class="sg ${dn?'done':''}"><div class="row between"><span>${g.team?'🏟':g.k==='avg'?'⭐':'⚽'} ${esc(g.k==='g'?'득점':g.k==='avg'?'평점':g.k==='ga'?'공격 포인트':g.k==='apps'?'출전':g.t)}</span><b>${dn?'✅ ':''}${sgFmt(g)}</b></div><div class="bar m"><i style="width:${Math.round(sgPct(g)*100)}%"></i></div></div>`; }).join('')}
-      ${G.vow?'':`<div class="vow"><small>시즌 각오</small><div class="row" style="gap:6px"><button class="btn sm" data-vow="humble">🙂 차근차근</button><button class="btn sm" data-vow="bold">🔥 도전<small>목표 +25% · 보상 1.5배</small></button></div></div>`}</div>`);
+      ${(()=>{ let s2=''; const Q=raceInfo(); if(Q&&Q.show) s2+=`<div class="sg sg-x"><div class="row between"><span>🏁 ${Q.lab} 레이스</span><b>${Q.first?(Q.gap===0?'공동 1위':'1위'):Q.rank+'위'}</b></div><small>${esc(Q.first?(Q.gap===0?`${josa(Q.oname,'과','와')} 동률`:`2위 ${josa(Q.oname,'과','와')} ${-Q.gap}${Q.u} 차`):`1위 ${josa(Q.oname,'과','와')} ${Q.gap}${Q.u} 차`)}</small></div>`; const R=radarInfo(); if(R) s2+=`<div class="sg sg-x rd"><div class="row between"><span>🔭 ${esc(R.c.short||R.c.name)}${R.visit?' <i class="vz">참관 예정</i>':''}</span><b>${R.ready?'제안 준비':R.v+'/70'}</b></div><div class="bar m"><i style="width:${Math.min(100,Math.round(R.v/70*100))}%"></i></div><small>${esc(radarTxt(R).replace(/^다음 경기 스카우트 참관 · /,''))}</small></div>`; return s2; })()}
+      ${G.vow||S.round>3?'':`<div class="vow"><small>시즌 각오</small><div class="row" style="gap:6px"><button class="btn sm" data-vow="humble">🙂 차근차근</button><button class="btn sm" data-vow="bold">🔥 도전<small>목표 +25% · 보상 1.5배</small></button></div></div>`}</div>`);
     gc.addEventListener('click',e=>{ const b=e.target.closest('[data-vow]'); if(!b) return; sgVow(b.dataset.vow); toast(b.dataset.vow==='bold'?'목표가 올라갔어요. 해내면 보상 1.5배':'목표 그대로, 차분하게 가요'); renderHub(); }); side.append(gc); } }
-  { const rc=h(`<div class="card u2c h2rec"><div class="u2h">${luc('chart-column',20)} 최근 경기</div><div class="form5 big">${formChips().replace(/>승</g,'>W<').replace(/>무</g,'>D<').replace(/>패</g,'>L<')}</div></div>`); side.append(rc);
+  { const rc=h(`<div class="card u2c h2rec"><div class="u2h">${luc('chart-column',20)} 최근 경기</div><div class="form5 big">${formChips().replace(/>승</g,'>W<').replace(/>무</g,'>D<').replace(/>패</g,'>L<')}</div></div>`); void rc; /* v118: 최근 경기는 시즌 목표 머리줄로 */
     const lv=[4,8].concat(SKILLS.map(k=>k.lvl||0)).filter(l=>l>p.level).sort((a,b)=>a-b)[0]; void lv; }
   const extra=h(`<div class="home-extra" hidden></div>`); box.append(extra); extra.append(h(`<div class="mood">${md[0]} ${esc(md[1])}</div>`)); [...box.querySelectorAll(':scope>.card.slim, :scope>.card:not(.h2me)')].forEach(c=>{ if(c.parentElement===box) extra.append(c); }); { const fw0=side.querySelector(':scope>.card:not(.sgoal):not(.h2rec):not(.chal2):not(.rcv2):not(.nact)'); if(fw0&&!fw0.classList.contains('h2ul')) extra.append(fw0); }
   { const wc=weekEventCard(); if(wc) extra.append(wc); }
@@ -4458,7 +4584,7 @@ function renderGear(box){
     <div class="gslots">${GEAR_SLOTS.map(slotCard).join('')}</div><div id="g-list" class="list" style="margin-top:10px"></div></div><div class="g2-r u2c" id="g-cmp"></div></div>`);
   box.append(card);
   const list=card.querySelector('#g-list'); const cur=G[sel];
-  if(sel==='boots'&&cur&&cur.dur<100){ const rc=Math.max(10,Math.round(gearPrice('boots',cur.tier)*0.25*(1-cur.dur/100)/0.75)); list.append(h(`<div class="item"><div class="ic">🔧</div><div class="tx"><b>축구화 수리</b><small>내구도 ${cur.dur}% → 100% · 0%가 되면 효과가 절반</small></div><button class="btn sm ${p.money>=rc?'primary':''}" data-rep="${rc}">수리 · ${fmtMoney(rc)}</button></div>`)); }
+  if(sel==='boots'&&cur&&cur.dur<100){ const rc=Math.max(10,Math.round(gearPrice('boots',cur.tier)*0.25*(1-cur.dur/100)/0.75)); list.append(h(`<div class="item"><div class="ic">🔧</div><div class="tx"><b>축구화 수리</b><small>내구도 ${cur.dur}% → 100% · 0%가 되면 효과 80%</small></div><button class="btn sm ${p.money>=rc?'primary':''}" data-rep="${rc}">수리 · ${fmtMoney(rc)}</button></div>`)); }
   const recT=(()=>{ let r=0; for(let t=Math.max(1,mt-1);t<=Math.min(5,mt);t++) if(t>(cur?cur.tier:0)&&p.money>=gearPrice(sel,t)) r=t; return r; })(); const recB=sel==='boots'&&deal?deal.brand:(cur?cur.brand:GEAR_BRANDS[0].id);
   GEAR_BRANDS.forEach(B=>{ for(let t=Math.max(1,mt-1);t<=Math.min(5,mt+1);t++){ const g={brand:B.id,tier:t,dur:100}; const price=gearPrice(sel,t); const lock=t>mt; const eq=cur&&cur.brand===B.id&&cur.tier===t;
       const T=GEAR_TIERS[t-1]; const req=lock?`명성 ${T.rep.toLocaleString()}${T.div1?' · 1부 소속':''} 해금`:'';
@@ -4618,7 +4744,7 @@ function scoutAfterMatch(r,ev,myG,oppG,notes){ if(ev.type==='nat'||r.injured) re
     else if(gain>0) msg=`👀 ${c.short||c.name} · 관전 무난 · 관심 ${now}`;
     else msg=`👀 ${c.short||c.name} · 관전 아쉬움 · 관심 ${now}`;
     notes.push(msg); sc.lastMsg={season:S.season,msg}; sc.visit=null; }
-  if(pf>0.6) Object.keys(sc.f).forEach(id=>{ if(id!==sc.visit) sc.f[id]=Math.min(100,sc.f[id]+1); });
+  if(pf>0.6) Object.keys(sc.f).forEach(id=>{ if(id!==sc.visit) sc.f[id]=Math.min(100,sc.f[id]+(r.auto?1:pf>1?4:2)); }); /* v118: 좋은 경기 입소문 */
   scheduleVisit(); }
 function isLastYear(){ return S.season>=S.contractEnd&&!S.loan; }
 function biddingWar(list,notes){ const ext=list.filter(o=>!o.renew&&!o.loan&&!o.pre); for(let i=0;i<ext.length;i++) for(let j=i+1;j<ext.length;j++){ const a=ext[i],b=ext[j]; if(Math.abs(CLUBS[a.clubId].str-CLUBS[b.clubId].str)<=6&&Math.abs(a.wage-b.wage)<=Math.max(a.wage,b.wage)*0.25){ const w=a.wage<b.wage?a:b; w.wage=Math.round(Math.max(a.wage,b.wage)*1.1); w.raised=CLUBS[(w===a?b:a).clubId].name; if(notes) notes.push(`🔥 경쟁 입찰: ${CLUBS[w.clubId].name}가 조건을 올렸어요`); return; } } }
@@ -5047,6 +5173,7 @@ function autoMatch(silent){
   return finishMatch({home,opp,ga,gb,goals,assists,rating:inj?0:rating,auto:true,injured:inj,dnp,dnpWhy:dnp?sl0.why:null,bench:bnc&&!inj,playedFrac:bnc?0.33:1,shots:0,passes:0,passOk:0,tackles:0,events:[],tstats:null,cards:0,ev},silent);
 }
 function finishMatch(r,silent){
+  const _pre=ladderSnap(); /* v118 */
   const p=S.player, ev=r.ev, d=divOf(S.clubId); let m=divMult(d.id);
   const myG=r.home?r.ga:r.gb, oppG=r.home?r.gb:r.ga; const notes=[];
   if(ev.type==='league'&&!r.ev.pro){ try{ potmTick(r,notes); }catch(e){} } if(ev.type!=='nat'){ try{ myChantCheck(notes); }catch(e){} }
@@ -5089,7 +5216,7 @@ function finishMatch(r,silent){
   let endoPay=0; try{ endoPay=endoAfterMatch(r,ev,notes); }catch(e){} money+=endoPay;
   let gearPay=0; if(S.gearDeal&&S.gear&&S.gear.boots&&S.gear.boots.brand===S.gearDeal.brand&&ev.type!=='nat'&&!r.injured){ gearPay=Math.round(S.wage*S.gearDeal.pct); money+=gearPay; }
   if(S.gear&&S.gear.boots&&!r.injured){ const bt=S.gear.boots; if(S.gearDeal&&S.gearDeal.brand===bt.brand){ const mt=gearMaxTier(); if(mt>bt.tier){ bt.tier=mt; bt.dur=100; notes.push(`👟 ${GEAR_BRANDS.find(x=>x.id===bt.brand).name}가 새 ${GEAR_TIERS[mt-1].n} 축구화를 보내왔어요`); } else if(bt.dur<40){ bt.dur=100; notes.push('👟 스폰서가 축구화를 새것으로 교체해 줬어요'); } }
-    else { const before=bt.dur; bt.dur=Math.max(0,bt.dur-(r.auto?3:8)); if(before>0&&bt.dur<=0) notes.push('👟 축구화가 다 닳았어요, 성장 › 장비에서 수리해요 (효과 절반)'); else if(before>=25&&bt.dur<25) notes.push('👟 축구화가 많이 닳았어요'); } }
+    else { const before=bt.dur; bt.dur=Math.max(0,bt.dur-(r.auto?2:4)); if(before>0&&bt.dur<=0) notes.push('👟 축구화가 다 닳았어요, 성장 › 장비에서 수리하면 효과 100%'); /* v118: 덜 닳고 덜 손해 */ else if(before>=25&&bt.dur<25) notes.push('👟 축구화가 많이 닳았어요'); } }
   const stW=ev.type==='nat'?0:staffWage(); money-=stW;
   p.xp+=xp; p.rep+=rep; p.money+=money;
   if(r.dnp) notes.push(`🚫 명단 제외 · ${r.dnpWhy||'감독 선택'}`);
@@ -5130,9 +5257,10 @@ function finishMatch(r,silent){
   let buddy=null; if(ev.type!=='nat'&&!r.injured&&buddyOk()){ const b=S.buddy; const st0=buddyStage(b); const C=r.chem; let d=r.auto?1:(C?C.pts:0)+(r.buddyPlayed?1:0); d=Math.min(d,14); if(d>0){ b.chem=Math.min(100,b.chem+d); b.apps=(b.apps||0)+1; const combo=C&&C.combo?C.combo:0; const first=combo&&!b.combos; b.combos=(b.combos||0)+combo; const st1=buddyStage(b); buddy={name:b.name,d,v:b.chem,st0,st1,up:st1>st0,combo,first}; if(first) notes.push(`🤝 ${josa(b.name,'과','와')} 첫 합작골!`); if(st1>st0) notes.push(`🤝 ${b.name} · ${BUDDY_ST[st1]} 달성`); } }
   const titles=titleProgress(r); titles.forEach(t=>{ notes.push(`${t.ic} 칭호 획득 · ${t.name}`); p.rep+=30; });
   if(lvls>0&&archPending()) notes.push('🎯 새 유형 특성 해금 · 성장 탭');
+  try{ S.hook=[nextPreview(),nearMiss()].filter(Boolean).join(' · '); }catch(e){} /* v118: 이어하기 화면 다음 화 예고 */
   save();
   try{ inboxFromNotes(notes); if(trust&&trust.up) pushNews('✅','선발 확정','다음 경기부터 선발'); if(trust&&trust.down) pushNews('🪑','벤치 강등','다음 경기 벤치'); if(motm) pushNews('👑','경기 MVP',`vs ${r.opp.name} · 평점 ${r.rating.toFixed(1)}`); const f3=S.form||[]; if(f3.length>=3&&f3.reduce((a,b)=>a+b,0)/3>=7.3&&!(S.inbox||[]).slice(0,4).some(x=>x.t==='관심이 뜨거워져요')) pushNews('🔥','관심이 뜨거워져요','여러 구단이 주목'); }catch(e){}
-  const G={xp,rep,money,lvls,myG,oppG,motm,notes,sponsorPay,sp,gearPay,endoPay,trust,buddy,titles,scenes,stW}; if(silent) return G;
+  const G={xp,rep,money,lvls,myG,oppG,motm,notes,sponsorPay,sp,gearPay,endoPay,trust,buddy,titles,scenes,stW}; G.pre=_pre; try{ G.beats=beatsOf(r,G,_pre); G.beats.forEach(b=>pushNews(b.ic,b.h,b.sub)); }catch(e){ G.beats=[]; } if(silent) return G;
   renderResult(r,G);
 }
 function pressEvent(r,g){
@@ -5302,9 +5430,12 @@ function renderResult(r,g){
       try{ const sc=top.querySelector('.res-sc.u2'), kp=top.querySelector('.res-kpi.u2'), hb=top.querySelector('.h2res .h2b'); if(sc){ const hd=h(`<div class="res-hd" data-nofit></div>`); hd.append(sc); col.prepend(hd); } if(kp&&hb){ hb.append(kp); } const lvr=rw.querySelector('.rw-lv'); if(lvr){ const row=h(`<div class="card res-lvrow" data-nofit></div>`); row.append(lvr); ex.before(row); } rw.classList.add('rw2'); col.classList.add('res3'); }catch(e){ console.warn(e); }
       const db=h(`<button class="btn" id="res-detail">${luc('clipboard-list',20)} 상세 기록${pe?' <i class="dotn">!</i>':''}</button>`); db.onclick=()=>{ const m=openExtra('상세 기록',ex); if(m){ try{ m.classList.add('rd-m'); const mb=m.querySelector('.more-b'); const cs=[...mb.children]; const kind=c=>c.classList.contains('np-fold')?'news':c.querySelector(':scope>.tbl, :scope .tbl')&&/팀 기록/.test(c.textContent.slice(0,30))?'team':/평점 근거|평점 계산/.test(c.textContent.slice(0,40))?'rate':'sum'; const has={}; try{ const chs=mb.querySelector('.chres'); if(chs&&!chs.closest('[data-rk="ch"]')){ const cc=h(`<div class="card ch-card"></div>`); cc.append(chs); mb.append(cc); cs.push(cc); } }catch(e){} cs.forEach(c=>{ let k=c.classList.contains('ch-card')?'ch':kind(c); if(c.children.length===1&&c.firstElementChild.classList.contains('label')) k='none'; c.dataset.rk=k; if(k!=='none') has[k]=1; if(c.tagName==='DETAILS') c.open=true; c.querySelectorAll('details').forEach(d=>d.open=true); }); if(r.auto){ const rc=cs.find(c=>c.dataset.rk==='rate'); const note=h(`<p class="muted rd-auto">${luc('info',16)} 자동 경기 · 세부 행동 미기록</p>`); if(rc) rc.prepend(note); } const T=[['sum','요약'],['ch','찬스'],['rate','평점'],['team','팀 기록'],['news','기사']].filter(t=>has[t[0]]); const bar=h(`<div class="rd-tabs">${T.map(([k,n],i)=>`<button type="button" class="${i===0?'on':''}" data-rt="${k}">${n}</button>`).join('')}</div>`); const setT=k=>{ bar.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.rt===k)); cs.forEach(c=>{ c.hidden=c.dataset.rk!==k; }); mb.scrollTop=0; }; bar.onclick=e=>{ const b=e.target.closest('[data-rt]'); if(b) setT(b.dataset.rt); }; mb.before(bar); setT(T[0][0]); const h3=m.querySelector('.more-h h3'); if(h3) h3.textContent=`평점 ${(+r.rating).toFixed(1)} · ${res}`; }catch(e){ console.warn(e); } const x=m.querySelector('#more-x'); const back=()=>{ [...m.querySelectorAll('.more-b>*')].forEach(c=>{ c.hidden=false; ex.append(c); }); m.remove(); }; x.onclick=back; m.addEventListener('click',e=>{ if(e.target===m){ e.stopImmediatePropagation(); back(); } },true); } }; b.append(db);
       const gbt=b.querySelector('#res-grow'); if(gbt) gbt.innerHTML=luc('trending-up',20)+` 성장 · ${S.player.points}P`; const nb=b.querySelector('#res-next'); if(nb) nb.innerHTML='다음 경기 준비 ▶'; } }catch(e){ console.warn(e); }
+  try{ const rm=col.querySelector('.res-main'); if(rm&&!r.injured&&r.ev.type!=='nat'){ const pb=progBlock(r,g); if(pb){ rm.append(pb); rm.classList.add('has-pg'); } } }catch(e){ console.warn('pg',e); }
   show('screen-result');
-  if(S.introSk==='pending'&&giftSkills().length&&!r.injured) setTimeout(()=>giftPick(go),450);
-  else { const gained=(g.lvls||[]); const unl=gained.length?SKILLS.filter(s=>!s.ult&&!p.skills.includes(s.id)&&gained.includes(s.lvl)):[]; if(unl.length&&!r.injured) setTimeout(()=>skillUnlockPop(unl,gained[gained.length-1],id=>{ if(id){ renderSkill.sel=id; renderSkill.open=true; } go('skill'); }),450); }
+  const postPop0=()=>{ if(S.introSk==='pending'&&giftSkills().length&&!r.injured) setTimeout(()=>giftPick(go),450);
+  else { const gained=(g.lvls||[]); const unl=gained.length?SKILLS.filter(s=>!s.ult&&!p.skills.includes(s.id)&&gained.includes(s.lvl)):[]; if(unl.length&&!r.injured) setTimeout(()=>skillUnlockPop(unl,gained[gained.length-1],id=>{ if(id){ renderSkill.sel=id; renderSkill.open=true; } go('skill'); }),450); } };
+  const postPop=()=>{ let n=0; const w=()=>{ if(document.querySelector('.prs-m')&&n++<400) return setTimeout(w,300); postPop0(); }; w(); }; /* v118: 속보 → 기자회견 → 스킬 순서로 하나씩 */
+  if(g.beats&&g.beats.some(b=>b.pr>=70)) setTimeout(()=>headlinePop(g.beats,postPop),500); else postPop();
 }
 function giftPick(go){ document.querySelectorAll('.sk-unlock').forEach(m=>m.remove()); const L=giftSkills().map(id=>SKILLS.find(x=>x.id===id)); if(!L.length) return; const TN={shot:'슛',pass:'패스',dash:'돌파',roll:'돌파',tackle:'수비',buff:'버프'};
   let pick=L[0].id; const m=h(`<div class="hub-modal sk-unlock gift-pick"><div class="card sk-un-card gp2"><button class="gp-x" data-x="1" aria-label="닫기">✕</button><div class="gp-h"><img src="${UI2_IMG.g_hd}" alt=""><b>Lv.2 달성 · 입문 스킬 1개 무료</b></div>
@@ -7831,7 +7962,7 @@ function drawTitleArt(num){ const c=el('title-cv'); if(!c) return; const x=c.get
 (function audioWarm(){ const go=()=>{ try{ audioInit(); }catch(e){} document.removeEventListener('pointerdown',go,true); document.removeEventListener('keydown',go,true); }; document.addEventListener('pointerdown',go,true); document.addEventListener('keydown',go,true); })(); /* v97 */
 function initTitle(){
   const sv=load(); const cc=el('cont-card'); try{ drawTitleBg(); }catch(e){} titleView('start'); el('go-create').classList.toggle('primary',!(sv&&sv.player)); el('go-create').classList.toggle('ghost2',!!(sv&&sv.player));
-  if(sv&&sv.player){ cc.hidden=false; el('cont-name').textContent=`${sv.player.name} · Lv.${sv.player.level} ${POS_INFO[sv.player.pos].name}`; el('cont-desc').textContent=sv.prologue?'프롤로그 · 고교 졸업반 결승':`${CLUBS[sv.clubId].name} · 시즌 ${sv.season} · ${sv.round}라운드`; }
+  if(sv&&sv.player){ cc.hidden=false; el('cont-name').textContent=`${sv.player.name} · Lv.${sv.player.level} ${POS_INFO[sv.player.pos].name}`; el('cont-desc').textContent=sv.prologue?'프롤로그 · 고교 졸업반 결승':`${CLUBS[sv.clubId].name} · 시즌 ${sv.season} · ${sv.round}라운드`+(sv.hook&&!sv.prologue?`\n다음 화 · ${sv.hook}`:''); }
   else cc.hidden=true;
   el('pos-desc').textContent=POS_INFO[pos].desc;
   try{ el('btn-hof').hidden=!hofLoad().length; }catch(e){}

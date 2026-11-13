@@ -114,7 +114,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   ok('저장 → 새로고침 → 이어하기: 기록 보존', snap===snap2, snap===snap2?'':snap+' / '+snap2);
 
   // 6) 특성: Lv.5 해금 → 무료 선택 → 변경은 유료
-  await pg.evaluate(()=>{ S.player.level=6; S.player.money=1000; S.player.trait=null; save(); renderHub(); });
+  await pg.evaluate(()=>{ S.player.level=6; S.player.money=1000; S.player.trait=null; save(); renderHub(); document.querySelectorAll(".hub-modal").forEach(m=>m.remove()); });
   await pg.click('#tabs button[data-tab="player"]'); await pg.waitForTimeout(250);
   await pg.click('button[data-tr2="soft"]'); await pg.waitForTimeout(150);
   const t1=await pg.evaluate(()=>({t:S.player.trait,m:S.player.money}));

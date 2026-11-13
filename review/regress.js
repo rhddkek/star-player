@@ -523,7 +523,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       // ⑦ 리그 수준: 한국 1부 > 태국·중국, 일본보다 조금 아래
       { const avg=d=>{ const a=Object.values(CLUBS).filter(c=>c.homeDiv===d); return a.reduce((x,c)=>x+c.str,0)/a.length; }; r.lg={kr:+avg('kr-1').toFixed(1),jp:+avg('jp-1').toFixed(1),cn:+avg('cn-1').toFixed(1),th:+avg('th-1').toFixed(1)}; }
       // ⑧ 내 팀·축구교실 화면 · 선 아이콘 뒤 글자 보임
-      { S.player.money=1e6; goKey('shop:life'); const st=document.querySelectorAll('.st-it').length; const b1=document.querySelector('[data-st="coach"]'); b1&&b1.click(); const ac=document.querySelector('#ac-up'); ac&&ac.click(); const sp=document.createElement('span'); sp.innerHTML=luc('leaf',15)+'글자'; document.body.append(sp); const vis=sp.getBoundingClientRect().width>30; sp.remove(); r.life={st,coachLv:staffLv('coach'),acad:S.acad&&S.acad.lv,lucText:vis}; }
+      { S.player.money=1e6; goKey('shop:life'); const st=document.querySelectorAll('.st2').length; const b1=document.querySelector('[data-st="coach"]'); b1&&b1.click(); const ac=document.querySelector('#ac-up'); ac&&ac.click(); const sp=document.createElement('span'); sp.innerHTML=luc('leaf',15)+'글자'; document.body.append(sp); const vis=sp.getBoundingClientRect().width>30; sp.remove(); r.life={st,coachLv:staffLv('coach'),acad:S.acad&&S.acad.lv,lucText:vis}; }
       r.ms=Math.round(performance.now()-T0); return r; });
     ok('v78 골키퍼: 11~26m 슛 선방률 65~85% (각 좁히기 · 슛 순간 옆으로)', R.gk.pct>=65&&R.gk.pct<=85, JSON.stringify(R.gk));
     ok('v78 내가 자리를 비우면 동료가 메움 (내 원래 자리 근처 4m 안)', R.cover.avg<4&&R.cover.dbg>=1, JSON.stringify(R.cover));

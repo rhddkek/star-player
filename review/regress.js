@@ -86,7 +86,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   let onResult=await pg.evaluate(()=>!el('result-col').closest('.screen').hidden);
   for(let i=0;i<10&&!onResult;i++){ await pg.waitForTimeout(800); onResult=await pg.evaluate(()=>!el('result-col').closest('.screen').hidden); }
   ok('경기 종료 → 결과 화면', onResult);
-  for(let i=0;i<10;i++){ const home=await pg.evaluate(()=>!el('btn-go').closest('.screen').hidden&&el('m-overlay').hidden); if(home) break; await pg.evaluate(()=>{ const bs=[...document.querySelectorAll('#result-col button.btn.primary, .overlay:not([hidden]) button.btn.primary, .overlay:not([hidden]) button.btn')].filter(b=>b.offsetParent); if(bs[0]) bs[0].click(); }); await pg.waitForTimeout(500); }
+  for(let i=0;i<10;i++){ const home=await pg.evaluate(()=>(el('btn-go')?!el('btn-go').closest('.screen').hidden:false)&&el('m-overlay').hidden); if(home) break; await pg.evaluate(()=>{ const bs=[...document.querySelectorAll('#result-col button.btn.primary, .overlay:not([hidden]) button.btn.primary, .overlay:not([hidden]) button.btn')].filter(b=>b.offsetParent); if(bs[0]) bs[0].click(); }); await pg.waitForTimeout(500); }
   const hub=await pg.evaluate(()=>({round:S.round||S.week||0,M:typeof M!=='undefined'&&M?{over:M.over}:null}));
   ok('결과 → 홈 복귀·라운드 진행', hub.round>round0, `라운드 ${round0}→${hub.round}`);
   await pg.evaluate(()=>document.querySelectorAll('.hub-modal').forEach(m=>m.remove())); await pg.click('#btn-go').catch(()=>{}); for(let k=0;k<8;k++){ await pg.waitForTimeout(400); const lu2=await pg.$('#lu-go'); if(lu2){ await lu2.click().catch(()=>{}); } if(await pg.evaluate(()=>typeof M!=='undefined'&&!!M&&!M.over&&el('m-overlay').hidden)) break; } await pg.waitForTimeout(800); /* v115: 팝업·라인업 표시가 늦어도 기다림 */

@@ -2699,6 +2699,32 @@ body.land-fit .fl-col>.res-main.has-pg:not(.fl-fill){flex-shrink:0!important}
 .stars.mini{color:#a89a7a!important}
 
 /*</u11>*/
+
+
+
+/*<u12>*/
+/* v128: 가로 홈 배치 — 모드 줄과 경기 시작 버튼이 겹치지 않게, 시즌 목표 카드가 잘리지 않게 */
+body.land-fit .nm2>*{flex-shrink:0!important}
+body.land-fit .nm2>.nm2-vs{flex:1 1 0!important;min-height:0!important;overflow:hidden}
+body.land-fit .nm2 .hm-mode{margin:6px 0 8px!important;height:36px!important;flex:0 0 36px!important}
+body.land-fit .nm2 .go-btn{flex:0 0 46px!important;height:46px!important;min-height:46px!important;margin:0!important}
+body.land-fit .sgoal .vow{display:flex;align-items:center;gap:8px;margin-top:6px!important}
+body.land-fit .sgoal .vow>small{flex:0 0 auto;white-space:nowrap}
+body.land-fit .sgoal .vow .row{flex:1 1 auto;flex-wrap:nowrap;min-width:0}
+body.land-fit .sgoal .vow .btn{flex:1 1 0;min-width:0;display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:center;column-gap:4px;row-gap:0;padding:5px 6px!important;min-height:38px;line-height:1.15}
+body.land-fit .sgoal .vow .btn small{flex:0 0 100%;display:block;font-size:.66rem!important;line-height:1.1;opacity:.85}
+body.land-fit .nm2 .hm-mode .segs,body.land-fit .nm2 #sel-mode{margin:0!important;height:100%!important}
+body.land-fit .sgoal{overflow-y:auto!important;scrollbar-width:thin}
+@media (max-height:380px){ body.land-fit .sgoal .sg-x>small{display:none!important} body.land-fit .sgoal .vow .btn small{display:none!important} body.land-fit .sgoal .vow .btn{min-height:32px} }
+.look-sws{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0 8px}
+.look-sw{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px 8px;border-radius:12px;border:2px solid #e3d9c2;background:#fbf8ee;font:inherit;color:#16213a;cursor:pointer;transition:border-color .15s,background-color .15s}
+.look-sw img{width:100%;max-width:72px;aspect-ratio:179/168;object-fit:cover;border-radius:8px;image-rendering:pixelated}
+.look-sw b{font-size:.9rem}
+.look-sw.on{border-color:#3cb48c;background:#e9f8f1}
+.look-sw:active{transform:scale(.98)}
+.look-note{display:block;color:#5f6878;font-size:.8rem}
+
+/*</u12>*/
 </style>
 
 <!-- ============ TITLE / NEW PLAYER ============ -->
@@ -4588,6 +4614,9 @@ function renderCos(box){ const p=S.player, C=S.cos;
     pc.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const sl=b.dataset.sl;
       if(b.dataset.ce){ C.eq[sl]=b.dataset.ce; save(); toast('착용했어요'); renderHub(); }
       if(b.dataset.cb){ const it=COS.find(x=>x.id===b.dataset.cb); if(p.money<it.price) return toast('돈이 부족해요'); p.money-=it.price; C.owned.push(it.id); C.eq[sl]=it.id; toast(`${cosFull(it)} 구입 · 착용 · 잔고 ${fmtMoney(p.money)}`); save(); renderHub(); } }); }
+  { const LKS=[['field','A'],['f2','B'],['f3','C'],['f4','D']]; const cur=LKS.some(x=>x[0]===S.look)?S.look:'field'; /* v128: 외형 바꾸기 (무료) */
+    const card=h(`<div class="card"><div class="sec">외형</div><div class="look-sws">${LKS.map(([l,n])=>`<button type="button" class="look-sw ${l===cur?'on':''}" data-lk2="${l}" aria-pressed="${l===cur}"><img src="${(UI2_LOOK[l]&&UI2_LOOK[l].face)||UI2_IMG.face}" alt="외형 ${n}"><b>${n}</b></button>`).join('')}</div><small class="look-note">무료 · 경기 속 선수와 초상·장면 그림이 함께 바뀌어요</small></div>`);
+    card.addEventListener('click',e=>{ const b=e.target.closest('[data-lk2]'); if(!b||b.dataset.lk2===cur) return; S.look=b.dataset.lk2; save(); toast('외형을 바꿨어요'); renderHub(); }); box.append(card); }
   COS_SLOTS.forEach(([slot,title])=>{ const items=COS.filter(c=>c.slot===slot);
     const card=h(`<div class="card"><div class="sec">${title}${C.eq[slot]?`<button class="btn sm" data-cu="${slot}" style="margin-left:auto">기본으로</button>`:''}</div><div class="cos-sws">${items.map(it=>{ const own=C.owned.includes(it.id), on=C.eq[slot]===it.id, lock=it.rep&&p.rep<it.rep;
       const sw=it.v.startsWith('#')?`<i class="sw" style="background:${it.v}"></i>`:`<i class="sw fx">${{fire:'🔥',ice:'❄️',gold:'✨',rainbow:'🌈',neon:'💡',star:'⭐'}[it.v]||'🏷️'}</i>`;

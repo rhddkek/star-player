@@ -2702,6 +2702,9 @@ body.land-fit .fl-col>.res-main.has-pg:not(.fl-fill){flex-shrink:0!important}
 
 
 
+
+
+
 /*<u12>*/
 /* v128: 가로 홈 배치 — 모드 줄과 경기 시작 버튼이 겹치지 않게, 시즌 목표 카드가 잘리지 않게 */
 body.land-fit .nm2>*{flex-shrink:0!important}
@@ -2723,6 +2726,11 @@ body.land-fit .sgoal{overflow-y:auto!important;scrollbar-width:thin}
 .look-sw.on{border-color:#3cb48c;background:#e9f8f1}
 .look-sw:active{transform:scale(.98)}
 .look-note{display:block;color:#5f6878;font-size:.8rem}
+@media (max-width:600px){ .cos2-t{grid-auto-flow:row!important;grid-template-columns:repeat(3,1fr)!important} .cos2-t button{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} }
+.cos2-b .look-card .sec{display:none}
+.cos2-b .look-card .look-sws{margin-top:2px}
+@media (max-width:600px){ .cos2-t button{white-space:normal!important;line-height:1.15;font-size:.82rem!important;padding:6px 4px!important} }
+.cos2-b .sec{margin-top:0!important;padding-top:4px!important}
 
 /*</u12>*/
 </style>
@@ -4615,7 +4623,7 @@ function renderCos(box){ const p=S.player, C=S.cos;
       if(b.dataset.ce){ C.eq[sl]=b.dataset.ce; save(); toast('착용했어요'); renderHub(); }
       if(b.dataset.cb){ const it=COS.find(x=>x.id===b.dataset.cb); if(p.money<it.price) return toast('돈이 부족해요'); p.money-=it.price; C.owned.push(it.id); C.eq[sl]=it.id; toast(`${cosFull(it)} 구입 · 착용 · 잔고 ${fmtMoney(p.money)}`); save(); renderHub(); } }); }
   { const LKS=[['field','A'],['f2','B'],['f3','C'],['f4','D']]; const cur=LKS.some(x=>x[0]===S.look)?S.look:'field'; /* v128: 외형 바꾸기 (무료) */
-    const card=h(`<div class="card"><div class="sec">외형</div><div class="look-sws">${LKS.map(([l,n])=>`<button type="button" class="look-sw ${l===cur?'on':''}" data-lk2="${l}" aria-pressed="${l===cur}"><img src="${(UI2_LOOK[l]&&UI2_LOOK[l].face)||UI2_IMG.face}" alt="외형 ${n}"><b>${n}</b></button>`).join('')}</div><small class="look-note">무료 · 경기 속 선수와 초상·장면 그림이 함께 바뀌어요</small></div>`);
+    const card=h(`<div class="card look-card"><div class="sec">외형</div><div class="look-sws">${LKS.map(([l,n])=>`<button type="button" class="look-sw ${l===cur?'on':''}" data-lk2="${l}" aria-pressed="${l===cur}"><img src="${(UI2_LOOK[l]&&UI2_LOOK[l].face)||UI2_IMG.face}" alt="외형 ${n}"><b>${n}</b></button>`).join('')}</div><small class="look-note">무료 · 경기 속 선수와 초상·장면 그림이 함께 바뀌어요</small></div>`);
     card.addEventListener('click',e=>{ const b=e.target.closest('[data-lk2]'); if(!b||b.dataset.lk2===cur) return; S.look=b.dataset.lk2; save(); toast('외형을 바꿨어요'); renderHub(); }); box.append(card); }
   COS_SLOTS.forEach(([slot,title])=>{ const items=COS.filter(c=>c.slot===slot);
     const card=h(`<div class="card"><div class="sec">${title}${C.eq[slot]?`<button class="btn sm" data-cu="${slot}" style="margin-left:auto">기본으로</button>`:''}</div><div class="cos-sws">${items.map(it=>{ const own=C.owned.includes(it.id), on=C.eq[slot]===it.id, lock=it.rep&&p.rep<it.rep;

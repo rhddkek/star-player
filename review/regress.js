@@ -11,10 +11,20 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // 프롤로그: 오프닝 애니메이션 → 건너뛰기 → 고교 결승 → 스카우트 제안 → 입단 → 주전 경쟁
   { const p0=await pg.evaluate(()=>({cut:!el('screen-cut').hidden,skip:!!el('cut-skip'),stage:S.prologue&&S.prologue.stage}));
     await pg.click('#cut-skip'); await pg.waitForTimeout(500);
-    const pw=await pg.evaluate(()=>({warm:!!(M&&M.practice&&M.chal&&M.chal.id==='warm'),defs:M?M.players.filter(q=>q.team===1&&q.role!=='GK').length:-1,me:M&&M.me.name,mateHas:!!(M&&M.ball.owner&&M.ball.owner.team===0&&!M.ball.owner.isUser)}));
+    const pw=await pg.evaluate(()=>({warm:!!(M&&M.practice&&M.chal&&M.chal.id==='warm'),defs:M?M.players.filter(q=>q.team===1&&q.role!=='GK').length:-1,me:M&&M.me.name,mateHas:!!(M&&M.tut&&M.tut.i===0&&M.ball.owner&&M.ball.owner.isUser)}));
+    // v130 조작 배우기: 여섯 단계 따라 하기 (이동 → 달리기 → 패스 → 패스 요청 → 슛 → 태클)
+    { await pg.waitForTimeout(2200); const t0=await pg.evaluate(()=>({bar:!el('tut-bar').hidden&&el('tut-bar').textContent,skip:!el('btn-prout').hidden&&el('btn-prout').textContent,mk:!!M.tut.mk,n:TUT_STEPS.length}));
+      await pg.evaluate(()=>{ M.user.x=M.tut.mk.x; M.user.y=M.tut.mk.y+1; }); await pg.waitForTimeout(300); const t1=await pg.evaluate(()=>({i:M.tut.i,hl:[...document.querySelectorAll('.tut-hl')].map(x=>x.id).join()}));
+      await pg.evaluate(()=>{ M.user.x=M.tut.mk.x; M.user.y=M.tut.mk.y+1; }); await pg.waitForTimeout(400); const t1b=await pg.evaluate(()=>({i:M.tut.i,moved:M.tut.mk.y>30}));
+      await pg.evaluate(()=>{ tutEnter(2,true); }); await pg.waitForTimeout(800); await pg.keyboard.press('z'); await pg.waitForTimeout(1500); const t2=await pg.evaluate(()=>({i:M.tut.i,own:!!(M.ball.owner&&M.ball.owner===tutMate())}));
+      await pg.waitForTimeout(1500); const t3a=await pg.evaluate(()=>({i:M.tut.i,held:!!(M.ball.owner&&M.ball.owner===tutMate())})); await pg.evaluate(()=>requestPass(M.user)); await pg.waitForTimeout(1800); const t3=await pg.evaluate(()=>({i:M.tut.i,mine:!!(M.ball.owner&&M.ball.owner.isUser)}));
+      await pg.evaluate(()=>tutGoal()); await pg.waitForTimeout(1800); const t4=await pg.evaluate(()=>({i:M.tut.i,def:M.players.filter(q=>q.team===1&&q.role!=='GK').length,opp:!!(M.ball.owner&&M.ball.owner.team===1)}));
+      await pg.waitForTimeout(1500); const t4b=await pg.evaluate(()=>({i:M.tut.i,opp:!!(M.ball.owner&&M.ball.owner.team===1)}));
+      await pg.evaluate(()=>{ const d=M.tut.def; M.user.x=d.x; M.user.y=d.y+1.4; }); await pg.keyboard.press('z'); await pg.waitForTimeout(1600); const t5=await pg.evaluate(()=>({done:M.tut.done,ov:!el('m-overlay').hidden,go:!!el('wm-go'),bar:el('tut-bar').hidden}));
+      ok('조작 배우기: 여섯 단계 안내(달리기 없이 가면 다시) · 동료가 요청 때까지 공 보유 · 태클로 완료', t0.bar&&t0.skip==='건너뛰기'&&t0.mk&&t0.n===6&&t1.i===1&&t1.hl==='k-sprint'&&t1b.i===1&&t1b.moved&&t2.i===3&&t2.own&&t3a.held&&t3.i===4&&t3.mine&&t4.i===5&&t4.def===1&&t4b.opp&&t5.done&&t5.ov&&t5.go&&t5.bar, JSON.stringify({t0,t1,t1b,t2,t3a,t3,t4,t4b,t5})); }
     await pg.evaluate(()=>warmDone()); await pg.waitForTimeout(500);
     const p1=await pg.evaluate(()=>({match:!el('screen-match').hidden,pro:!!(M&&M.ev.pro),me:M&&M.me.name,bench:!!(M&&M.bench),warmDone:S.warmDone}));
-    ok('프롤로그 워밍업: 컷신 뒤 수비 없는 연습(동료 패스 → 슛) → 결승전으로', pw.warm&&pw.defs===0&&pw.me==='칠성고'&&pw.mateHas&&p1.warmDone===true, JSON.stringify(pw));
+    ok('프롤로그 워밍업: 컷신 뒤 조작 배우기(수비 없이 시작) → 결승전으로', pw.warm&&pw.defs===0&&pw.me==='칠성고'&&pw.mateHas&&p1.warmDone===true, JSON.stringify(pw));
     await pg.evaluate(()=>{ if(el('tut-go')) el('tut-go').click(); M.score=[2,1]; M.stats.goals=1; M.min=90; M.over=true; concludeMatch(); }); await pg.waitForTimeout(400);
     const p2=await pg.evaluate(()=>({pro:!el('screen-pro').hidden,offers:document.querySelectorAll('#pro-col [data-pj]').length,kr:S.prologue.offers.every(o=>CLUBS[o.club].country==='kr')}));
     await pg.click('#pro-col [data-pj="0"]'); await pg.waitForTimeout(500);

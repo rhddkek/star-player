@@ -2751,6 +2751,28 @@ td.num.mine{font-weight:800;color:#1f8a66}
 .sp2-v b{white-space:nowrap}
 
 /*</u13>*/
+
+/*<u14>*/
+/* v130: 조작 배우기 안내 줄 + 눌러야 할 버튼 강조 */
+.tutbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(104px + env(safe-area-inset-top,0px));z-index:4;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px 9px;max-width:min(86vw,420px);background:rgba(10,22,36,.86);border:1.5px solid #2ee6d6;border-radius:14px;color:#fff;text-align:center;pointer-events:none}
+.tutbar[hidden]{display:none}
+.tutbar i{display:flex;gap:4px;margin-bottom:2px}
+.tutbar em{width:14px;height:4px;border-radius:2px;background:rgba(255,255,255,.25)}
+.tutbar em.ok{background:#2ee6d6}
+.tutbar em.on{background:#ffe27a}
+.tutbar b{font-size:.82rem;font-weight:800;color:#2ee6d6;letter-spacing:.01em}
+.tutbar span{font-size:.98rem;font-weight:700;line-height:1.3;word-break:keep-all}
+#screen-match.land .tutbar{top:calc(46px + env(safe-area-inset-top,0px));padding:6px 14px 7px;max-width:44vw}
+#screen-match.land .tutbar span{font-size:.9rem}
+#screen-match .ctl button.tut-hl{outline:3px solid #ffe27a;outline-offset:2px;animation:tutpulse 1s ease-in-out infinite}
+@keyframes tutpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,226,122,.55)}50%{box-shadow:0 0 0 9px rgba(255,226,122,0)}}
+@media (prefers-reduced-motion:reduce){#screen-match .ctl button.tut-hl{animation:none}}
+.tut-fin{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.tut-fin span{font-size:.84rem;font-weight:700;color:#0f3a2c;background:#7fe0b9;border-radius:8px;padding:3px 8px}
+
+#screen-match.tuting #pr-title,#screen-match.tuting #sit,#screen-match.tuting #hint,#screen-match.tuting #objs,#screen-match.tuting #hchips{display:none!important}
+
+/*</u14>*/
 </style>
 
 <!-- ============ TITLE / NEW PLAYER ============ -->
@@ -2827,7 +2849,7 @@ td.num.mine{font-weight:800;color:#1f8a66}
     <div class="prbar"><span id="pr-title" class="pr-tt" hidden></span><span id="pr-a10" class="pra10" hidden></span><button id="btn-prreset" hidden>↺ 다시</button><button id="btn-prdef" hidden>수비 빼기</button><button id="btn-prout" hidden>나가기</button></div><div class="matchmenu" style="display:flex;gap:6px"><button id="btn-mute">🔊</button><button id="btn-skip">메뉴</button></div>
     <div class="fkp" id="fkp" hidden><div class="fk-t"><span>⚽ 직접 프리킥</span><b id="fk-d">20m</b></div><canvas id="fk-cv"></canvas><div class="fk-spin"><button data-sp="-1">↺ 좌회전</button><button data-sp="0">● 무회전</button><button data-sp="1">↻ 우회전</button></div><div class="fk-g"><em></em><i id="fk-gf"></i></div><div class="fk-st" id="fk-st"></div><div class="fk-h">방향키·드래그: 골문 위 조준 · 슛 버튼 길게: 파워(초록 구간이 구석)</div><button id="fk-x">✕ 조준 취소 (패스로 연결)</button></div><div class="joyg" id="joyg"><i></i></div>
     <div class="joy" id="joy"><i></i></div>
-    <div class="hint" id="hint"></div>
+    <div class="hint" id="hint"></div><div class="tutbar" id="tut-bar" hidden></div>
     <div class="ctl">
       <div class="skrow">
         <button class="sk" id="k-s0"><div class="cdm"></div><span>·</span><small>-</small><b class="cdn" hidden></b></button>
@@ -5741,7 +5763,49 @@ const CHALS=[
   {id:'onetwo',ic:'🔁',name:'원투 돌파',desc:'동료와 원투(벽패스 리턴)를 주고받아 페널티 박스 안에서 공을 받기 2번.',need:2,time:120,def:2,rew:150,tip:'짧게 주고 바로 앞으로 달리면 동료가 리턴해요. 길목이 막히면 반대편으로 돌아 뛰어요.'},
   {id:'drill_shot',ic:'🎯',name:'슛 드릴',desc:'45초 안에 유효 슈팅 5회. 수비 1명과 골키퍼.',need:5,time:45,def:1,rew:0,drill:'shot',hidden:true,tip:'골문 가까이에서 원터치 타이밍을 맞추면 유효 슈팅이 늘어나요.'},
   {id:'drill_pass',ic:'🎯',name:'패스 드릴',desc:'45초 안에 패스 성공 8회. 수비 2명.',need:8,time:45,def:2,rew:0,drill:'pass',hidden:true,tip:'받자마자 가까운 동료에게 짧게. 원투로 돌려받으면 더 빨라요.'},
-  {id:'warm',ic:'🎓',name:'워밍업',desc:'연습 목표 · 1골 (패스 받기 → 전진 → 득점)',need:1,time:9999,def:0,rew:0,hidden:true,tip:'슛 버튼을 누르고 있으면 공을 따라가요. 받으면 왼쪽 드래그로 전진, 골문 가까이에서 슛을 길게.'}];
+  {id:'warm',ic:'🎓',name:'조작 배우기',desc:'여섯 가지만 따라 해 보세요',need:6,time:9999,def:1,rew:0,hidden:true,tip:'화면 위 안내를 하나씩 따라 하면 돼요.'}];
+/* v130: 조작 배우기 — 워밍업을 여섯 단계 따라 하기로 (이동·달리기·패스·패스 요청·슛·태클) */
+const TUT_STEPS=[
+  {k:'move',n:'이동',t:'화면 왼쪽을 드래그해서 민트색 표시까지',pc:'방향키로 민트색 표시까지',hl:null},
+  {k:'sprint',n:'달리기',t:'달리기를 누른 채 다음 표시까지',pc:'Space를 누른 채 다음 표시까지',hl:'k-sprint'},
+  {k:'pass',n:'패스',t:'동료 쪽을 보고 패스 버튼',pc:'동료 쪽을 보고 Z',hl:'k-pass'},
+  {k:'req',n:'패스 요청',t:'동료 공일 땐 슛 자리가 패스 요청',pc:'동료 공일 땐 X가 패스 요청',hl:'k-shot'},
+  {k:'shot',n:'슛',t:'골문 가까이에서 슛 · 길게 누르면 강슛',pc:'골문 가까이에서 X · 길게 누르면 강슛',hl:'k-shot'},
+  {k:'tackle',n:'태클',t:'상대에게 붙어서 태클 버튼',pc:'상대에게 붙어서 Z (태클)',hl:'k-pass'}];
+function tutPC(){ try{ return matchMedia('(hover:hover) and (pointer:fine)').matches; }catch(e){ return false; } }
+function tutMate(){ return M.players.find(q=>q.team===0&&!q.isUser&&q.role!=='GK'); }
+function tutBar(){ const T=M&&M.tut, bar=el('tut-bar'); if(!bar) return; document.querySelectorAll('.tut-hl').forEach(x=>x.classList.remove('tut-hl')); if(!T||T.done){ bar.hidden=true; el('screen-match').classList.remove('tuting'); return; } el('screen-match').classList.add('tuting'); const st=TUT_STEPS[T.i]; bar.innerHTML=`<i>${TUT_STEPS.map((x,k)=>`<em class="${k<T.i?'ok':k===T.i?'on':''}"></em>`).join('')}</i><b>${T.i+1}/${TUT_STEPS.length} ${st.n}</b><span>${tutPC()?st.pc:st.t}</span>`; bar.hidden=false; if(st.hl&&el(st.hl)) el(st.hl).classList.add('tut-hl'); }
+function tutOff(){ const bar=el('tut-bar'); if(bar) bar.hidden=true; el('screen-match').classList.remove('tuting'); document.querySelectorAll('.tut-hl').forEach(x=>x.classList.remove('tut-hl')); }
+function tutStart(){ const d=M.players.find(q=>q.team===1&&q.role!=='GK'); M.tut={i:0,def:d||null,sp:0,bad:0,hold:null,mk:null,pin:[],done:false}; tutEnter(0,true); }
+function tutReset(){ if(M&&M.tut&&!M.tut.done) tutEnter(M.tut.i,true); }
+function tutEnter(i,place){ const T=M.tut; if(!T) return; T.i=i; const st=TUT_STEPS[i], k=st.k, u=M.user, b=M.ball; if(M.chal) M.chal.prog=i;
+  const inD=T.def&&M.players.includes(T.def); if(k==='tackle'&&T.def&&!inD) M.players.push(T.def); if(k!=='tackle'&&inD) M.players=M.players.filter(q=>q!==T.def);
+  const mate=tutMate(); T.hold=null; T.mk=null; T.pin=[]; T.sp=0; T.bad=0; M.request=0; M.reqAck=null;
+  if(place){ M.restart=null; M.setPiece=null; M.penalty=null; M.freeze=Math.max(M.freeze||0,0.35); M.charge=null; b.vx=b.vy=b.vz=0; b.z=0; b.curve=0; b.passTarget=null; b.offside=null; u.vx=u.vy=0; u.stun=0; u.fx=0; u.fy=-1; u.tackleT=0; u.lunge=null; M.players.forEach(q=>{ q.vx=q.vy=0; q.stun=0; q.tackleT=0; q.lunge=null; if(q.role==='GK'){ q.x=W/2; q.y=q.team===1?1.5:H-1.5; q.inHands=false; } }); }
+  const pin=(q,x,y)=>{ if(!q) return; q.x=x; q.y=y; q.vx=q.vy=0; T.pin.push({q,x,y}); };
+  if(k==='move'){ if(place){ u.x=W/2; u.y=48; setOwner(u,{clean:true}); } pin(mate,W/2+13,46); T.mk={x:W/2,y:41}; }
+  else if(k==='sprint'){ if(place){ u.x=W/2; u.y=41; setOwner(u,{clean:true}); } pin(mate,W/2+13,46); T.mk={x:W/2-3,y:25}; }
+  else if(k==='pass'){ if(place){ u.x=W/2-3; u.y=25; setOwner(u,{clean:true}); } u.vx=u.vy=0; pin(mate,clamp(u.x+(u.x<W/2?4:-4),5,W-5),clamp(u.y-9,10,H-10)); if(mate){ T.hold=mate; const dx=mate.x-u.x, dy=mate.y-u.y, l=Math.hypot(dx,dy)||1; u.fx=dx/l; u.fy=dy/l; } }
+  else if(k==='req'){ if(place||M.ball.owner!==mate){ u.x=W/2; u.y=30; if(mate){ mate.x=W/2+4; mate.y=22; setOwner(mate,{clean:true}); mate.kickoffPassT=null; } } if(mate){ mate.kickoffPassT=null; pin(mate,mate.x,mate.y); T.hold=mate; } }
+  else if(k==='shot'){ if(place){ u.x=W/2; u.y=28; setOwner(u,{clean:true}); } pin(mate,u.x<W/2?W-8:8,30); if(mate) T.hold=mate; }
+  else if(k==='tackle'){ u.x=W/2; u.y=30; pin(mate,W/2+18,40); const d=T.def; if(d){ d.x=W/2; d.y=23; d.fx=0; d.fy=1; d.stun=0; setOwner(d,{clean:true}); pin(d,d.x,d.y); T.hold=d; } else { T.done=true; } }
+  if(k!=='tackle'&&k!=='req') u.protT=2.2; u.touchT=0; tutBar(); }
+function tutNext(){ const T=M.tut; if(!T||T.done) return; sfx('whistle'); feat(`✓ ${TUT_STEPS[T.i].n}`,'#7dffa8'); if(T.i>=TUT_STEPS.length-1){ T.done=true; if(M.chal) M.chal.prog=TUT_STEPS.length; tutOff(); M.freeze=Math.max(M.freeze||0,0.8); setTimeout(()=>{ if(M&&M.chal&&!M.chal.over) chalEnd(true); },800); return; } const nk=TUT_STEPS[T.i+1].k; tutEnter(T.i+1,nk==='tackle'); }
+function tutGoal(){ const T=M.tut; if(!T||T.done) return; if(TUT_STEPS[T.i].k==='shot'){ M.freeze=Math.max(M.freeze||0,1.2); tutNext(); M.restart=tutReset; } }
+function tutHold(pl){ const T=M.tut, u=M.user, k=TUT_STEPS[T.i].k; pl.vx=pl.vy=0; const dx=u.x-pl.x, dy=u.y-pl.y, l=Math.hypot(dx,dy)||1; pl.fx=dx/l; pl.fy=dy/l; if(pl.team!==0) return; if(M.t-(pl.tutGot==null?M.t:pl.tutGot)<0.35) return; if(k==='req'){ if(M.request>0) passTo(pl,u,{sure:true,power:0.5}); return; } if(k==='pass') return; passTo(pl,u,{sure:true,power:0.5}); }
+function tutTick(dt){ const T=M.tut; if(!T||T.done||(M.chal&&M.chal.over)) return; const u=M.user, b=M.ball, o=b.owner, k=TUT_STEPS[T.i].k, mate=tutMate();
+  for(let i=0;i<4;i++) M.cds[i]=Math.max(0,M.cds[i]-dt*2); M.mp=Math.min(M.mpMax||100,M.mp+dt*12); M.sta=Math.max(M.sta,70);
+  if(M.freeze>0&&M.restart&&M.restart!==tutReset){ M.restart=tutReset; M.freeze=Math.min(M.freeze,1.0); }
+  if(M.freeze>0) return;
+  T.pin.forEach(p=>{ p.q.x=p.x; p.q.y=p.y; p.q.vx=p.q.vy=0; if(p.q!==o){ const dx=u.x-p.q.x, dy=u.y-p.q.y, l=Math.hypot(dx,dy)||1; p.q.fx=dx/l; p.q.fy=dy/l; } });
+  if(o&&T.hold===o&&o.tutGot==null) o.tutGot=M.t; if(mate&&o!==mate) mate.tutGot=null;
+  const bad=(o&&o.role==='GK')||(o&&o.team===1&&k!=='tackle')||(k==='tackle'&&!o&&dist(b,u)>14)||(!o&&k!=='tackle'&&Math.hypot(b.vx,b.vy)<0.6&&dist(b,u)>5)||(k==='pass'&&!o&&b.passTarget!==mate&&dist(b,u)>7)||((k==='move'||k==='sprint')&&o&&o!==u&&o.team===0&&T.hold!==o);
+  if(bad){ T.bad+=dt; if(T.bad>1.1){ popup(u.x,u.y-1.8,k==='pass'?'동료 쪽을 보고 다시!':'다시!','#cfe8ff'); tutReset(); return; } } else T.bad=0;
+  if(k==='move'){ if(T.mk&&dist(u,T.mk)<2.2) tutNext(); }
+  else if(k==='sprint'){ if(input.sprint&&Math.hypot(u.vx,u.vy)>2.5) T.sp+=dt; if(T.mk&&dist(u,T.mk)<2.4){ if(T.sp>=0.45) tutNext(); else { popup(u.x,u.y-1.9,tutPC()?'Space를 누른 채로!':'달리기 버튼을 누른 채로!','#ffe27a'); T.sp=0; T.mk=T.mk.y<30?{x:W/2+3,y:40}:{x:W/2-3,y:25}; } } }
+  else if(k==='pass'){ if(o===mate&&mate){ tutNext(); } else if(o&&o===u&&mate&&dist(u,mate)>26){ T.pin=[]; const nx=clamp(u.x+(u.x<W/2?4:-4),5,W-5), ny=clamp(u.y-9,10,H-10); mate.x=nx; mate.y=ny; T.pin.push({q:mate,x:nx,y:ny}); } }
+  else if(k==='req'){ if(o===u) tutNext(); }
+  else if(k==='tackle'){ const d=T.def; if(o===u){ tutNext(); } else if(d&&o===d&&(u.tackleT>0||u.lunge)&&dist(u,d)<2.0){ setOwner(u,{clean:true}); d.stun=0.9; u.tackleT=0; M.stats.tackles=(M.stats.tackles||0)+1; popup(u.x,u.y-1.8,'뺏었다!','#7dffa8'); sfx('tackle'); tutNext(); } } }
 function chalOf(id){ return CHALS.find(c=>c.id===id); }
 function chalCleared(id){ return !!(S.chal&&S.chal[id]); }
 function recChal(r){ if(!r||r.auto||r.injured) return null; const my=r.home?r.ga:r.gb, op=r.home?r.gb:r.ga; const cand=[];
@@ -5750,7 +5814,7 @@ function recChal(r){ if(!r||r.auto||r.injured) return null; const my=r.home?r.ga
 function practiceMenu(){ const m=document.createElement('div'); m.className='hub-modal';
   m.innerHTML=`<div class="card" style="max-width:440px;width:100%"><div class="row between"><h2>⚽ 연습장</h2><button class="btn sm" id="pm-x">닫기</button></div><p class="muted" style="margin:6px 0 10px;font-size:.85rem">컨디션을 쓰지 않고 몇 번이든 다시 할 수 있어요. 상황 도전은 첫 클리어에만 보상.</p>
     <div class="a10m"><b>🔟 10초 공격 <small>나 + 동료 1명 vs 수비 2명 + 키퍼 · 10번 공격</small></b><div class="row" style="gap:6px;flex-wrap:nowrap;margin-top:6px">${Object.values(DEF_STY).map(D=>`<button class="btn" style="flex:1;flex-direction:column;gap:0;padding:7px 4px;font-size:.78rem" data-pm="a10:${D.k}"><span style="font-size:1.1rem">${D.ic}</span>${D.n.replace(' 수비','')}<small class="muted" style="font-size:.66rem">${S.a10best&&S.a10best[D.k]!=null?'최고 '+S.a10best[D.k]+'골':'기록 없음'}</small></button>`).join('')}</div></div>
-    <div class="list" style="gap:8px"><button class="btn block" data-pm="free" style="justify-content:flex-start;text-align:left"><b>🆓 자유 연습</b>&nbsp;<small class="muted">슛·스킬 마음껏</small></button>
+    <div class="list" style="gap:8px"><button class="btn block" data-pm="warm" style="justify-content:flex-start;text-align:left"><b>🎓 조작 배우기</b>&nbsp;<small class="muted">이동·패스·슛·태클 따라 하기</small></button><button class="btn block" data-pm="free" style="justify-content:flex-start;text-align:left"><b>🆓 자유 연습</b>&nbsp;<small class="muted">슛·스킬 마음껏</small></button>
     ${CHALS.filter(c=>!c.hidden).map(c=>`<button class="btn block ${chalCleared(c.id)?'':'primary'}" data-pm="${c.id}" style="flex-direction:column;align-items:flex-start;gap:2px;text-align:left"><span><b>${c.ic} ${c.name}</b> ${chalCleared(c.id)?`<span class="pill good">클리어 ${S.chal[c.id]}회</span>`:`<span class="pill acc">첫 클리어 +${fmtMoney(c.rew)}</span>`}</span><small style="font-weight:600;white-space:normal;line-height:1.3">${c.desc}</small></button>`).join('')}</div></div>`;
   m.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if(b.id==='pm-x'){ m.remove(); return; } const k=b.dataset.pm; if(!k) return; m.remove(); if(k.startsWith('a10:')){ PR_A10=k.slice(4); startPractice(null); setTimeout(()=>{ if(M&&M.a10){ const D0=DEF_STY[M.a10.sty]; banner(`${D0.ic} ${D0.n}`,D0.tip,1); } },150); return; } startPractice(k==='free'?null:k); });
   document.body.append(m); }
@@ -6262,6 +6326,7 @@ function ownerAI(pl,team,mine,theirs,goal,dir){
   const b=M.ball, u=M.user;
   const gd=dist(pl,goal);
   const sp=M.setPiece; if(sp&&sp.taker===pl){ if(M.t-sp.t0<0.9) return; aiSetPiece(pl,team,mine,theirs,goal,sp); return; }
+  if(M.tut&&!M.tut.done&&M.tut.hold===pl){ tutHold(pl); return; }
   if(pl.kickoffPassT!=null&&team===0){ pl.kickoffPassT=null; const uu=M.user; if(uu!==pl&&dist(uu,pl)<30){ passTo(pl,uu,{sure:true,power:0.5}); return; } }
   if(team===0&&pl.deliveryT>0){ pl.deliveryT=0; const air=M.ball.z>0.6||(M.t-(pl.gotT||M.t))<0.3; shoot(pl,goal.x+rnd(-2.4,2.4),goal.y,{power:0.9,hard:true,header:air,force:true}); M.ball.pHead=true; M.ball.delFin=pl.delP||1; comicPop(pl.x,pl.y-2,air?'택배 헤딩!!':'택배 발리!!','#ffe27a',true); return; }
   if(team===0&&M.giveGo&&M.giveGo.mate===pl&&M.ball.owner===pl){ const G=M.giveGo; if(G.dec==null){ const g=ggDecide(pl,theirs); G.dec=g.ok; G.why=g.why; const dg=M.dbg||(M.dbg={}); dg[g.ok?'ggYes':'ggNo']=(dg[g.ok?'ggYes':'ggNo']||0)+1; }
@@ -7120,7 +7185,7 @@ function callOffside(pl){ const b=M.ball; M.tstats[pl.team].offs=(M.tstats[pl.te
   startSetPiece('fk',1-pl.team,{x:clamp(pl.x,1,W-1),y:clamp(pl.y,1,H-1)},{indirect:true}); }
 function sendOffAI(pl){ const i=M.players.indexOf(pl); if(i<0) return; M.players.splice(i,1); banner('퇴장!',(pl.team===0?M.me:M.opp).short+' '+playerName((pl.team===0?M.me:M.opp).id,pl.i)+' · 10명으로 싸워요'); }
 function goalScored(topGoal){ const u9=M&&M.user; if(u9&&u9._sim) u9.isUser=true; try{ return goalScored0(topGoal); } finally{ if(u9&&u9._sim&&M&&M.user===u9) u9.isUser=false; } } /* v96: 중계 구간에 내 선수가 넣은 골·도움도 내 기록 */
-function goalScored0(topGoal){ try{ if(M&&!M.practice&&((topGoal===0)===!!M.home)) M.chantT=Math.min(M.chantT==null?99:M.chantT,3.2); const k9=M&&M.ball&&M.ball.lastKicker; if(M&&!M.practice&&topGoal===0&&M.home&&k9&&k9.isUser&&myChantOn()){ M.chantForce='chant1'; M.chantT=1.4; chantStop(); const nm=S.player.name; setTimeout(()=>{ if(M&&!M.over) tick(`♪ "${nm}! ${nm}!" 관중이 내 응원가를 불러요`); },1500); M.cheerT=Math.max(M.cheerT||0,6); } }catch(e){} if(M.practice&&topGoal===0) prShotDone('골!'); if(M.a10&&M.a10.cur&&topGoal===0&&!M.a10.cur.res) M.a10.cur.res='골'; if(M.practice&&M.chal&&M.chal.id==='drill_shot'&&topGoal===0&&!M.chal.over&&M.ball.lastKicker&&M.ball.lastKicker.isUser) chalProg(); if(M.practice&&M.chal&&(M.chal.id==='last'||M.chal.id==='warm')&&topGoal===0&&!M.chal.over){ M.chal.prog++; M.freeze=Math.max(M.freeze||0,1.2); setTimeout(()=>{ if(M&&M.chal&&!M.chal.over) chalEnd(true); },900); } // topGoal=0 → 윗골(상대 골문)에 들어감 → 내 팀 득점
+function goalScored0(topGoal){ try{ if(M&&!M.practice&&((topGoal===0)===!!M.home)) M.chantT=Math.min(M.chantT==null?99:M.chantT,3.2); const k9=M&&M.ball&&M.ball.lastKicker; if(M&&!M.practice&&topGoal===0&&M.home&&k9&&k9.isUser&&myChantOn()){ M.chantForce='chant1'; M.chantT=1.4; chantStop(); const nm=S.player.name; setTimeout(()=>{ if(M&&!M.over) tick(`♪ "${nm}! ${nm}!" 관중이 내 응원가를 불러요`); },1500); M.cheerT=Math.max(M.cheerT||0,6); } }catch(e){} if(M.practice&&topGoal===0) prShotDone('골!'); if(M.a10&&M.a10.cur&&topGoal===0&&!M.a10.cur.res) M.a10.cur.res='골'; if(M.practice&&M.chal&&M.chal.id==='drill_shot'&&topGoal===0&&!M.chal.over&&M.ball.lastKicker&&M.ball.lastKicker.isUser) chalProg(); if(M.practice&&M.tut&&topGoal===0){ tutGoal(); } else if(M.practice&&M.chal&&M.chal.id==='last'&&topGoal===0&&!M.chal.over){ M.chal.prog++; M.freeze=Math.max(M.freeze||0,1.2); setTimeout(()=>{ if(M&&M.chal&&!M.chal.over) chalEnd(true); },900); } // topGoal=0 → 윗골(상대 골문)에 들어감 → 내 팀 득점
   const b=M.ball, scorer=b.lastKicker, team=topGoal===0?0:1;
   if(scorer.team!==team){ /* 자책골 */ }
   if(M.chance){ const ph=M.chance.phase; setTimeout(()=>{ if(!M||!M.chance) return; const e=M.events[M.events.length-1]; chFeed(`⚽ ${team===0?'골!':'실점'} ${M.score[0]}-${M.score[1]}${e&&e.name?' · '+e.name:''}`); if(ph==='live'&&M.chance.phase==='live') chanceEnd(team===0?'goal':'conceded'); },0); }
@@ -7311,11 +7376,11 @@ function practiceReset(){ if(!M) return; const u=M.user, b=M.ball; M.restart=nul
   setOwner(u,{clean:true}); u.touchT=0; if(!M.chal||M.chal.id!=='escape') u.protT=2.2; M.prOppT=0; M.prResets=(M.prResets||0)+1;
   M.players.forEach(q=>{ q.lunge=null; });
   if(M.a10){ a10Place(); return; }
-  if(M.chal&&M.chal.id==='warm'){ const mate=M.players.find(q=>q.team===0&&!q.isUser&&q.role!=='GK'); u.x=W/2+rnd(-6,6); u.y=46; u.vx=u.vy=0; if(mate){ mate.x=clamp(u.x+(u.x<W/2?10:-10),4,W-4); mate.y=u.y+6; mate.vx=mate.vy=0; setOwner(mate,{clean:true}); mate.touchT=0; mate.kickoffPassT=0; } } }
+  if(M.chal&&M.chal.id==='warm'){ if(!M.tut) tutStart(); else tutReset(); } }
 function prFirstTick(){ const F=PR_FIRST; if(!F||F.ok||F.at==null) return; const sk=SKILLS.find(x=>x.id===F.id); if(!sk) return; const shot=sk.type==='shot'; const okNow=shot?M.score[0]>F.g0:(M.t-F.at>0.9); if(!okNow){ if(shot&&M.t-F.at>3.5){ F.at=null; popup(M.user.x,M.user.y-2.2,'한 번 더! 골문 보고 발동','#ffe27a'); } return; }
   F.ok=true; S.introTry=false; save(); sfx('levelup'); M.paused=true; { const bn=el('banner'); if(bn) bn.classList.remove('show'); } showOverlay(`<div class="pf2"><div class="pf-h"><span class="sic" style="background:${SK_COL[sk.type]||'#2a3a6a'}">${pxi(sk.id,40)||icon(sk.id,30)}</span><b>${esc(sk.name)} 성공</b><i>✓ 1회 성공</i></div><small>이제 경기에서도 쓸 수 있어요 · 기력이 차면 오른쪽 스킬 버튼</small><div class="pf-bt"><button class="btn" id="pf-more">연습 더 하기</button><button class="btn primary" id="pf-next">경기 준비</button></div></div>`);
   setTimeout(()=>{ const a=el('pf-next'), c=el('pf-more'); if(a) a.onclick=()=>{ PR_FIRST=null; endPractice(); tab='home'; renderHub(); }; if(c) c.onclick=()=>{ PR_FIRST=null; el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); }; },30); }
-function practiceTick(dt){ M.min=10; M.minPlayed=10; prFirstTick(); if(!M) return;
+function practiceTick(dt){ M.min=10; M.minPlayed=10; prFirstTick(); if(!M) return; if(M.tut){ tutTick(dt); return; }
   if(M.a10&&M.a10.cur&&!M.a10.done){ if(M.freeze<=0&&!M.a10.cur.res&&M.t-M.a10.cur.t0>10){ M.a10.cur.res='시간 초과'; popup(M.user.x,M.user.y-1.8,'10초 넘었어요','#ffd27f'); practiceReset(); return; } a10HUD(); }
   if(M.chal&&!M.chal.over){ const c=M.chal; if(M.freeze<=0) c.t+=dt; if(c.t>=c.time){ chalEnd(false); return; }
     if(c.id==='onetwo'){ const w=M.stats.walls||0; if(w>(M.chalW0||0)){ M.chalW0=w; M.chalWallT=M.t; } const o=M.ball.owner; if(o&&o.isUser&&M.t-(M.chalWallT==null?-9:M.chalWallT)<3.2&&o.y<22&&Math.abs(o.x-W/2)<20.16){ M.chalWallT=-9; popup(o.x,o.y-2.2,'박스 진입!','#7dffa8'); chalProg(); return; } } } for(let i=0;i<4;i++) M.cds[i]=Math.max(0,M.cds[i]-dt*2); M.mp=Math.min(M.mpMax||100,M.mp+dt*12);
@@ -7324,18 +7389,18 @@ function practiceTick(dt){ M.min=10; M.minPlayed=10; prFirstTick(); if(!M) retur
   if(o&&(o.team===1||(o.team===0&&o.role==='GK'))){ M.prOppT=(M.prOppT||0)+dt; if(M.prOppT>1.0){ popup(M.user.x,M.user.y-1.8,'다시!','#cfe8ff'); practiceReset(); } } else if(!(!o&&M.ball.lastKicker&&M.ball.lastKicker.team===1)) M.prOppT=0; else { M.prOppT=(M.prOppT||0)+dt; if(M.prOppT>1.2){ popup(M.user.x,M.user.y-1.8,'다시!','#cfe8ff'); practiceReset(); return; } }
   if(!o&&(M.ball.y>H*0.62)){ M.prOppT=(M.prOppT||0)+dt; if(M.prOppT>1.5) practiceReset(); } }
 function startPractice(chalId){ audioInit(); if(chalId) PR_FIRST=null; PR_CHAL=chalId?chalOf(chalId):null; startMatch(false,true); const kc=cosVal('kit'); if(kc&&M){ M.myTeamColor=kc; } prHUD(); if(PR_FIRST&&M){ const sk=SKILLS.find(x=>x.id===PR_FIRST.id); M.mp=M.mpMax||100; setTimeout(()=>{ if(M&&PR_FIRST&&sk) banner(`${sk.icon} ${sk.name} 한 번 성공하기`,SK_EX[sk.id]||'오른쪽 스킬 버튼으로 발동',0,1); },150); } if(M&&M.chal){ setTimeout(()=>{ if(M&&M.chal) banner(`${M.chal.ic} ${M.chal.name}`,M.chal.desc,isLand()?1:0,1); },120); } }
-function chalRestart(){ if(!M||!M.chal) return; M.chal.prog=0; M.chal.t=0; M.chal.over=false; M.stats.walls=0; M.chalW0=0; el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); practiceReset(); }
-function warmDone(){ S.warmDone=true; save(); if(el('btn-prout')) el('btn-prout').hidden=true; if(el('pr-title')) el('pr-title').hidden=true; const o=el('m-overlay'); o.hidden=true; cancelAnimationFrame(raf); ambience(false); el('btn-prreset').hidden=true; el('btn-prdef').hidden=true; M=null; startMatch(false); }
+function chalRestart(){ if(!M||!M.chal) return; if(M.tut){ const d=M.tut.def; if(d&&!M.players.includes(d)) M.players.push(d); M.tut=null; } M.chal.prog=0; M.chal.t=0; M.chal.over=false; M.stats.walls=0; M.chalW0=0; el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); practiceReset(); }
+function warmDone(){ tutOff(); if(!S.prologue){ if(M) M.chal=null; endPractice(); return; } S.warmDone=true; save(); if(el('btn-prout')) el('btn-prout').hidden=true; if(el('pr-title')) el('pr-title').hidden=true; const o=el('m-overlay'); o.hidden=true; cancelAnimationFrame(raf); ambience(false); el('btn-prreset').hidden=true; el('btn-prdef').hidden=true; M=null; startMatch(false); }
 function chalEnd(ok){ const c=M.chal; if(!c||c.over) return; c.over=true; M.paused=true; let rw='';
-  if(c.id==='warm'){ sfx('levelup'); showOverlay(`<h3>🎓 워밍업 완료!</h3><p style="margin:6px 0 0">패스 받기 → 전진 → 득점. 경기에서도 이 셋이 기본이에요.<br><small class="muted">패스·태클 같은 나머지 조작은 경기 중 화면 위 안내가 상황마다 알려 줘요.</small></p><div class="list" style="margin-top:10px"><button class="btn primary" id="wm-go">⚽ 결승전 시작</button><button class="btn" id="wm-again">한 번 더 연습</button></div>`); el('wm-go').onclick=()=>warmDone(); el('wm-again').onclick=()=>chalRestart(); return; } if(ok&&c.drill&&S.drill&&!S.drill.done&&S.drill.id===c.id){ S.drill.done=true; const k=S.drill.k; const p=S.player; p.tg=p.tg||{}; p.tg[k]=(p.tg[k]||0)+15; const nm=STATS.find(x=>x[0]===k)[1]; if(p.tg[k]>=tgNeed(p.stats[k])&&p.stats[k]<statCap(k)){ p.tg[k]-=tgNeed(p.stats[k]); p.stats[k]++; rw=`훈련 보너스 · ${nm} ${p.stats[k]-1} → ${p.stats[k]}!`; } else rw=`훈련 보너스 · ${nm} 게이지 +15 (${p.tg[k]}/${tgNeed(p.stats[k])})`; save(); }
+  if(c.id==='warm'){ sfx('levelup'); showOverlay(`<h3>🎓 조작 배우기 완료</h3><div class="tut-fin">${TUT_STEPS.map(x=>`<span>✓ ${x.n}</span>`).join('')}</div><p style="margin:8px 0 0"><small class="muted">스루패스·개인기·스킬은 경기 중 화면 위 안내가 필요한 순간에 알려 줘요. 다시 하려면 연습장 › 조작 배우기.</small></p><div class="list" style="margin-top:10px"><button class="btn primary" id="wm-go">${S.prologue?'⚽ 결승전 시작':'돌아가기'}</button><button class="btn" id="wm-again">한 번 더 연습</button></div>`); el('wm-go').onclick=()=>warmDone(); el('wm-again').onclick=()=>chalRestart(); return; } if(ok&&c.drill&&S.drill&&!S.drill.done&&S.drill.id===c.id){ S.drill.done=true; const k=S.drill.k; const p=S.player; p.tg=p.tg||{}; p.tg[k]=(p.tg[k]||0)+15; const nm=STATS.find(x=>x[0]===k)[1]; if(p.tg[k]>=tgNeed(p.stats[k])&&p.stats[k]<statCap(k)){ p.tg[k]-=tgNeed(p.stats[k]); p.stats[k]++; rw=`훈련 보너스 · ${nm} ${p.stats[k]-1} → ${p.stats[k]}!`; } else rw=`훈련 보너스 · ${nm} 게이지 +15 (${p.tg[k]}/${tgNeed(p.stats[k])})`; save(); }
   if(ok){ S.chal=S.chal||{}; const first=!S.chal[c.id]; S.chal[c.id]=(S.chal[c.id]||0)+1; if(c.drill){ rw=rw||'훈련 보너스는 주 1회 (이번 주는 이미 받음)'; } else if(first){ S.player.money+=c.rew; rw=`첫 클리어 보상 <b>+${fmtMoney(c.rew)}</b>`; } else rw='이미 클리어한 도전, 보상 없음'; save(); sfx('levelup'); }
   showOverlay(`<h3>${ok?'🎉 도전 성공!':'⏱ 시간 종료'}</h3><p style="margin:6px 0 0"><b>${c.ic} ${c.name}</b> · ${c.prog}/${c.need}</p>${ok?`<p class="muted" style="margin:4px 0 0;font-size:.88rem">${rw}</p>`:`<p class="muted" style="margin:4px 0 0;font-size:.88rem">💡 ${c.tip}</p>`}<div class="list" style="margin-top:10px"><button class="btn primary" id="ch-again">${ok?'한 번 더':'다시 도전'}</button><button class="btn" id="ch-menu">다른 도전 고르기</button><button class="btn" id="ch-end">연습 종료</button></div>`);
   el('ch-again').onclick=()=>chalRestart(); el('ch-menu').onclick=()=>{ endPractice(); practiceMenu(); }; el('ch-end').onclick=()=>endPractice(); }
 function chalProg(n=1){ const c=M&&M.chal; if(!c||c.over) return; c.prog+=n; sfx('whistle'); feat(`${c.ic} ${c.prog}/${c.need}`,'#7dffa8'); if(c.prog>=c.need){ M.freeze=Math.max(M.freeze||0,0.8); setTimeout(()=>{ if(M&&M.chal&&!M.chal.over) chalEnd(true); },700); } else { M.freeze=Math.max(M.freeze||0,0.9); M.restart=practiceReset; } }
-function prHUD(){ const on=!!(M&&M.practice); { const o=el('btn-prout'); if(o){ o.hidden=!on||!!(M.chal&&M.chal.id==='warm'); o.textContent=PR_FIRST&&!PR_FIRST.ok?'나중에 하기':'나가기'; o.onclick=()=>{ if(!M||!M.practice) return; const first=!!PR_FIRST; PR_FIRST=null; endPractice(); if(first){ tab='skill'; renderHub(); toast('스킬 탭에서 언제든 다시 체험할 수 있어요'); } }; } } { const t=el('pr-title'); if(t){ t.hidden=!on; if(on){ const id=(PR_FIRST&&PR_FIRST.id)||(PR_TRIAL&&PR_TRIAL.id); const sk=id&&SKILLS.find(x=>x.id===id); t.textContent='연습'+(sk?' · '+sk.name:M.chal?' · '+M.chal.name:''); } } } el('btn-prreset').hidden=!on; el('btn-prdef').hidden=!on||!!M.chal||!!M.a10; if(el('pr-a10')) el('pr-a10').hidden=!(on&&M.a10); if(!on) return; el('btn-prdef').textContent=M.prBench?'수비 넣기':'수비 빼기'; el('live-rt').hidden=true; }
+function prHUD(){ const on=!!(M&&M.practice); { const o=el('btn-prout'); if(o){ o.hidden=!on; o.textContent=M&&M.chal&&M.chal.id==='warm'&&S.prologue?'건너뛰기':PR_FIRST&&!PR_FIRST.ok?'나중에 하기':'나가기'; o.onclick=()=>{ if(!M||!M.practice) return; const first=!!PR_FIRST; PR_FIRST=null; endPractice(); if(first){ tab='skill'; renderHub(); toast('스킬 탭에서 언제든 다시 체험할 수 있어요'); } }; } } { const t=el('pr-title'); if(t){ t.hidden=!on; if(on){ const id=(PR_FIRST&&PR_FIRST.id)||(PR_TRIAL&&PR_TRIAL.id); const sk=id&&SKILLS.find(x=>x.id===id); t.textContent='연습'+(sk?' · '+sk.name:M.chal?' · '+M.chal.name:''); } } } el('btn-prreset').hidden=!on; el('btn-prdef').hidden=!on||!!M.chal||!!M.a10; if(el('pr-a10')) el('pr-a10').hidden=!(on&&M.a10); if(!on) return; el('btn-prdef').textContent=M.prBench?'수비 넣기':'수비 빼기'; el('live-rt').hidden=true; }
 function prToggleDef(){ if(!M||!M.practice||M.chal) return; if(M.prBench){ M.players.push(...M.prBench); M.prBench=null; } else { M.prBench=M.players.filter(q=>q.team===1&&q.role!=='GK'); M.players=M.players.filter(q=>!M.prBench.includes(q)); } practiceReset(); prHUD(); }
 function prShotDone(res){ if(M&&M.a10&&M.a10.cur&&!M.a10.cur.res&&res&&res!=='골!') M.a10.cur.res=res.includes('선방')?'선방':'빗나감'; if(M&&M.practice&&M.prShot&&!M.prShot.res){ M.prShot.res=res; M.prShotT=M.t; } }
-function endPractice(){ if(M&&M.chal&&M.chal.id==='warm'){ warmDone(); return; } PR_FIRST=null; if(el('btn-prout')) el('btn-prout').hidden=true; if(el('pr-title')) el('pr-title').hidden=true; if(el('pr-a10')) el('pr-a10').hidden=true; cancelAnimationFrame(raf); ambience(false); if(PR_TRIAL){ S.player.equip=PR_TRIAL.eq; PR_TRIAL=null; save(); } el('btn-prreset').hidden=true; el('btn-prdef').hidden=true; M=null; el('m-overlay').hidden=true; show('screen-hub'); renderHub(); }
+function endPractice(){ if(M&&M.chal&&M.chal.id==='warm'){ warmDone(); return; } tutOff(); PR_FIRST=null; if(el('btn-prout')) el('btn-prout').hidden=true; if(el('pr-title')) el('pr-title').hidden=true; if(el('pr-a10')) el('pr-a10').hidden=true; cancelAnimationFrame(raf); ambience(false); if(PR_TRIAL){ S.player.equip=PR_TRIAL.eq; PR_TRIAL=null; save(); } el('btn-prreset').hidden=true; el('btn-prdef').hidden=true; M=null; el('m-overlay').hidden=true; show('screen-hub'); renderHub(); }
 function concludeMatch(){ simFlag(false);
   cancelAnimationFrame(raf); ambience(false);
   const st=M.stats, myG=M.score[0], oppG=M.score[1];
@@ -7367,7 +7432,7 @@ function vSwap(on){ // 가로 화면: 그리는 동안만 월드 (x,y) → 화�
   const sp=p=>{ const x=p[0], y=p[1]; if(on){ p[0]=-y; p[1]=x; } else { p[0]=y; p[1]=-x; } };
   if(on) cornerFlags(); const seen=new Set(); const P=o=>{ if(!o||seen.has(o)) return; seen.add(o); sw(o,'x','y'); sw(o,'vx','vy'); sw(o,'fx','fy'); }; (M.cflags||[]).forEach(P);
   M.players.forEach(P); P(M.ref); P(M.ball); if(M.ball&&M.ball.thPts) M.ball.thPts.forEach(sp);
-  ['fx','rings','ghosts','popups','comics','bolts'].forEach(k=>(M[k]||[]).forEach(P)); P(M.runSpot); P(M.delMark);
+  ['fx','rings','ghosts','popups','comics','bolts'].forEach(k=>(M[k]||[]).forEach(P)); P(M.runSpot); P(M.delMark); P(M.tut&&M.tut.mk);
   (M.vfx||[]).forEach(e=>{ if(seen.has(e)) return; seen.add(e); sw(e,'x','y'); if(e.dirn) e.rot+=on?Math.PI/2:-Math.PI/2; });
   (M.cracks||[]).forEach(c=>{ if(c.pts) c.pts.forEach(sp); (c.br||[]).forEach(b2=>b2.pts&&b2.pts.forEach(sp)); (c.arms||[]).forEach(a=>a.forEach(sp)); });
   VLAND=on; }
@@ -7679,6 +7744,7 @@ function draw(){ if(M&&M.chance&&(M.chance.phase==='sim'||M.chance.phase==='zoom
         [[c.star?0.55:0.75,c.ice?`rgba(30,60,90,${0.85*fade})`:`rgba(40,22,8,${0.9*fade})`],[c.star?0.28:0.36,c.ice?`rgba(170,240,255,${0.95*fade})`:`rgba(255,${190+Math.round(40*Math.sin(M.t*20))},60,${0.95*fade})`],[0.1,`rgba(255,255,230,${fade})`]].forEach(([w0,col])=>{ ctx.strokeStyle=col; ctx.lineWidth=li===0||c.star?w0:w0*0.6; ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y)); ctx.stroke(); }); });
       if(!c.star&&prog<1&&M.fx.length<260){ const tip=c.pts[Math.max(0,Math.ceil((c.pts.length-1)*prog))]; for(let i=0;i<3;i++) M.fx.push({x:tip[0]+rnd(-.5,.5),y:tip[1]+rnd(-.3,.3),vx:rnd(-3,3),vy:rnd(-5,-1),life:rnd(0.3,0.6),c:Math.random()<0.5?'rgba(120,80,40,.9)':'rgba(255,210,90,.9)',s:rnd(0.15,0.35)}); }
       ctx.restore(); }); }
+  if(M.tut&&M.tut.mk&&!M.tut.done){ const dm=M.tut.mk, r=1.9+Math.sin(M.t*6)*0.18; ctx.save(); ctx.fillStyle='rgba(46,230,214,.2)'; ctx.strokeStyle='#2ee6d6'; ctx.lineWidth=0.26; ctx.beginPath(); ctx.arc(dm.x,dm.y,r,0,7); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(dm.x,dm.y,0.45,0,7); ctx.fillStyle='#2ee6d6'; ctx.fill(); { const uu=M.user, dx=dm.x-uu.x, dy=dm.y-uu.y, l=Math.hypot(dx,dy); if(l>4.5){ const ex=dx/l, ey=dy/l, ax=uu.x+ex*2.9, ay=uu.y+ey*2.9; ctx.globalAlpha=0.6+0.35*Math.sin(M.t*6); ctx.beginPath(); ctx.moveTo(ax+ex*1.1,ay+ey*1.1); ctx.lineTo(ax-ey*0.7,ay+ex*0.7); ctx.lineTo(ax+ey*0.7,ay-ex*0.7); ctx.closePath(); ctx.fill(); } } ctx.restore(); }
   if(M.delMark){ M.delMark.t-=1/60; if(M.delMark.t<=0||M.ball.owner) M.delMark=null; else { const dm=M.delMark; ctx.save(); ctx.strokeStyle=dm.mate?'#2ee6d6':'#ffe27a'; ctx.lineWidth=0.2; ctx.setLineDash([0.6,0.4]); ctx.beginPath(); ctx.ellipse(dm.x,dm.y,1.4+Math.sin(M.t*10)*0.15,0.8,0,0,7); ctx.stroke(); ctx.setLineDash([]); ctx.restore(); } }
   if(M.shield){ const sh=M.shield, k=sh.t/sh.T; ctx.save(); ctx.globalAlpha=0.75*k; ctx.strokeStyle='#9fd0ff'; ctx.fillStyle='rgba(120,180,255,.18)'; ctx.lineWidth=0.25; ctx.beginPath(); ctx.ellipse(M.user.x,M.user.y,2.6*(1.2-k*0.2),1.5*(1.2-k*0.2),0,Math.PI,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore(); }
   // 선수
@@ -8013,7 +8079,7 @@ function hintLv(){ if(!S) return 2; if(S.hintMode==null&&S.noActHint) S.hintMode
 function gestOn(){ return S.hintMode==='on'||(S.hintMode!=='off'&&!!(typeof M!=='undefined'&&M&&M.practice)); } /* v93: 버튼 아래 조작 설명은 연습장(또는 조작 힌트 '항상')에서만 */
 function hintModeLabel(){ return S.hintMode==='on'?'항상':S.hintMode==='off'?'끔':'자동'; }
 function hintModeNext(){ S.hintMode=S.hintMode==='on'?'off':S.hintMode==='off'?'auto':'on'; S.noActHint=undefined; save(); }
-function actHintOn(){ return hintLv()>0; }
+function actHintOn(){ if(typeof M!=='undefined'&&M&&M.tut&&!M.tut.done) return false; return hintLv()>0; }
 function hintPick(h){ if(!h) return null; const lv=hintLv(); if(lv>=2) return h; if(lv<=0) return null; return (h.pri||h.c)?h:null; } // 1단계: 색이 있는 핵심 안내(슛 찬스·크로스·압박·원터치)만
 function actHint(){ // 지금 가장 쓸모 있는 행동 하나만
   const u=M.user, b=M.ball, has=b.owner===u; const pc=actHint.pc!=null?actHint.pc:(actHint.pc=!window.__SP_FRAMED&&typeof matchMedia==='function'&&matchMedia('(pointer:fine)').matches); const K=(m,k)=>pc?`${k} ${m}`:m;
@@ -8094,7 +8160,7 @@ function updateHUD(){
   if(M._objT%30===0&&!M.bench&&!M.practice){ const pl=Math.min(1,(M.min-(M.min0||0))/(90-(M.min0||0))); const R0=calcRating(M.stats,M.score[0],M.score[1],pl,true); const lr=clamp(R0.rating,3,10); const v=Math.round(lr*10)/10; const box=el('live-rt'); const pm={}; R0.parts.forEach(x=>{ const k=x.t.replace(/ \d+%$/,'').replace(/ \(.*\)$/,'').replace(/ \d+회$/,''); pm[k]=(pm[k]||0)+x.v; });
     if(M._lr==null){ M._lr=v; M._lrP=pm; } const d=v-M._lr; if(Math.abs(d)>=0.1){ M._lrD=d>0?'▲':'▼'; M._lrT=M.t; M._lr=v; const P0=M._lrP||{}; let best=null,bv=0; new Set([...Object.keys(pm),...Object.keys(P0)]).forEach(k=>{ const dv=(pm[k]||0)-(P0[k]||0); if(Math.sign(dv)===Math.sign(d)&&Math.abs(dv)>bv){ bv=Math.abs(dv); best=k; } }); M._lrWhy=best?`${best} ${d>0?'+':'−'}${Math.abs(d).toFixed(1)}`:''; M._lrP=pm; } const showD=M._lrT!=null&&M.t-M._lrT<2.8;
     box.hidden=false; box.style.background=ratingColor(v); box.innerHTML=`평점 ${v.toFixed(1)}${showD?`<span class="d" style="color:${M._lrD==='▲'?'#b6ffcf':'#ffd0c8'}">${M._lrD}</span>${M._lrWhy?`<span class="why">${esc(M._lrWhy)}</span>`:''}`:''}`; }
-  if(M.practice){ el('sc-t').textContent=M.chal?(M.chal.time>999?'워밍업':`${Math.max(0,Math.ceil(M.chal.time-M.chal.t))}초`):'연습'; if((M._objT=(M._objT||0)+1)%10===1){ const ps=M.prShot; el('objs').innerHTML=M.chal?`<div style="font-size:.8rem;opacity:.85">${M.chal.ic} ${M.chal.name}</div><div><b>${M.chal.prog}/${M.chal.need}</b>${M.chal.time>999?'':` · 남은 ${Math.max(0,Math.ceil(M.chal.time-M.chal.t))}초`}</div>${isLand()?`<div style="font-size:.72rem;opacity:.8">${M.chal.id==='last'?'골 넣기':M.chal.id==='escape'?'수비 사이에서 동료에게':M.chal.id==='warm'?'패스 받기 → 전진 → 득점':'원투 후 박스 안에서 받기'}</div>`:''}`:ps?`<div style="font-size:.8rem;opacity:.85">직전 슛</div><div>${ps.k} · ${ps.d}m · 힘 ${ps.pw}%</div><div style="color:${ps.res==='골!'?'#7dffa8':ps.res&&ps.res.startsWith('유효')?'#ffe27a':'#ffb4a0'}">${ps.res||'…'}</div>`:'<div style="font-size:.8rem;opacity:.85">슛을 차면 거리·힘·결과가 여기 나와요</div>'; } }
+  if(M.practice){ el('sc-t').textContent=M.chal?(M.chal.time>999?'연습':`${Math.max(0,Math.ceil(M.chal.time-M.chal.t))}초`):'연습'; if((M._objT=(M._objT||0)+1)%10===1){ const ps=M.prShot; el('objs').innerHTML=M.chal?`<div style="font-size:.8rem;opacity:.85">${M.chal.ic} ${M.chal.name}</div><div><b>${M.chal.prog}/${M.chal.need}</b>${M.chal.time>999?'':` · 남은 ${Math.max(0,Math.ceil(M.chal.time-M.chal.t))}초`}</div>${isLand()?`<div style="font-size:.72rem;opacity:.8">${M.chal.id==='last'?'골 넣기':M.chal.id==='escape'?'수비 사이에서 동료에게':M.chal.id==='warm'?(M.tut&&!M.tut.done?TUT_STEPS[M.tut.i].n:'완료'):'원투 후 박스 안에서 받기'}</div>`:''}`:ps?`<div style="font-size:.8rem;opacity:.85">직전 슛</div><div>${ps.k} · ${ps.d}m · 힘 ${ps.pw}%</div><div style="color:${ps.res==='골!'?'#7dffa8':ps.res&&ps.res.startsWith('유효')?'#ffe27a':'#ffb4a0'}">${ps.res||'…'}</div>`:'<div style="font-size:.8rem;opacity:.85">슛을 차면 거리·힘·결과가 여기 나와요</div>'; } }
   else if((M._objT=(M._objT||0)+1)%15===1) el('objs').innerHTML=objView(M.objs).map(o=>{ const v=objectiveVal(o), done=v>=o.n; const short=objShort(o.t); const mg=o.merged, mdone=mg&&v>=mg.n; return `<div style="opacity:${done?1:.9};color:${done?'#7dffa8':'#fff'}">${done?'✅':o.main?'⭐':'☆'} ${short} ${o.k==='clean'?(done?'':'✗'):`${Math.min(v,mg&&done?mg.n:o.n)}/${mg&&done?mg.n:o.n}`}${mg&&done?(mdone?' 🎁':' · 추가'):''}</div>`; }).join('');
   const has=M.ball.owner===M.user;
   { const hl=String(hintLv()); if(document.body.dataset.hint!==hl) document.body.dataset.hint=hl; }

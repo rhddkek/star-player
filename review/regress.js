@@ -144,7 +144,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   const pre=await pg.evaluate(()=>JSON.stringify({r:S.round,h:(S.history||[]).length,xp:S.player.xp,apps:S.player.career.apps}));
   await pg.evaluate(()=>openHubMore()); await pg.waitForTimeout(200); await pg.click('#btn-practice'); await pg.waitForTimeout(300); const pmN=await pg.evaluate(()=>document.querySelectorAll('.hub-modal [data-pm]').length); await pg.click('.hub-modal [data-pm=free]'); await pg.waitForTimeout(1500);
   const pr1=await pg.evaluate(()=>({practice:!!(M&&M.practice),n:M.players.length,own:M.ball.owner===M.user}));
-  ok('연습장 입장(메뉴: 10초 공격 3 + 자유 + 도전 3): 소수 인원·내 공으로 시작', pmN===7&&pr1.practice&&pr1.n<=6&&pr1.own, JSON.stringify(pr1)+' menu='+pmN);
+  ok('연습장 입장(메뉴: 10초 공격 3 + 조작 배우기 + 자유 + 도전 3): 소수 인원·내 공으로 시작', pmN===8&&pr1.practice&&pr1.n<=6&&pr1.own, JSON.stringify(pr1)+' menu='+pmN);
   await pg.evaluate(()=>{ el('banner').classList.remove('show'); M.freeze=0; const u=M.user; u.x=34; u.y=16; setOwner(u); u.touchT=0; u.protT=2; input.shotHold=true; });
   await pg.waitForTimeout(400); await pg.evaluate(()=>{ input.shotRelease=true; }); await pg.waitForTimeout(4500);
   const pr2=await pg.evaluate(()=>({own:M.ball.owner===M.user,resets:M.prResets||0,shots:M.stats.shots,min:M.min,over:M.over}));

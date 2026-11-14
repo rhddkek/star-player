@@ -417,7 +417,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   { const c5=await b.newContext({viewport:{width:430,height:900}}); const p5=await c5.newPage(); const e5=[]; p5.on('pageerror',e=>e5.push(e.message)); await p5.goto(FILE); await p5.click('#go-create'); await p5.click('#btn-new'); await p5.waitForTimeout(300);
     await p5.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); renderHub(); }); await p5.waitForTimeout(300);
     const def=await p5.evaluate(()=>{ const b=document.querySelector('#sel-mode [data-mode].on'); return b?b.dataset.mode:null; });
-    await p5.evaluate(()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); el('btn-go').click(); }); await p5.waitForTimeout(1200);
+    await p5.evaluate(()=>{ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); if(!el('btn-go')) renderHub(); el('btn-go').click(); }); await p5.waitForTimeout(1200);
     const R=await p5.evaluate(async()=>{ const wait=ms=>new Promise(r=>setTimeout(r,ms)); const ov=el('m-overlay'); if(ov&&!ov.hidden){ const bt=ov.querySelector('.btn.primary'); if(bt) bt.click(); }
       const R={sim:false,chsim:false,live:0,feed:0}; const t0=Date.now();
       while(Date.now()-t0<70000){ await wait(150); if(!M) break; const C=M.chance; if(!C) continue; if(M.paused){ const o=el('m-overlay'); const bt=o&&!o.hidden&&o.querySelector('.btn.primary'); if(bt) bt.click(); continue; }

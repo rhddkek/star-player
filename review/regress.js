@@ -692,6 +692,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('v132 훈련 모션 창(주간·개인 코치·명단 제외 주 추가 훈련 1회) · 개인 코치는 빈 창 없이 바로 · 가로 알림 띠 아래 · 가격+모자란 금액 · 바로 킥오프 · 조작법 표',
       f1&&f1.t==='슈팅 훈련'&&f1.wk==='train'&&/슈팅 훈련/.test(f1.msg)&&coDirect&&pmH>=30&&f2&&f2.t==='패스 훈련'&&f2.dots===2&&f3.fx&&f3.done&&(f3.tg>tg0||f3.st>0)&&again&&tz.top>200&&/tbot/.test(tz.cls)&&/부족/.test(lack)&&/만/.test(lack.replace(/[0-9,]+만 부족/,''))&&lu1.ov&&lu1.sk&&!lu2.ov&&!lu2.paused&&lu2.skip===true&&hp.secs>=3&&hp.rows>=12&&eV.length===0, JSON.stringify({f1,coDirect,pmH,f2,f3,again,tz,lack,lu1,lu2,hp,eV:eV.slice(0,2)}));
     await cV.close(); }
+  // v133: 구단 프로필에서 바로 입단 제안 · 훈련 모션 배경 9종
+  { const cW=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const pw2=await cW.newPage(); const eW=[]; pw2.on('pageerror',e=>eW.push(e.message));
+    await pw2.goto(FILE); await pw2.waitForTimeout(500); await pw2.tap('#go-create'); await pw2.waitForTimeout(300); await pw2.tap('#btn-new'); await pw2.waitForTimeout(400);
+    const R=await pw2.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; autoMatch(true); await w(900); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
+      const tgt=Object.values(CLUBS).filter(c=>!c.nat&&c.id!==S.clubId&&divOf(c.id)&&c.country==='kr').sort((a,b)=>a.str-b.str)[0]; S.win=null; clubProfile(tgt.id); await w(250); const b0=document.querySelector('#cp-rev'); o.closed=!!(b0&&b0.disabled&&/이적시장/.test(b0.textContent)); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      S.win={k:'summer',s:S.season,until:S.round+4}; S.movedS=null; clubProfile(tgt.id); await w(250); const b1=document.querySelector('#cp-rev'); o.open=!!(b1&&!b1.disabled&&/가능성/.test(b1.textContent)); b1&&b1.click(); await w(300); const m=document.querySelector('.rv-m'); o.modal=!!m&&m.querySelector('h3').textContent; o.sel=!!(m&&m.querySelector('.rv-it.sel [data-dm]')); o.prof=!!document.querySelector('#cp-goal');
+      const d=m&&m.querySelector('[data-dm="1"]'); const n0=revState().n; if(d){ d.click(); await w(250); } o.used=revState().n-n0; o.asked=!!revState().asked[tgt.id]; document.querySelectorAll('.hub-modal').forEach(x=>x.remove());
+      o.bg=['shot','pass','buddy','ctrl','spd','tackle','str','sta','mp'].map(k=>!!trBg(k)).every(Boolean); trainFx(['str','mp'],'피지컬 훈련 +40 · 피지컬 40 → 41'); await w(500); const f=document.querySelector('.trfx-m'); o.fx=!!f&&f.querySelector('#trfx-t').textContent; o.gauge=!!(f&&f.querySelector('.trfx-g')); o.cv=f?f.querySelector('canvas').width:0; f&&f.querySelector('#trfx-ok').click(); return o; });
+    ok('v133 구단 프로필 › 입단 제안(시장 닫힘 땐 안내, 열리면 그 구단이 골라진 채 제안 창) · 훈련 모션 배경 9종·게이지', R.closed&&R.open&&R.modal==='구단에 먼저 제안'&&R.sel&&!R.prof&&R.used===1&&R.asked&&R.bg&&R.fx==='피지컬 훈련'&&R.gauge&&R.cv===640&&eW.length===0, JSON.stringify({...R,eW:eW.slice(0,2)}));
+    await cW.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

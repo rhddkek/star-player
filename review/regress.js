@@ -674,6 +674,24 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       R.res=!el('screen-result').hidden; return R; });
     ok('v96 찬스 중계 구간: 내 선수도 일반 AI 선수로 뛰고(팀 약화 해소) 찬스가 시작되면 다시 내 조작 · 유효 슈팅 ≤ 슈팅 · 경기 정상 종료', R.simFlag===true&&R.liveFlag===true&&R.onT&&R.res&&eS.length===0, JSON.stringify({...R,eS:eS.slice(0,2)}));
     await cS.close(); }
+  // v132: 훈련 모션 · 추가 훈련 · 바로 킥오프 · 알림 띠 아래 · 가격 표시
+  { const cV=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const pv=await cV.newPage(); const eV=[]; pv.on('pageerror',e=>eV.push(e.message));
+    await pv.goto(FILE); await pv.waitForTimeout(500); await pv.tap('#go-create'); await pv.waitForTimeout(300); await pv.tap('#btn-new'); await pv.waitForTimeout(400);
+    await pv.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.player.money=3000; for(let i=0;i<2;i++) autoMatch(true); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); tab='home'; renderHub(); }); await pv.waitForTimeout(1200); await pv.evaluate(()=>document.querySelectorAll('.hub-modal').forEach(m=>m.remove()));
+    const tp=async sel=>{ const e=await pv.$(sel); if(!e) return false; const bx=await e.boundingBox(); if(!bx) return false; await pv.touchscreen.tap(bx.x+bx.width/2,bx.y+bx.height/2); await pv.waitForTimeout(350); return true; };
+    await pv.evaluate(()=>{ S.weekAct=null; renderHub(); }); await tp('.hm-wk'); await tp('.wk-sheet [data-wstat="shot"]'); await tp('.wk-sheet [data-tr]');
+    const f1=await pv.evaluate(()=>{ const m=document.querySelector('.trfx-m'); return m?{t:m.querySelector('#trfx-t').textContent,msg:m.querySelector('.trfx-msg').textContent,wk:S.weekAct}:null; }); await tp('#trfx-ok');
+    await pv.evaluate(()=>goKey('player:stat')); await tp('.st3b'); const coDirect=await pv.evaluate(()=>!!document.querySelector('.co-card')&&!document.querySelector('.more-m')); const pmH=await pv.evaluate(()=>{ const r=document.querySelector('.co-card .co-pm button').getBoundingClientRect(); return Math.round(Math.min(r.width,r.height)); });
+    await tp('.co-card [data-cp="pass"]'); await tp('.co-card [data-cp="spd"]'); await tp('#co-go'); const f2=await pv.evaluate(()=>{ const m=document.querySelector('.trfx-m'); return m?{t:m.querySelector('#trfx-t').textContent,dots:m.querySelectorAll('#trfx-d em').length}:null; }); await tp('#trfx-ok');
+    await pv.evaluate(()=>{ const ev=nextEvent(); selFor(ev); S.sel.k='out'; S.sel.why='감독 선택 (명단 제외)'; tab='home'; renderHub(); }); await pv.waitForTimeout(300); const tg0=await pv.evaluate(()=>(S.player.tg&&S.player.tg.tackle)||0); await tp('[data-row="extra"]'); await tp('.xt-m [data-xt="tackle"]');
+    const f3=await pv.evaluate(()=>{ const m=document.querySelector('.trfx-m'); return {fx:!!m,done:extraDone(),tg:(S.player.tg&&S.player.tg.tackle)||0,st:S.player.stats.tackle}; }); await tp('#trfx-ok'); await tp('[data-row="extra"]'); const again=await pv.evaluate(()=>!document.querySelector('.xt-m'));
+    await pv.evaluate(()=>{ toast('알림 위치 확인'); }); const tz=await pv.evaluate(()=>{ const r=el('toast').getBoundingClientRect(); return {top:Math.round(r.top),cls:el('toast').className}; });
+    await pv.evaluate(()=>{ S.player.money=0; goKey('shop:life'); }); await pv.waitForTimeout(300); const lack=await pv.evaluate(()=>{ const b=document.querySelector('#item-list button[data-i]'); return b?b.textContent:''; });
+    await pv.evaluate(()=>{ const ev=nextEvent(); selFor(ev); S.sel.k='start'; S.sel.why=''; tab='home'; renderHub(); startMatch(false); }); await pv.waitForTimeout(700); const lu1=await pv.evaluate(()=>({ov:!el('m-overlay').hidden,sk:!!el('lu-sk')})); await tp('#lu-sk'); await tp('#lu-back'); await pv.evaluate(()=>{ startMatch(false); }); await pv.waitForTimeout(900); const lu2=await pv.evaluate(()=>({ov:!el('m-overlay').hidden,paused:!!(M&&M.paused),skip:S.skipLineup}));
+    await pv.evaluate(()=>{ el('btn-skip').click(); }); await pv.waitForTimeout(300); await pv.evaluate(()=>{ el('pz-help').click(); }); await pv.waitForTimeout(200); const hp=await pv.evaluate(()=>({secs:document.querySelectorAll('#m-overlay .hp2 section').length,rows:document.querySelectorAll('#m-overlay .hp-r').length}));
+    ok('v132 훈련 모션 창(주간·개인 코치·명단 제외 주 추가 훈련 1회) · 개인 코치는 빈 창 없이 바로 · 가로 알림 띠 아래 · 가격+모자란 금액 · 바로 킥오프 · 조작법 표',
+      f1&&f1.t==='슈팅 훈련'&&f1.wk==='train'&&/슈팅 훈련/.test(f1.msg)&&coDirect&&pmH>=30&&f2&&f2.t==='패스 훈련'&&f2.dots===2&&f3.fx&&f3.done&&(f3.tg>tg0||f3.st>0)&&again&&tz.top>200&&/tbot/.test(tz.cls)&&/부족/.test(lack)&&/만/.test(lack.replace(/[0-9,]+만 부족/,''))&&lu1.ov&&lu1.sk&&!lu2.ov&&!lu2.paused&&lu2.skip===true&&hp.secs>=3&&hp.rows>=12&&eV.length===0, JSON.stringify({f1,coDirect,pmH,f2,f3,again,tz,lack,lu1,lu2,hp,eV:eV.slice(0,2)}));
+    await cV.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

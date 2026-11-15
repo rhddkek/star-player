@@ -2794,6 +2794,8 @@ td.num.mine{font-weight:800;color:#1f8a66}
 
 
 
+
+
 /*<u16>*/
 /* v132: 가로 화면 알림 띠는 아래쪽 */
 .toast.tbot{top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:min(480px,56vw);padding:7px 14px;font-size:.84rem;line-height:1.35;border-radius:10px!important;box-shadow:0 4px 14px #0006}
@@ -2889,6 +2891,16 @@ td.num.mine{font-weight:800;color:#1f8a66}
   body.land-fit .hub-modal .row.between>.btn.sm,body.land-fit .more-h .btn.sm{min-height:44px!important;min-width:68px!important;font-size:1rem!important}
   body.land-fit .xt-b{min-height:62px}
   .hp-r{grid-template-columns:54px 1fr;padding:3px 0}
+}
+@media (orientation:portrait){
+  .lu-bt.b3{grid-template-columns:auto auto minmax(96px,1fr)!important;gap:6px!important}
+  .lu-bt.b3 .btn{padding-inline:8px!important;min-width:0}
+  .lu-bt.b3 #lu-back{font-size:.86rem!important}
+  .lu-bt.b3 .lu-sk{font-size:.76rem!important;gap:5px;padding-inline:8px!important}
+  .lu-bt.b3 .lu-sk i{width:18px;height:18px}
+  .co-card .co-r{grid-template-areas:"n v" "pm pm" "c c"!important}
+  .co-card .co-c{text-align:right}
+  .co-card .co-pm{justify-content:space-between}
 }
 
 /*</u16>*/

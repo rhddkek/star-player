@@ -1,7 +1,0 @@
-const {chromium}=require('playwright'); const OUT='/tmp/claude-0/-home-claude/99dc0c2a-f95d-5557-84c3-47562decaedf/scratchpad/v132/';
-(async()=>{ const b=await chromium.launch(); const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true}); const pg=await ctx.newPage(); const errs=[]; pg.on('pageerror',e=>errs.push(e.message));
- await pg.goto('file:///home/claude/star-player/index.html'); await pg.waitForTimeout(500); await pg.tap('#go-create'); await pg.waitForTimeout(300); await pg.tap('#btn-new'); await pg.waitForTimeout(400);
- await pg.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; for(let i=0;i<2;i++) autoMatch(true); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); tab='home'; renderHub(); }); await pg.waitForTimeout(1200); await pg.evaluate(()=>document.querySelectorAll('.hub-modal').forEach(m=>m.remove()));
- const ks=['shot','pass','ctrl','spd','tackle','str','sta','mp']; const ts=[0.75,1.0,1.2,0.5,1.15,1.2,0.6,1.0];
- for(let i=0;i<ks.length;i++){ await pg.evaluate(k=>{ trainFx([k],'슈팅 훈련 +40 · 슈팅 30 → 31 · 다음 12/90'); },ks[i]); await pg.waitForTimeout(ts[i]*1000+120); await (await pg.$('#trfx-c')).screenshot({path:OUT+'fx_'+ks[i]+'.png'}); await pg.evaluate(()=>document.querySelectorAll('.trfx-m').forEach(m=>{ m._dead=true; m.remove(); })); }
- console.log('errs',errs); await b.close(); })();

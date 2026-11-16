@@ -2803,6 +2803,7 @@ td.num.mine{font-weight:800;color:#1f8a66}
 
 
 
+
 /*<u16>*/
 /* v132: 가로 화면 알림 띠는 아래쪽 */
 .toast.tbot{top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:min(480px,56vw);padding:7px 14px;font-size:.84rem;line-height:1.35;border-radius:10px!important;box-shadow:0 4px 14px #0006}
@@ -2923,6 +2924,8 @@ td.num.mine{font-weight:800;color:#1f8a66}
 .st2 .pm button{position:relative}.st2 .pm button::after{content:'';position:absolute;inset:-6px -3px}
 .toast.tbot{left:calc(84px + env(safe-area-inset-left,0px))!important;transform:none!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:max(168px,20vw)!important;text-align:left;font-size:.8rem!important;padding:6px 10px!important}
 .h2stat .h2img img{object-position:50% 4%!important}
+/* v136: 상황 띠를 점수판 안으로 */
+#screen-match.land .score .sit{position:static!important;transform:none!important;display:block;width:84px;box-sizing:border-box;text-align:center;overflow:hidden;text-overflow:ellipsis;padding:0 8px 0 4px!important;border:0!important;background:none!important;font-size:.74rem;font-weight:700;align-self:center;white-space:nowrap}
 
 /*</u16>*/
 </style>
@@ -7739,10 +7742,10 @@ function fkPanel(){ const F=M.fk, b=M.ball, g=goalOf(0); const d=Math.round(dist
   x.fillStyle='rgba(255,255,255,.75)'; x.font='bold 18px "Noto Sans KR",sans-serif'; x.textAlign='center'; x.fillText(F.spin<0?'↺':F.spin>0?'↻':'●',rx,ry-16); }
 function gkOutChip(u){ if(M.setPiece) return false; const gk=M.players.find(q=>q.role==='GK'&&q.team===1); if(!gk) return false; const d=dist(u,gk); return gk.y>6.5&&u.y<34&&u.y>gk.y+1.5&&d<15&&d>3; }
 function sitInfo(){ const b=M.ball, o=b.owner, u=M.user, sp=M.setPiece; const lost=M.lostT||[-9,-9];
-  if(sp){ if(sp.type==='fk'&&M.fk) return ['set',`직접 프리킥 · 골문까지 ${Math.round(dist(b,goalOf(0)))}m`]; return ['set',`${SP_NAMES[sp.type]}${sp.taker&&sp.taker.isUser?' · 내가 찬다':sp.team===0?' · 우리 공':' · 상대 공'}`]; }
+  if(sp){ if(sp.type==='fk'&&M.fk) return ['set',`프리킥 ${Math.round(dist(b,goalOf(0)))}m`]; return ['set',`${SP_NAMES[sp.type]}${sp.taker&&sp.taker.isUser?' · 나':sp.team===0?' · 우리':' · 상대'}`]; }
   if(M.freeze>0) return null;
-  if(o&&o.team===0){ const ctr=M.t-lost[1]<5; if(o===u) return ['atk',dist(u,goalOf(0))<22?'슈팅 찬스!':ctr?'역습 기회!':'공격 · 볼 소유']; return ['atk',ctr?'역습 기회!':o.role==='GK'?'빌드업 시작':'공격 전개 중']; }
-  if(o&&o.team===1){ if(b.y>H*0.72) return ['def','위험 지역 · 막아라!']; if(M.t-lost[0]<4) return ['def','역압박 · 바로 뺏어라']; return ['def','수비 정비 · 자리 지키기']; }
+  if(o&&o.team===0){ const ctr=M.t-lost[1]<5; if(o===u) return ['atk',dist(u,goalOf(0))<22?'슈팅 찬스!':ctr?'역습!':'공격']; return ['atk',ctr?'역습!':o.role==='GK'?'빌드업':'공격']; }
+  if(o&&o.team===1){ if(b.y>H*0.72) return ['def','위험!']; if(M.t-lost[0]<4) return ['def','역압박']; return ['def','수비']; }
   return ['loose','루즈볼 · 경합']; }
 function skChip(name,col){ const e=el('skchip'); if(!e) return; e.innerHTML=`<b>⚡</b> ${esc(name)} <em>발동!</em>`; e.style.setProperty('--c',col||'#9fd0ff'); e.classList.remove('show'); void e.offsetWidth; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1500); }
 function celebTick(dt){ const T=M.celebTo; if(!T) return; let any=false; M.players.forEach(p=>{ if(!p.celebRun) return; if(M.freeze<0.3){ p.celebRun=false; p.vx=p.vy=0; return; } any=true; const dx=T.x-p.x, dy=T.y-p.y, d=Math.hypot(dx,dy);
@@ -8319,20 +8322,20 @@ function actHint(){ // 지금 가장 쓸모 있는 행동 하나만
   if(has&&u.touchT>0.05) return {t:'트래핑',c:'rgba(20,60,90,.88)',pri:2};
   if(has&&M.charge) return null;
   if(has){ const gd=dist(u,goalOf(0)); const [,od]=nearest(M.players.filter(q=>q.team===1&&q.role!=='GK'),u);
-    if(gd<26&&Math.abs(u.x-W/2)<20) return {t:K('슛','X')+' · 길게 누르면 강슛',c:'rgba(150,95,0,.9)'};
+    if(gd<26&&Math.abs(u.x-W/2)<20) return {t:K('슛','X')+' · 꾹 = 강슛',c:'rgba(150,95,0,.9)'};
     if(crossZone(u)) return {t:K('패스','Z')+' = 크로스',c:'rgba(20,70,130,.88)'};
-    if(od<2.6) return {t:'압박! '+K('패스','Z')+'로 빼기',c:'rgba(130,40,30,.88)'};
-    return {t:K('패스','Z')+' (위로 밀면 롱패스) · '+K('스루','F')+' · 달리며 돌파'}; }
-  if(incomingU()){ const ot=M.oneTouch&&M.t-M.oneTouch.t<2.5?M.oneTouch:null; const nb=!S.player.career||S.player.career.apps<6; return {t:ot?(ot.type==='shot'?'원터치 슛 준비됨':'원터치 패스 준비됨'):'공 받는 중'+(nb?' · 미리 누르면 원터치':''),c:'rgba(20,90,60,.9)',pri:1}; }
+    if(od<2.6) return {t:'압박 · '+K('패스','Z'),c:'rgba(130,40,30,.88)'};
+    return (!S.player.career||S.player.career.apps<3)?{t:K('패스','Z')+' · '+K('스루','F')+' · 돌파'}:null; } /* v136: 늘 떠 있던 긴 안내는 첫 3경기만, 단어로 */
+  if(incomingU()){ const ot=M.oneTouch&&M.t-M.oneTouch.t<2.5?M.oneTouch:null; const nb=!S.player.career||S.player.career.apps<6; return {t:ot?(ot.type==='shot'?'원터치 슛':'원터치 패스'):'받는 중'+(nb?' · 원터치 가능':''),c:'rgba(20,90,60,.9)',pri:1}; }
   const o=b.owner;
-  if(o&&o.team===0&&M.giveGo&&M.giveGo.mate===o&&M.t-M.giveGo.t<3.4){ if(M.giveGo.dec===true) return {t:'앞으로 달리면 원투 리턴!',c:'rgba(20,70,130,.9)'}; if(M.giveGo.dec===false) return {t:(M.giveGo.why?M.giveGo.why+' · ':'')+(actHint.pc?'F ':'')+'스루 = 리턴 요청',c:'rgba(60,60,80,.88)'}; }
-  if(o&&o.team===0){ if(M.request>0) return {t:M.reqState==='ok'?'요청함, 곧 패스 와요':'요청함, 비어 있는 곳으로 움직이기'}; const lr=laneRisk(o,u,M.players.filter(q=>q.team===1)); if(lr>0.6&&dist(o,u)<35) return {t:'↔ 옆으로 움직여 패스길 열기'}; return {t:K('슛','X')+' = 패스 요청'}; }
-  if(o&&o.team===1&&dist(o,u)<7) return {t:K('패스','Z')+' = 태클 (정면에서)',c:'rgba(30,50,120,.9)'};
+  if(o&&o.team===0&&M.giveGo&&M.giveGo.mate===o&&M.t-M.giveGo.t<3.4){ if(M.giveGo.dec===true) return {t:'원투 · 앞으로!',c:'rgba(20,70,130,.9)'}; if(M.giveGo.dec===false) return {t:(M.giveGo.why?M.giveGo.why+' · ':'')+(actHint.pc?'F ':'')+'스루 = 리턴 요청',c:'rgba(60,60,80,.88)'}; }
+  if(o&&o.team===0){ if(M.request>0) return {t:M.reqState==='ok'?'패스 옴':'빈 곳으로'}; const lr=laneRisk(o,u,M.players.filter(q=>q.team===1)); if(lr>0.6&&dist(o,u)<35) return {t:'↔ 패스길 열기'}; return {t:K('슛','X')+' = 패스 요청'}; }
+  if(o&&o.team===1&&dist(o,u)<7) return {t:K('패스','Z')+' = 태클',c:'rgba(30,50,120,.9)'};
   const newbie=!S.player.career||S.player.career.apps<6;
-  if(o&&o.team===1&&!M.chasing&&newbie) return {t:K('슛','X')+' 누르고 있기 = 공 따라가기',c:'rgba(30,50,120,.85)'};
-  if(!o&&b.isShot&&b.lastKicker===u) return M.after&&M.after.t>0?{t:'방향키 = 공 휘기 · 아래로 = 띄우기',c:'rgba(120,90,10,.9)'}:null;
-  if(!o&&(b.z>1.1||b.vz>3)&&b.passTarget===u) return {t:'점선 원 = 공이 떨어질 곳',c:'rgba(20,90,90,.9)'};
-  if(!o&&dist(b,u)<14) return {t:newbie?'공을 먼저 잡자! ('+K('슛','X')+' 누르면 자동으로 따라감)':'공을 먼저 잡자!'};
+  if(o&&o.team===1&&!M.chasing&&newbie) return {t:K('슛','X')+' 꾹 = 추격',c:'rgba(30,50,120,.85)'};
+  if(!o&&b.isShot&&b.lastKicker===u) return M.after&&M.after.t>0?{t:'방향 = 휘기 · ↓ = 띄우기',c:'rgba(120,90,10,.9)'}:null;
+  if(!o&&(b.z>1.1||b.vz>3)&&b.passTarget===u) return {t:'점선 원 = 낙하 지점',c:'rgba(20,90,90,.9)'};
+  if(!o&&dist(b,u)<14) return {t:newbie?'루즈볼 · '+K('슛','X')+' 꾹 = 추격':'루즈볼!'};
   return null; }
 function ahDom(ah){ const e=el('ahint'); if(!e) return; const t=ah?ah.t:''; if(e._t!==t){ e._t=t; e.textContent=t; e.style.background=(ah&&ah.c)||''; e.classList.toggle('show',!!t); e._p=0; }
   if(t&&!e._p){ const tops=[...document.querySelectorAll('.ctl button')].filter(x=>x.offsetParent&&x.getBoundingClientRect().height>0).map(x=>x.getBoundingClientRect().top); if(tops.length){ e.style.bottom=Math.round(innerHeight-Math.min(...tops)+8)+'px'; e._p=1; } } }
@@ -8408,7 +8411,7 @@ function updateHUD(){
   el('k-sprint').classList.toggle('on',!!M.sprinting); mvHud(has); el('k-sprint').classList.toggle('has',has&&!mySp); el('k-shot').classList.toggle('has',has&&!mySp);
   { const kt=el('k-thru'); const mb=M.ball.owner&&M.ball.owner.team===0&&!has; const defd=!has&&!mb&&!M.setPiece; const lt=has?'스루':mb?'침투':'협력 압박'; const st=kt.querySelector('span'); if(st.textContent!==lt){ st.textContent=lt; st.style.fontSize=lt.length>2?'.68rem':''; st.style.lineHeight=lt.length>2?'1.05':''; } kt.classList.toggle('dim',!!M.setPiece&&!has); kt.classList.toggle('req',M.reqThru>0||M.helpPress>0); kt.classList.toggle('def',defd&&!(M.helpPress>0)); }
   { const hn=el('hint'); if(!hn.hidden) hn.hidden=true; }
-  { const se=el('sit'); if(se){ const si=sitInfo(); const k=si?si.join('|'):''; if(se._k!==k){ se._k=k; se.className='sit'+(si?' '+si[0]:''); se.textContent=si?si[1]:''; se.style.visibility=si?'':'hidden'; } } }
+  { const se=el('sit'); if(se){ if(!se._mv){ se._mv=1; const sc0=document.querySelector('#screen-match .score'); if(sc0) sc0.append(se); } /* v136: 상황 띠를 점수판 안으로 */ const si=sitInfo(); const k=si?si.join('|'):''; if(se._k!==k){ se._k=k; se.className='sit'+(si?' '+si[0]:''); se.textContent=si?si[1]:''; se.style.visibility=si?'':'hidden'; } } }
   { const fkOn=!!(M.fk&&M.setPiece&&M.ball.owner===M.user); const fp=el('fkp'); if(fp){ if(fp.hidden===fkOn) fp.hidden=!fkOn; const sm=el('screen-match'); if(sm.classList.contains('fkon')!==fkOn) sm.classList.toggle('fkon',fkOn); if(fkOn) fkPanel(); } }
   [0,1,2,3].forEach(i=>{ if(i>=slotCount()) return; const btn=el('k-s'+i); const sk=SKILLS.find(x=>x.id===S.player.equip[i]); if(!sk) return; const cd=M.cds[i]; const SCx=skCost(sk); btn.style.setProperty('--cd',cd/SCx.cd);
     const needBall=['shot','pass','dash','roll'].includes(sk.type), needNo=sk.type==='tackle'; let okBall=needBall?has:needNo?!has:true; if(sk.id==='bicycle'&&!has&&!M.ball.owner&&dist(M.user,M.ball)<2.5) okBall=true; const ultLeft=sk.ult?ultMax(sk.id)-((M.ultN||{})[sk.id]||0):99; if(ultLeft<=0) okBall=false;

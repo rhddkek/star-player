@@ -718,6 +718,14 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       o.ai=NEWLOOKS.length===6; TINT.zz=1; S.history=[{season:1,round:1,type:'league',a:'jp-1-1',b:S.clubId,opp:'jp-1-1',ga:0,gb:1,goals:1,assists:0,rating:7,club:S.clubId},{season:1,round:2,type:'cc',a:'th-1-1',b:S.clubId,opp:'th-1-1',ga:0,gb:1,goals:1,assists:0,rating:7,club:S.clubId}]; retire(true); await w(200); const col=el('result-col'); o.ret=!!col.querySelector('.ret2'); o.path=col.querySelectorAll('.ret2 .rt-path>*, .ret2 .rt-cl>*').length; o.html=(col.querySelector('.ret2 .rt-r')||{innerHTML:''}).innerHTML.replace(/data:[^"]+/g,'').slice(0,0); o.names=[...col.querySelectorAll('.ret2 .rt-r b')].map(x=>x.textContent).join('|').slice(0,200); o.mine=CLUBS[S.clubId].short||CLUBS[S.clubId].name; return o; });
     ok('v135 지난주와 같게(미리 골라짐 · 광고는 기억 안 함) · 재계약 주급 상한 · 은퇴 화면 구단 경로는 내 구단만 · 경기 그림 6종', R.last==='spd'&&R.same&&R.pre&&R.keep&&R.cap&&R.grow&&R.ai&&R.ret&&!/부리람|반둥/.test(R.names)&&eV.length===0, JSON.stringify({...R,eV:eV.slice(0,2)}));
     await cV.close(); }
+  // v136: 상황 띠가 점수판 안으로 · 조작 안내는 단어로
+  { const cS=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const ps=await cS.newPage(); const eS=[]; ps.on('pageerror',e=>eS.push(e.message));
+    await ps.goto(FILE); await ps.waitForTimeout(500); await ps.tap('#go-create'); await ps.waitForTimeout(300); await ps.tap('#btn-new'); await ps.waitForTimeout(400);
+    await ps.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await ps.waitForTimeout(800); await ps.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await ps.waitForTimeout(2500);
+    const R=await ps.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); M.freeze=0; const u=M.user; u.x=W/2; u.y=60; setOwner(u); await w(400); const se=el('sit'); const o={in:!!se.closest('.score'),txt:se.textContent,w:Math.round(se.getBoundingClientRect().width)}; const sc=document.querySelector('#screen-match .score').getBoundingClientRect(); o.top=Math.round(se.getBoundingClientRect().top-sc.top); o.h=Math.round(sc.height);
+      S.player.career.apps=10; const h1=actHint(); S.player.career.apps=0; const h0=actHint(); o.h1=h1&&h1.t; o.h0=h0&&h0.t; return o; });
+    ok('v136 상황 띠가 점수판 안(한 단어) · 공 잡았을 때 긴 안내는 첫 3경기만 단어로', R.in&&R.txt.length<=6&&R.w>=60&&R.top>=0&&R.top<R.h&&!R.h1&&/패스 · 스루 · 돌파/.test(R.h0||'')&&eS.length===0, JSON.stringify({...R,eS:eS.slice(0,2)}));
+    await cS.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

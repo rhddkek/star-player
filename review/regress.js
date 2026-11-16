@@ -708,6 +708,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       o.spr=['f5','f6','f7','f8'].every(l=>!!mySpr('idle','south',0,'#1d3f8f','#ffffff',null,l)); const px=l=>{ const t=tinted(SPR[l].idle.south[0],l+'idlesouth0',195,265,'#1d3f8f','#ffffff'); const d=t.getContext('2d').getImageData(0,0,t.width,t.height).data; let n=0,sum=0; for(let i=0;i<d.length;i+=4){ if(d[i+3]>10){ n++; sum+=d[i]*3+d[i+1]*5+d[i+2]*7; } } return sum; }; o.diff=new Set(['f2','f6','f7','f8'].map(px)).size===4&&px('field')!==px('f5');
       const keep=S.look; S.look='f7'; o.use=myLook()==='f7'&&NEWLOOK.f7==='x7'&&uimg('face')===UI2_LOOK.f7.face; S.look=keep; return o; });
     ok('v134 경기장 폭 72(포메이션 좌표 함께 넓어짐) · 외형 8종(E~H 초상 14장씩 · 경기 그림 머리색 변형)', R.W===72&&R.H===105&&R.form&&R.mid===36&&R.looks===8&&R.art&&R.spr&&R.diff&&R.use, JSON.stringify(R)); }
+  // v135: 지난주와 같게 · 재계약 주급 상한 · 은퇴 화면 거쳐 온 구단 · 색칠 캐시 비우기
+  { const cV=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const pv=await cV.newPage(); const eV=[]; pv.on('pageerror',e=>eV.push(e.message));
+    await pv.goto(FILE); await pv.waitForTimeout(500); await pv.tap('#go-create'); await pv.waitForTimeout(300); await pv.tap('#btn-new'); await pv.waitForTimeout(400);
+    const R=await pv.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
+      S.weekAct=null; weekCardEl.sel=null; weekCardEl.stat=null; doWeekAct('spd'); o.last=S.lastWk; S.weekAct=null; weekCardEl.sel=null; weekCardEl.stat=null; const c1=weekCardEl(); o.same=!!c1.querySelector('.wk-same'); const okb=c1.querySelector('#wk-ok'); o.pre=!!okb&&!okb.disabled&&okb.dataset.tr==='spd';
+      S.weekAct=null; weekCardEl.sel=null; weekCardEl.stat=null; doWeekAct('ad'); o.keep=S.lastWk==='spd';
+      const mine=CLUBS[S.clubId]; S.wage=mine.wage*40; S.contractEnd=S.season; const rn=makeOffers().find(x=>x.renew); o.cap=!rn||rn.wage<=Math.round(S.wage*legMul())+1; S.wage=90; const rn2=makeOffers().find(x=>x.renew); o.grow=!rn2||rn2.wage>=80;
+      o.ai=NEWLOOKS.length===6; TINT.zz=1; S.history=[{season:1,round:1,type:'league',a:'jp-1-1',b:S.clubId,opp:'jp-1-1',ga:0,gb:1,goals:1,assists:0,rating:7,club:S.clubId},{season:1,round:2,type:'cc',a:'th-1-1',b:S.clubId,opp:'th-1-1',ga:0,gb:1,goals:1,assists:0,rating:7,club:S.clubId}]; retire(true); await w(200); const col=el('result-col'); o.ret=!!col.querySelector('.ret2'); o.path=col.querySelectorAll('.ret2 .rt-path>*, .ret2 .rt-cl>*').length; o.html=(col.querySelector('.ret2 .rt-r')||{innerHTML:''}).innerHTML.replace(/data:[^"]+/g,'').slice(0,0); o.names=[...col.querySelectorAll('.ret2 .rt-r b')].map(x=>x.textContent).join('|').slice(0,200); o.mine=CLUBS[S.clubId].short||CLUBS[S.clubId].name; return o; });
+    ok('v135 지난주와 같게(미리 골라짐 · 광고는 기억 안 함) · 재계약 주급 상한 · 은퇴 화면 구단 경로는 내 구단만 · 경기 그림 6종', R.last==='spd'&&R.same&&R.pre&&R.keep&&R.cap&&R.grow&&R.ai&&R.ret&&!/부리람|반둥/.test(R.names)&&eV.length===0, JSON.stringify({...R,eV:eV.slice(0,2)}));
+    await cV.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

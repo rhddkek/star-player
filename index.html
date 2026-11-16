@@ -7473,7 +7473,7 @@ function outOfBounds(where){ if(M.ball.lastKicker&&M.ball.lastKicker.isUser) prS
 }
 
 /* ---------- LOOP ---------- */
-const TEMPO_K=/[?&]tempo=1\b/.test(location.search)?1:0.75;
+const TEMPO_K=/[?&]tempo=1\b/.test(location.search)?1:0.95; /* v138: 75%는 너무 느려 95%로 */
 function loop(now){
   if(!M) return;
   const el0=Math.min(0.2,Math.max(0,(now-lastT)/1000)); const sub=el0>0.045?Math.min(6,Math.ceil(el0/0.0334)):1; let dt=Math.min(0.034,el0/sub); lastT=now; /* v88: 프레임이 느려도 경기 시간은 실제 시간대로 */

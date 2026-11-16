@@ -734,7 +734,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       o.ppm=+(M.cam.ppm).toFixed(1); o.vh=+(393/M.cam.ppm).toFixed(1);
       const a=M.players.find(q=>q.team===0&&q.role==='DF'), c=M.players.find(q=>q.team===1&&q.role==='FW'); M.paused=false; a.st.str=95; c.st.str=20; let lost=0; for(let i=0;i<40;i++){ a.bumpAt=c.bumpAt=-9; a.bumpT=c.bumpT=0; a.x=30; a.y=50; c.x=30.6; c.y=50; a.vx=4; c.vx=-4; a.vy=c.vy=0; a.stun=c.stun=0; a.tackleT=c.tackleT=0; a.rollT=c.rollT=0; M.setPiece=null; bodyContact(0.016); if(c.bumpT>0) lost++; } o.lost=lost; c.bumpT=0.3; const v1=maxSpeed(c); c.bumpT=0; o.slow=+(v1/maxSpeed(c)).toFixed(2);
       const sp=(hx,bx)=>shapePoint({hx,hy:60,i:3,role:'MF',st:{}},0,false,50,bx,null).x; o.wL=+sp(8,36).toFixed(1); o.wR=+sp(64,36).toFixed(1); return o; });
-    ok('v137 경기 템포 75%(경기 시계는 그대로) · 카메라 뒤로 · 힘센 쪽이 몸싸움에서 이김(휘청 = 속도 60%) · 수비 대형 좁힘', R.k===0.75&&R.sim>0.6&&R.sim<0.85&&R.clock>0.5&&R.clock<0.7&&R.vh>29&&R.lost>=26&&R.slow===0.6&&(R.wR-R.wL)<40&&eT.length===0, JSON.stringify({...R,eT:eT.slice(0,2)}));
+    ok('v137·v138 경기 템포 95%(경기 시계는 그대로) · 카메라 뒤로 · 힘센 쪽이 몸싸움에서 이김(휘청 = 속도 60%) · 수비 대형 좁힘', R.k===0.95&&R.sim>0.82&&R.sim<1.02&&R.clock>0.5&&R.clock<0.7&&R.vh>29&&R.lost>=26&&R.slow===0.6&&(R.wR-R.wL)<40&&eT.length===0, JSON.stringify({...R,eT:eT.slice(0,2)}));
     await cT.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

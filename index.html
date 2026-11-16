@@ -5863,7 +5863,8 @@ function animFor(pl){ // 상태 → [캐릭터, 애니메이션, 방향, 프레�
 function postHit(b,t){ popup(b.x,b.y<H/2?2.2:H-2.2,t,'#ffd84d'); sfx('save'); sfx('kick'); M.shake=Math.max(M.shake||0,0.35); b.saveChecked=false; b.fire=b.thunder=b.meteor=b.bike=b.knuckle=b.pHead=false; b.curve=0; M.slow=Math.max(M.slow||0,0.3); kickDust(b.x,b.y,8); (M.dbg||(M.dbg={})).post=(M.dbg.post||0)+1; }
 function bodyContact(dt){ const ps=M.players; for(let i=0;i<ps.length;i++){ const a=ps[i]; if(a.stun>0||a.rollT>0||a.tackleT>0||(a.isUser&&(M.dashT>0||M.phantomT>0||M.rollImm>0))) continue; for(let j=i+1;j<ps.length;j++){ const c=ps[j]; if(a.team===c.team||c.stun>0||c.rollT>0||c.tackleT>0||(c.isUser&&(M.dashT>0||M.phantomT>0||M.rollImm>0))) continue; const dx=c.x-a.x, dy=c.y-a.y, d=Math.hypot(dx,dy); if(d>0.85||d<0.001) continue;
     const sa=(a.isUser?ustat('str'):a.st.str)+(M.ball.owner===a?8:0), sc=(c.isUser?ustat('str'):c.st.str)+(M.ball.owner===c?8:0); const push=(0.85-d)*0.5, wa=sc/(sa+sc), wc=sa/(sa+sc); const nx=dx/d, ny=dy/d;
-    a.x-=nx*push*wa; a.y-=ny*push*wa; c.x+=nx*push*wc; c.y+=ny*push*wc; const rv=(c.vx-a.vx)*nx+(c.vy-a.vy)*ny; if(rv<0){ a.vx+=nx*rv*wa; a.vy+=ny*rv*wa; c.vx-=nx*rv*wc; c.vy-=ny*rv*wc; } } } }
+    a.x-=nx*push*wa; a.y-=ny*push*wa; c.x+=nx*push*wc; c.y+=ny*push*wc; const rv=(c.vx-a.vx)*nx+(c.vy-a.vy)*ny; if(rv<0){ a.vx+=nx*rv*wa; a.vy+=ny*rv*wa; c.vx-=nx*rv*wc; c.vy-=ny*rv*wc; }
+    /* v137: 세게 부딪히면 힘에서 밀린 쪽이 잠깐 휘청(속도↓) — 피지컬이 체감되게 */ if(rv<-4.2&&!M.setPiece&&M.t-(a.bumpAt||-9)>1.3&&M.t-(c.bumpAt||-9)>1.3&&a.role!=='GK'&&c.role!=='GK'){ const lose=Math.random()<clamp(wa+(wa-0.5)*1.6,0.08,0.92)?a:c, win=lose===a?c:a; a.bumpAt=c.bumpAt=M.t; lose.bumpT=0.32+Math.min(0.3,(-rv-4.2)*0.05); if((a.isUser||c.isUser)&&(M.ball.owner===a||M.ball.owner===c||dist(M.ball,a)<4)){ const u=a.isUser?a:c; popup(u.x,u.y-2.2,lose===u?'밀렸다':'몸싸움 승!',lose===u?'#ffb0a0':'#9fe8c0'); try{ buzz(lose===u?18:10); }catch(e){} } } } } }
 /* v119: 픽셀 공 (회전 4프레임) */
 function ballFrames(){ if(ballFrames.c) return ballFrames.c; const N=14, out=[];
   for(let f=0;f<4;f++){ const c=document.createElement('canvas'); c.width=c.height=N; const x=c.getContext('2d'); const id=x.createImageData(N,N), D=id.data; const cx=6.5, cy=6.5, R=6.4;
@@ -6245,7 +6246,7 @@ function matchMinute(){ return Math.floor(M.min)+1; }
 function ustat(k){ // 내 선수 유효 스탯 (버프·컨디션·적응 포함)
   return clamp((M.user.st[k]??S.player.stats[k]??50)+((M.gearB&&M.gearB.st[k])||0)+(M.buffT>0?25:0)+(M.leadT>0?8:0)+aStat(k)-(S.player.cond<50?6:0)-(S.player.adapt>0?5:0)-adaptPen(),1,120);
 }
-function maxSpeed(pl){ const s=pl.isUser?ustat('spd'):pl.st.spd; let v=(5.6+s/100*3.6)*1.3*(M&&M.weather==='snow'?0.95:1)*(S&&S.tempo==='real'&&M&&!M.practice?0.9:1); if(!pl.isUser&&pl.sta!=null&&pl.sta<0.5) v*=1-(0.5-pl.sta)*0.3; if(pl.isUser){ if(M.sta<25) v*=0.8; if(M.dashT>0) v*=1.6*(M.dashB>0?1.22:1); if(M.tornT>0) v*=0.55; if(M.phantomT>0) v*=1.2; if(M.sprintT>0) v*=1.3; if(M.boostT>0) v*=1.22; if(M.mvShield) v*=0.5; if(M.jockeyOn) v*=0.88; if(M.sprinting) v*=((M.ball&&M.ball.owner===pl)?1.32:1.45)*(trait('runner')?1.05:1); if(M.ball&&M.ball.owner===pl) v*=0.96; } if(pl.stun>0) v*=0.3; if(pl.role==='GK') v*=0.9; return v; }
+function maxSpeed(pl){ const s=pl.isUser?ustat('spd'):pl.st.spd; let v=(5.6+s/100*3.6)*1.3*(M&&M.weather==='snow'?0.95:1)*(S&&S.tempo==='real'&&M&&!M.practice?0.9:1); if(!pl.isUser&&pl.sta!=null&&pl.sta<0.5) v*=1-(0.5-pl.sta)*0.3; if(pl.isUser){ if(M.sta<25) v*=0.8; if(M.dashT>0) v*=1.6*(M.dashB>0?1.22:1); if(M.tornT>0) v*=0.55; if(M.phantomT>0) v*=1.2; if(M.sprintT>0) v*=1.3; if(M.boostT>0) v*=1.22; if(M.mvShield) v*=0.5; if(M.jockeyOn) v*=0.88; if(M.sprinting) v*=((M.ball&&M.ball.owner===pl)?1.32:1.45)*(trait('runner')?1.05:1); if(M.ball&&M.ball.owner===pl) v*=0.96; } if(pl.stun>0) v*=0.3; if(pl.bumpT>0) v*=0.6; if(pl.role==='GK') v*=0.9; return v; }
 
 const PLAN_NM={build:'후방 빌드업',direct:'롱볼',tiki:'짧은 패스 연계',wing:'측면 공략',counter:'역습'};
 function planReset(team,why){ M.plan=M.plan||[null,null]; M.plan[team]={k:null,why,t:M.t}; }
@@ -6529,13 +6530,13 @@ function shapePoint(pl,team,inPoss,ub,bx,dropper){ // 팀 블록 안 내 자리 
     else if(sr==='WF'){ u=uF-3; x=side<0?5:W-5; if(side!==bSide&&Math.abs(bx-W/2)>12) x=W/2+side*12; }
     else { u=pl===dropper?Math.min(uF-13,ub+5):uF; x=W/2+(pl.hx-W/2)*0.9+(bx-W/2)*0.3; }
   } else { const hl=(M.hiLine&&M.hiLine[team])||0; const dsO=team===1&&DS(1)?DS(1).line:0; const uD=clamp(ub-19+hl*5+dsO,6,36+hl*8+Math.max(0,dsO)), uM=Math.max(uD+6,Math.min(uD+11,ub-3)), uF=Math.max(uM+6,Math.min(uM+12,ub+5)); // 미드필드 라인은 항상 공보다 골문 쪽
-    x=W/2+(pl.hx-W/2)*0.8+(bx-W/2)*0.38;
-    if(sr==='CB'){ u=uD; x=W/2+(pl.hx-W/2)*0.9+(bx-W/2)*0.35; }
-    else if(sr==='FB'){ u=uD+(side===bSide?2:0); x=W/2+side*(side===bSide?20:15)+(bx-W/2)*0.3; }
+    /* v137: 수비 대형을 공 쪽으로 더 좁힘(폭 45m → 35m 안팎) */ x=W/2+(pl.hx-W/2)*0.64+(bx-W/2)*0.46;
+    if(sr==='CB'){ u=uD; x=W/2+(pl.hx-W/2)*0.74+(bx-W/2)*0.42; }
+    else if(sr==='FB'){ u=uD+(side===bSide?2:0); x=W/2+side*(side===bSide?16:11)+(bx-W/2)*0.4; }
     else if(sr==='DM'){ u=uD+7; x=W/2+(bx-W/2)*0.45; }
     else if(sr==='CM'){ u=uM; }
-    else if(sr==='WM'){ u=uM-(side===bSide?3:0); x=W/2+side*18+(bx-W/2)*0.4; }
-    else if(sr==='WF'){ u=uF-5; x=W/2+side*15+(bx-W/2)*0.3; }
+    else if(sr==='WM'){ u=uM-(side===bSide?3:0); x=W/2+side*13.5+(bx-W/2)*0.46; }
+    else if(sr==='WF'){ u=uF-6; x=W/2+side*11.5+(bx-W/2)*0.4; }
     else { u=clamp(uF,30,62); x=W/2+(pl.hx-W/2)*0.6+(bx-W/2)*0.3; }
   }
   u=clamp(u,3,H-3); if(!inPoss&&team===1){ const D0=DS(1); if(D0&&D0.narrow!==1) x=W/2+(x-W/2)*D0.narrow; } return {x:clamp(x,2,W-2),y:team===0?H-u:u}; }
@@ -7472,6 +7473,7 @@ function outOfBounds(where){ if(M.ball.lastKicker&&M.ball.lastKicker.isUser) prS
 }
 
 /* ---------- LOOP ---------- */
+const TEMPO_K=/[?&]tempo=1\b/.test(location.search)?1:0.75;
 function loop(now){
   if(!M) return;
   const el0=Math.min(0.2,Math.max(0,(now-lastT)/1000)); const sub=el0>0.045?Math.min(6,Math.ceil(el0/0.0334)):1; let dt=Math.min(0.034,el0/sub); lastT=now; /* v88: 프레임이 느려도 경기 시간은 실제 시간대로 */
@@ -7479,9 +7481,10 @@ function loop(now){
   if(M.htWait>0){ M.htWait-=dt; if(M.htWait<=0){ M.htWait=0; M.freeze=Math.min(M.freeze||0,1.0); if(!M.over&&M.half2) halftimeShow(); } draw(); raf=requestAnimationFrame(loop); return; }
   if(M.replay){ if(stepReplay()){ draw(); drawReplayOverlay(); raf=requestAnimationFrame(loop); return; } }
   if(M.replayIn>0){ M.replayIn-=dt; if(M.replayIn<=0) startReplay(); }
-  M.players.forEach(pl=>{ if(pl.celebT>0) pl.celebT-=dt; if(pl.dejT>0) pl.dejT-=dt; if(pl.jumpT>0) pl.jumpT-=dt; });
+  M.players.forEach(pl=>{ if(pl.celebT>0) pl.celebT-=dt; if(pl.dejT>0) pl.dejT-=dt; if(pl.jumpT>0) pl.jumpT-=dt; if(pl.bumpT>0) pl.bumpT-=dt; });
   const rawDt=dt*sub;
   if(M.slow>0){ M.slow-=rawDt; dt*=0.25; }
+  const dtReal=dt; dt*=TEMPO_K; /* v137: 경기 템포 75% — 선수·공·판단이 모두 같은 비율로 느려짐(경기 시계는 실제 시간 그대로) */
   if(M.chanceReq&&!M.chance&&!(M.introT>0)) chanceInit();
   if(M.chance&&M.chance.phase==='intro'){ M.chance.t-=rawDt; if(M.chance.t<=0) chanceLive(); }
   if(M.chance&&M.chance.phase==='zoom'){ M.chance.zt-=rawDt; if(M.chance.zt<=0){ const tr=M.chance.ztr; M.chance.ztr=null; M.chance.phase='sim'; chanceBegin(tr); } } /* v95: 찬스 직전 확대 컷 */
@@ -7493,9 +7496,9 @@ function loop(now){
   if(M.chance&&(M.chance.phase==='intro'||M.chance.phase==='zoom'||(step>=sub&&M.chance.phase!=='sim'))) break; if(M.paused) break;
   if(!M.over){
     if(M.practice&&M.freeze>0&&M.restart&&M.restart!==practiceReset){ M.restart=practiceReset; M.freeze=Math.min(M.freeze,1.0); M.slow=Math.min(M.slow||0,0.25); }
-    if(M.freeze>0){ if(M.celebTo) celebTick(dt); if(M.trans) transTick(dt); M.freeze-=dt; if(M.freeze<=0){ if(M.trans) transFinish(); if(M.restart){ const r=M.restart; M.restart=null; r(); } } }
+    if(M.freeze>0){ if(M.celebTo) celebTick(dtReal); if(M.trans) transTick(dtReal); M.freeze-=dtReal; if(M.freeze<=0){ if(M.trans) transFinish(); if(M.restart){ const r=M.restart; M.restart=null; r(); } } }
     else {
-      M.t+=dt; M.min+=dt*0.6*(M.highlight?1.67:1);
+      M.t+=dt; M.min+=dtReal*0.6*(M.highlight?1.67:1);
       if((!M.chance||M.chance.phase==='live')&&!M.botUser) updateUser(dt); updateAI(dt);
       if(M.setPiece&&M.ball.owner===M.setPiece.taker){ const sp=M.setPiece, tk=sp.taker; tk.vx=tk.vy=0; const md=SP_DIST[sp.type];
         if(md) M.players.forEach(p=>{ if(p.team!==sp.team){ const d=dist(p,sp.pos); if(d<md){ const a=Math.atan2(p.y-sp.pos.y,p.x-sp.pos.x)||1; p.x=sp.pos.x+Math.cos(a)*md; p.y=sp.pos.y+Math.sin(a)*md; p.vx*=0.3; p.vy*=0.3; } } });
@@ -7658,7 +7661,7 @@ function resize(){ const sm=el('screen-match'); const vw0=(sm&&sm.clientWidth)||
   const w=cv.clientWidth||vw0, h=cv.clientHeight||(cv._tp?cv._tp.hc:vh0); if(cv._tp){ cv._tp.hc=h; cv._tp.wc=w; }
   const dpr=Math.min(2,window.devicePixelRatio||1); cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); cv._w=w; cv._h=h;
   cv2.width=Math.round(vw0*dpr); cv2.height=Math.round(vh0*dpr); CTX2.setTransform(dpr,0,0,dpr,0,0); cv2._w=vw0; cv2._h=vh0;
-  if(M) M.cam.ppm=land?(tilt?Math.min(h/31,w/42):Math.min(h/28.5,w/42)):Math.min(w/28,h/40); }
+  if(M) M.cam.ppm=land?(tilt?Math.min(h/36.5,w/49.5):Math.min(h/33.5,w/49.5)):Math.min(w/32.5,h/46.5); /* v137: 카메라를 18%쯤 뒤로 — 동료 움직임과 공간이 더 보이게 */ }
 window.addEventListener('resize',resize);
 let VLAND=false;
 function isLand(){ if(typeof cv==='undefined'||!cv) return false; if(cv._land!=null) return !!cv._land; return !!(cv._w&&cv._h&&cv._w>cv._h*1.05); }

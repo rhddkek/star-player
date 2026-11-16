@@ -1,7 +1,7 @@
 // 스타 플레이어 회귀 테스트 — 업데이트할 때마다 실행
 // node regress.js [html경로]
 const {chromium,devices}=require('playwright');
-const FILE='file://'+(process.argv[2]||'/home/claude/star-player.html');
+const FILE0='file://'+(process.argv[2]||'/home/claude/star-player.html'); const FILE=FILE0+'?tempo=1'; /* v137: 기존 검사는 예전 속도(템포 1)로 로직만 확인 — 실제 게임은 템포 0.75 (맨 아래 v137 검사) */
 const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'실패',name,info]); };
 (async()=>{
   const b=await chromium.launch();
@@ -726,6 +726,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       S.player.career.apps=10; const h1=actHint(); S.player.career.apps=0; const h0=actHint(); o.h1=h1&&h1.t; o.h0=h0&&h0.t; return o; });
     ok('v136 상황 띠가 점수판 안(한 단어) · 공 잡았을 때 긴 안내는 첫 3경기만 단어로', R.in&&R.txt.length<=6&&R.w>=60&&R.top>=0&&R.top<R.h&&!R.h1&&/패스 · 스루 · 돌파/.test(R.h0||'')&&eS.length===0, JSON.stringify({...R,eS:eS.slice(0,2)}));
     await cS.close(); }
+  // v137: 경기 템포 75% · 수비 대형 좁히기 · 몸싸움 휘청 · 카메라 뒤로
+  { const cT=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const pt=await cT.newPage(); const eT=[]; pt.on('pageerror',e=>eT.push(e.message));
+    await pt.goto(FILE0); await pt.waitForTimeout(500); await pt.tap('#go-create'); await pt.waitForTimeout(300); await pt.tap('#btn-new'); await pt.waitForTimeout(400);
+    await pt.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await pt.waitForTimeout(800); await pt.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await pt.waitForTimeout(2500);
+    const R=await pt.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); const o={k:TEMPO_K}; M.freeze=0; M.introT=0; const t0=M.t, m0=M.min, r0=performance.now(); await w(2000); const el2=(performance.now()-r0)/1000; o.sim=+((M.t-t0)/el2).toFixed(2); o.clock=+((M.min-m0)/el2).toFixed(2);
+      o.ppm=+(M.cam.ppm).toFixed(1); o.vh=+(393/M.cam.ppm).toFixed(1);
+      const a=M.players.find(q=>q.team===0&&q.role==='DF'), c=M.players.find(q=>q.team===1&&q.role==='FW'); M.paused=false; a.st.str=95; c.st.str=20; let lost=0; for(let i=0;i<40;i++){ a.bumpAt=c.bumpAt=-9; a.bumpT=c.bumpT=0; a.x=30; a.y=50; c.x=30.6; c.y=50; a.vx=4; c.vx=-4; a.vy=c.vy=0; a.stun=c.stun=0; a.tackleT=c.tackleT=0; a.rollT=c.rollT=0; M.setPiece=null; bodyContact(0.016); if(c.bumpT>0) lost++; } o.lost=lost; c.bumpT=0.3; const v1=maxSpeed(c); c.bumpT=0; o.slow=+(v1/maxSpeed(c)).toFixed(2);
+      const sp=(hx,bx)=>shapePoint({hx,hy:60,i:3,role:'MF',st:{}},0,false,50,bx,null).x; o.wL=+sp(8,36).toFixed(1); o.wR=+sp(64,36).toFixed(1); return o; });
+    ok('v137 경기 템포 75%(경기 시계는 그대로) · 카메라 뒤로 · 힘센 쪽이 몸싸움에서 이김(휘청 = 속도 60%) · 수비 대형 좁힘', R.k===0.75&&R.sim>0.6&&R.sim<0.85&&R.clock>0.5&&R.clock<0.7&&R.vh>33&&R.lost>=26&&R.slow===0.6&&(R.wR-R.wL)<40&&eT.length===0, JSON.stringify({...R,eT:eT.slice(0,2)}));
+    await cT.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

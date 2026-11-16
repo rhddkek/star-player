@@ -736,6 +736,19 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const sp=(hx,bx)=>shapePoint({hx,hy:60,i:3,role:'MF',st:{}},0,false,50,bx,null).x; o.wL=+sp(8,36).toFixed(1); o.wR=+sp(64,36).toFixed(1); return o; });
     ok('v137·v138 경기 템포 95%(경기 시계는 그대로) · 카메라 뒤로 · 힘센 쪽이 몸싸움에서 이김(휘청 = 속도 60%) · 수비 대형 좁힘', R.k===0.95&&R.sim>0.82&&R.sim<1.02&&R.clock>0.5&&R.clock<0.7&&R.vh>29&&R.lost>=26&&R.slow===0.6&&(R.wR-R.wL)<40&&eT.length===0, JSON.stringify({...R,eT:eT.slice(0,2)}));
     await cT.close(); }
+  // v139: 외출(자유 시간) · 히로인 10명
+  { const cL=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const pl=await cL.newPage(); const eL=[]; pl.on('pageerror',e=>eL.push(e.message));
+    await pl.goto(FILE); await pl.waitForTimeout(500); await pl.tap('#go-create'); await pl.waitForTimeout(300); await pl.tap('#btn-new'); await pl.waitForTimeout(400);
+    const R=await pl.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; const p=S.player; const clickAll=async()=>{ for(let i=0;i<8;i++){ const b=document.querySelector('.life-m .life-bt .btn'); if(!b) break; b.click(); await w(30); } };
+      o.n=HEROINES.length; o.img=HEROINES.every(H=>HIMG[H.id]&&HIMG[H.id].n.startsWith('data:image/'))&&!!HIMG.jiu.d&&!!HIMG.haruka.v; o.story=HEROINES.every(H=>H.meet.length>=3&&H.friend.a.length===2&&H.some.a.length===2&&H.love.length>=3&&H.wed);
+      goKey('player:out'); await w(100); o.tab=!!document.querySelector('.out2')&&document.querySelectorAll('.out-row').length===10; o.lock=document.querySelectorAll('.out-row.lock').length>=5;
+      p.cond=50; const J=HEROINES[0]; lifeVisit(J); await w(50); o.scene=!!document.querySelector('.life-m'); await clickAll(); o.aff1=hSt('jiu').aff; o.cond=p.cond; o.used=lifeOf().free===false; const a1=hSt('jiu').aff; lifeVisit(J); await w(30); o.block=hSt('jiu').aff===a1&&!document.querySelector('.life-m');
+      p.cond=50; lifeWeek(); o.reset=lifeOf().free===true; hSt('jiu').aff=15; lifeVisit(J); await w(50); document.querySelector('.life-m .life-bt .btn').click(); await w(30); o.choice=document.querySelectorAll('.life-m .life-op').length===2; document.querySelector('.life-m .life-op').click(); await w(30); await clickAll(); o.aff2=hSt('jiu').aff;
+      p.money=1000; lifeGift(J,'flower'); o.gift=p.money===970&&hSt('jiu').aff===o.aff2+6; lifeConfess(J); o.early=lifeOf().lover==null; hSt('jiu').aff=85; lifeConfess(J); o.needNeck=lifeOf().lover==null; lifeGift(J,'neck'); lifeConfess(J); await w(50); await clickAll(); o.lover=lifeOf().lover==='jiu'; p.cond=50; lifeWeek(); o.bonus=p.cond===53;
+      const E=HEROINES.find(x=>x.id==='emma'); hSt('emma').met=true; hSt('emma').aff=85; lifeOf().bag.neck=1; const r0=p.rep=1000; lifeConfess(E); await w(50); await clickAll(); o.two=lifeOf().lover==null&&p.rep===700&&hSt('jiu').aff<85;
+      const k='shot', v0=p.stats[k]; lifeOf().prog={}; for(let i=0;i<4;i++) lifeProg(k,1); o.prog=p.stats[k]===v0+1; o.seoyeon=HEROINES[1].can({rep:0,career:{apps:0,goals:0},level:1})===false&&HEROINES[1].can({rep:2000})===true; return o; });
+    ok('v139 외출: 히로인 10명(이야기·그림) · 주 1회 방문(효과+호감) · 단계 장면·선택지 · 선물 · 고백엔 목걸이 · 연인 보너스 · 양다리 발각 · 수련 4번에 능력치 +1', R.n===10&&R.img&&R.story&&R.tab&&R.lock&&R.scene&&R.aff1===7&&R.cond===58&&R.used&&R.block&&R.reset&&R.choice&&R.aff2===27&&R.gift&&R.early&&R.needNeck&&R.lover&&R.bonus&&R.two&&R.prog&&R.seoyeon&&eL.length===0, JSON.stringify({...R,eL:eL.slice(0,2)}));
+    await cL.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

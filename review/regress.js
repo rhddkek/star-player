@@ -371,7 +371,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   // v66: 시안 UI · FMH식 커리어 (시즌 목표·감독 면담·신뢰 로그·소식함·마음 한 줄·스카우트·구단 프로필·이적 비교·협상·일정·챌린지)
   { const q=await pg.evaluate(()=>{ const r={}; show('screen-hub'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
       r.nav=document.querySelectorAll('#tabs button').length===5&&!!document.querySelector('#tabs [data-tab=career]');
-      tab='player'; renderPlayer.sub='stat'; renderHub(); r.seg=document.querySelectorAll('#tab-player .hub-seg [data-gk]').length===5; r.hero=!!document.querySelector('#tab-player .h2img img');
+      tab='player'; renderPlayer.sub='stat'; renderHub(); r.seg=document.querySelectorAll('#tab-player .hub-seg [data-gk]').length===6; /* v140: 외출 탭 추가 */ r.hero=!!document.querySelector('#tab-player .h2img img');
       renderPlayer.sub='week'; S.weekAct=null; S.player.injury=0; renderHub(); r.wk3=document.querySelectorAll('#tab-player .wk-o.big').length===3; document.querySelector('#tab-player [data-wsel=rest]').click(); const ok2=document.querySelector('#tab-player #wk-ok'); r.wkSel=!!ok2&&ok2.dataset.tr==='rest'&&!ok2.disabled; ok2.click(); r.wkDone=S.weekAct==='rest';
       S.sg=null; const G=sgEnsure(); r.sg=!!G&&G.goals.length===3&&G.goals.some(g=>g.team); const n0=G.goals[0].n; sgVow('bold'); r.vow=G.vow==='bold'&&G.goals[0].n>=Math.round(n0*1.25)-0;
       tab='home'; renderHub(); r.homeSg=!!document.querySelector('#tab-home .sgoal')&&!!document.querySelector('#tab-home .inbox')&&!!document.querySelector('#tab-home .mood');

@@ -6685,14 +6685,14 @@ function subRole(pl){ if(pl._sr) return pl._sr; const cx=Math.abs(pl.hx-W/2); le
 function shapePoint(pl,team,inPoss,ub,bx,dropper){ // 팀 블록 안 내 자리 (u: 우리 골문에서 거리)
   const sr=subRole(pl), side=Math.sign(pl.hx-W/2)||(pl.i%2?1:-1), bSide=Math.sign(bx-W/2)||0; let u,x;
   if(inPoss){ const uD=clamp(ub-24,14,58), uM=clamp(ub-3,28,80), uF=clamp(ub+14,46,H-9);
-    x=W/2+(pl.hx-W/2)*1.15+(bx-W/2)*0.22;
-    if(sr==='CB'){ u=uD; x=W/2+(pl.hx-W/2)*1.6+(bx-W/2)*0.2; }
-    else if(sr==='FB'){ const wb=isWB(pl); if(wb){ u=Math.min(uM+6,ub+(side===bSide?6:-2)); x=side<0?3:W-3; } else if(side===bSide&&ub>uD+12){ u=Math.min(ub+2,uM+12); x=side<0?3.5:W-3.5; } else if(Math.abs(bx-W/2)>10&&ub>40){ u=uD+3; x=W/2+side*11; } else { u=uD+7; x=W/2+side*21; } }
+    /* v142: 공격 때 경기장을 더 넓게 — 반대편 윙·풀백이 안으로 덜 좁히고, 중앙 미드필더·투톱도 간격을 벌림 */ x=W/2+(pl.hx-W/2)*1.3+(bx-W/2)*0.18;
+    if(sr==='CB'){ u=uD; x=W/2+(pl.hx-W/2)*1.7+(bx-W/2)*0.18; }
+    else if(sr==='FB'){ const wb=isWB(pl); if(wb){ u=Math.min(uM+6,ub+(side===bSide?6:-2)); x=side<0?3:W-3; } else if(side===bSide&&ub>uD+12){ u=Math.min(ub+2,uM+12); x=side<0?3.5:W-3.5; } else if(Math.abs(bx-W/2)>10&&ub>40){ u=uD+3; x=W/2+side*17; } else { u=uD+7; x=W/2+side*27; } }
     else if(sr==='DM'){ u=uM-10; x=W/2+(bx-W/2)*0.3; }
-    else if(sr==='CM'){ u=uM; x=W/2+(pl.hx-W/2)*1.25+(bx-W/2)*0.3; }
-    else if(sr==='WM'){ u=uM+7; x=side<0?5:W-5; if(side!==bSide&&Math.abs(bx-W/2)>12) x=W/2+side*24; } // 반대편 윙은 넓게 남아 전환 패스 대기
-    else if(sr==='WF'){ u=uF-3; x=side<0?5:W-5; if(side!==bSide&&Math.abs(bx-W/2)>12) x=W/2+side*12; }
-    else { u=pl===dropper?Math.min(uF-13,ub+5):uF; x=W/2+(pl.hx-W/2)*0.9+(bx-W/2)*0.3; }
+    else if(sr==='CM'){ u=uM; x=W/2+(pl.hx-W/2)*1.5+(bx-W/2)*0.2; }
+    else if(sr==='WM'){ u=uM+7; x=side<0?4:W-4; if(side!==bSide&&Math.abs(bx-W/2)>12) x=W/2+side*29; } // 반대편 윙은 넓게 남아 전환 패스 대기
+    else if(sr==='WF'){ u=uF-3; x=side<0?4:W-4; if(side!==bSide&&Math.abs(bx-W/2)>12) x=W/2+side*22; }
+    else { u=pl===dropper?Math.min(uF-13,ub+5):uF; x=W/2+(pl.hx-W/2)*1.25+(bx-W/2)*0.22; }
   } else { const hl=(M.hiLine&&M.hiLine[team])||0; const dsO=team===1&&DS(1)?DS(1).line:0; const uD=clamp(ub-19+hl*5+dsO,6,36+hl*8+Math.max(0,dsO)), uM=Math.max(uD+6,Math.min(uD+11,ub-3)), uF=Math.max(uM+6,Math.min(uM+12,ub+5)); // 미드필드 라인은 항상 공보다 골문 쪽
     /* v137: 수비 대형을 공 쪽으로 더 좁힘(폭 45m → 35m 안팎) */ x=W/2+(pl.hx-W/2)*0.64+(bx-W/2)*0.46;
     if(sr==='CB'){ u=uD; x=W/2+(pl.hx-W/2)*0.74+(bx-W/2)*0.42; }

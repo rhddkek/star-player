@@ -813,6 +813,17 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await setup(); const D=await px.evaluate(()=>{ useSkill(2,true,0,0); return { act:!!M.cine&&M.cine.focus==='user'&&M.tornT>0 }; });
     const R={...A,...B,...C,...D}; ok('v146 필살 슛 연출: 컷인 정지 → 슬로·카메라 확대 · 새 혜성 그림 8종 · 아이스(일반 스킬) 짧은 연출 · 골 폭발(히트스톱·섬광) · 필살 발동 연출(토네이도)', R.data&&R.cine&&R.freeze&&R.slowed&&R.cam&&R.iceKind&&R.iceCine&&R.impact&&R.act&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v147: 대기실 음악(허브에서 재생·경기 중 멈춤·설정에서 끔) · 분신 슛·그림자 분신 전용 그림
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE0); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.mute=false; S.noBgm=false; show('screen-hub'); audioInit(); bgmSync(); }); await px.waitForTimeout(2500);
+    const R={}; R.hub=await px.evaluate(()=>!!bgmNode&&!!bgmBuf&&Math.abs(bgmNode.loopEnd-bgmNode.loopStart-BGM_L)<0.01&&bgmBuf.duration>BGM_L+0.3);
+    R.off=await px.evaluate(()=>{ S.noBgm=true; bgmSync(); const r=!bgmNode; S.noBgm=false; bgmSync(); return r&&!!bgmNode; });
+    await px.evaluate(()=>{ S.player.level=20; S.player.skills=SKILLS.map(s=>s.id); S.player.equip=['phantom','triple','dash','wall']; S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await px.waitForTimeout(2200);
+    R.match=await px.evaluate(()=>!bgmNode&&!bgmWant());
+    R.art=await px.evaluate(()=>{ M.freeze=0; M.introT=0; M.setPiece=null; M.mp=999; M.cds=[0,0,0,0]; M.ultN={}; const u=M.user; setOwner(u); u.touchT=0; useSkill(0,true,0,0); const cl=(M.vfx||[]).filter(e=>e.k==='cx_clone'); return cl.length===2&&cl[0].dx===-cl[1].dx&&!!VFX_DATA.cx_triple&&VFX_DATA.cx_triple.w===256; });
+    ok('v147 대기실 음악: 허브에서 이음매 없이 반복·경기 화면에서 멈춤·설정으로 끔 · 그림자 분신(양옆 분신 둘)·분신 슛 전용 그림', R.hub&&R.off&&R.match&&R.art&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

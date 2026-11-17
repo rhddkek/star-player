@@ -775,6 +775,18 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const src=String(header); o.hd=/1\.0\):1/.test(src)&&/0\.12\)/.test(src); M.paused=false; return o; });
     ok('v142·v143 공격 대형 넓게(반대편 윙·풀백) · 빈 박스로 크로스하면 동료 둘이 낙하지점으로 달려듦(닿을 수 있는 곳으로 올림) · 헤딩 경합·슛 보정', R.wide&&R.box0&&R.rush&&R.tgt&&R.land&&R.hd&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v144: 스루패스(빈 공간·수비 반응·받은 뒤 돌파) · 슈퍼 세이브 리그 수준별
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await px.waitForTimeout(2500);
+    const R=await px.evaluate(()=>{ const o={}; M.freeze=0; M.introT=0; M.paused=true; M.setPiece=null; const u=M.user; u.x=W/2; u.y=38; u.vx=u.vy=0; u.stun=0;
+      M.players.forEach(q=>{ if(q===u||q.role==='GK') return; q.stun=0; q.vx=q.vy=0; q.thruT=0; q.runT=0; q.boostT=0; q.brkT=0; const R=q.role; if(q.team===0){ q.x=clamp(q.hx,5,W-5); if(Math.abs(q.x-u.x)<7) q.x=u.x+(q.x<u.x?-10:10); q.y=R==='FW'?30:R==='MF'?48:63; } else { q.x=clamp(W/2+(q.hx-W/2)*0.8,6,W-6); q.y=R==='DF'?27:R==='MF'?43:58; } });
+      setOwner(u); u.touchT=0; u.kickCd=0; const line=secondLastY(1); const pl=planThru(u,0,0,0.5); o.plan=!!pl&&!pl.q.isUser&&pl.P.y<u.y-4&&!pl.lob; o.lob=!!(planThru(u,0,0,1)||{}).lob;
+      const m=M.players.find(q=>q.team===0&&!q.isUser&&q.role==='FW')||M.players.find(q=>q.team===0&&!q.isUser&&q.role!=='GK'), d0=M.players.find(q=>q.team===1&&q.role==='DF'); const a=maxSpeed(m); m.boostT=1; o.boost=Math.abs(maxSpeed(m)/a-1.16)<0.01; m.boostT=0; const c=maxSpeed(d0); d0.slowT=M.t+1; o.slow=Math.abs(maxSpeed(d0)/c-0.84)<0.01; d0.slowT=0;
+      if(pl){ userThru(u,0,0,0.5,pl); o.run=pl.q.brkT>M.t&&pl.q.boostT>0&&pl.q.thruT>0; const ds=M.players.filter(q=>q.team===1&&q.role==='DF'); o.late=ds.some(q=>q.lateT>0&&q.turnT>0)&&ds.every(q=>q.slowT>M.t); o.ball=M.ball.thru===true&&!M.ball.owner; }
+      const src=String(superSave); o.ss=src.includes('-50)/28,0.2,1)'); o.spin=String(planThru).includes('tq-T-0.4'); M.paused=false; return o; });
+    ok('v144 스루패스: 앞 공간으로 계획·끝까지 누르면 로빙 · 받는 동료 가속·돌파 · 수비 한 박자 늦게 반응 · 슈퍼 세이브 하위 리그만 낮춤', R.plan&&R.lob&&R.boost&&R.slow&&R.run&&R.late&&R.ball&&R.ss&&R.spin&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

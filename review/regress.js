@@ -553,7 +553,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('v80 새 스킬 아이콘·수치표 연결', !!V&&V.skills.length===5&&V.skills.every(x=>x.endsWith(':true:true')), JSON.stringify(V&&V.skills));
     ok('v80 플레이 스타일 효과: 박스 안 슛·키퍼 보정 · 레벨 특성 대기', !!V&&V.arch.shotErrBox<1&&V.arch.gkBox<1&&V.arch.pending===false&&V.arch.pending2===true, JSON.stringify(V&&V.arch));
     ok('v80 플레이 스타일 팝업: 3가지 중 선택 · 열린 단계만 고름 · 닫기', !!V&&V.ui.card&&V.ui.n3===3&&V.ui.opn===4&&V.ui.lock===1&&V.ui.arch.id==='finisher'&&V.ui.arch.picks[1]===0&&V.ui.closed&&ve==='[]', JSON.stringify(V&&V.ui)+' '+ve);
-    ok('v81 스킬 습득 레벨 Lv.1~20에 고르게(레벨당 2개 이하) · 강화 Lv.10까지(효율 -50%) · 늦은 스킬도 Lv.24에 만렙', !!V&&V.sk81.n===9&&V.sk81.lv===10&&V.sk81.eff===0.5&&V.sk81.maxPer<=2&&V.sk81.maxLvl===20&&V.sk81.early===10&&V.sk81.zone10<=24&&V.sk81.priceMono, JSON.stringify(V&&V.sk81));
+    ok('v81 스킬 습득 레벨 Lv.1~20에 고르게(레벨당 3개 이하 · v145 미드필더 스킬 추가) · 강화 Lv.10까지(효율 -50%) · 늦은 스킬도 Lv.24에 만렙', !!V&&V.sk81.n===9&&V.sk81.lv===10&&V.sk81.eff===0.5&&V.sk81.maxPer<=3&&V.sk81.maxLvl===20&&V.sk81.early===11&&V.sk81.zone10<=24&&V.sk81.priceMono, JSON.stringify(V&&V.sk81));
     let P2=null; try{ const o=execFileSync('node',[__dirname+'/passan.js',HTML,'5'],{encoding:'utf8',timeout:400000}); P2=JSON.parse(o.slice(o.indexOf('{'),o.lastIndexOf('}')+1)); }catch(e){ P2={err:String(e).slice(0,200)}; }
     const pool=k=>{ let ok2=0,n=0; ['T0','T1'].forEach(T=>{ const v=P2&&P2[T+' '+k]; if(!v) return; const m=v.match(/(\d+)% \(([\d.]+)/); if(m){ ok2+=(+m[1])*(+m[2]); n+=(+m[2]); } }); return n?ok2/n:0; };
     ok('v80 패스 성공률(AI끼리 5경기, 두 팀 합산): 전체 70% 이상 · 짧은 패스 76% 이상', pool('all')>=70&&pool('short')>=76, JSON.stringify(P2&&{a0:P2['T0 all'],a1:P2['T1 all'],s0:P2['T0 short'],s1:P2['T1 short']}));
@@ -786,6 +786,20 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       if(pl){ userThru(u,0,0,0.5,pl); o.run=pl.q.brkT>M.t&&pl.q.boostT>0&&pl.q.thruT>0; const ds=M.players.filter(q=>q.team===1&&q.role==='DF'); o.late=ds.some(q=>q.lateT>0&&q.turnT>0)&&ds.every(q=>q.slowT>M.t); o.ball=M.ball.thru===true&&!M.ball.owner; }
       const src=String(superSave); o.ss=src.includes('-50)/28,0.2,1)'); o.spin=String(planThru).includes('tq-T-0.4'); M.paused=false; return o; });
     ok('v144 스루패스: 앞 공간으로 계획·끝까지 누르면 로빙 · 받는 동료 가속·돌파 · 수비 한 박자 늦게 반응 · 슈퍼 세이브 하위 리그만 낮춤', R.plan&&R.lob&&R.boost&&R.slow&&R.run&&R.late&&R.ball&&R.ss&&R.spin&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v145: 미드필더 스킬 4종 (바늘구멍 스루 · 스쿱 패스 · 마에스트로 · 신의 한 수) + AI 미드필더 스루 스킬
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.player.level=20; S.player.skills=SKILLS.map(s=>s.id); S.player.equip=['threader','scoop','maestro','godpass']; S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await px.waitForTimeout(2500);
+    const R=await px.evaluate(()=>{ const o={}; const ids=['threader','scoop','maestro','godpass']; o.defs=ids.every(id=>{ const s=SKILLS.find(x=>x.id===id); return s&&ICO[id]!=null&&ART.icons[ICO[id]]&&SK_EX[id]&&SK_LIM[id]&&SK_PARAM[id]&&SK80[id]; })&&!!CUT_ART.godpass&&SKILLS.find(x=>x.id==='godpass').ult===true;
+      const setup=()=>{ M.paused=true; M.freeze=0; M.introT=0; M.setPiece=null; M.mp=999; M.cds=[0,0,0,0]; M.ultN={}; const u=M.user; u.x=W/2; u.y=38; u.vx=u.vy=0; u.stun=0; M.players.forEach(q=>{ if(q===u) return; q.stun=0; q.vx=q.vy=0; q.thruT=0; q.runT=0; q.boostT=0; q.brkT=0; q.kpFinT=0; q.deliveryT=0; q.finK=null; const R=q.role; if(R==='GK'){ q.x=W/2; q.y=q.team===1?1.5:H-1.5; return; } if(q.team===0){ q.x=clamp(q.hx,5,W-5); if(Math.abs(q.x-u.x)<7) q.x=u.x+(q.x<u.x?-10:10); q.y=R==='FW'?30:R==='MF'?48:63; } else { q.x=clamp(W/2+(q.hx-W/2)*0.8,6,W-6); q.y=R==='DF'?28:R==='MF'?43:58; } }); setOwner(u); u.touchT=0; u.kickCd=0; return u; };
+      let u=setup(); useSkill(0,true,0,0); let b=M.ball, q=b.passTarget; o.thr=!b.owner&&b.kpass===true&&q&&q.team===0&&!q.isUser&&q.kpFinT>M.t&&q.brkT>M.t&&q.thruP&&q.thruP.y<secondLastY(1)&&b.offside==null;
+      u=setup(); useSkill(1,true,0,0); b=M.ball; q=b.passTarget; o.scoop=!b.owner&&b.scoop===true&&b.vz>0&&q&&q.finK==='volley'&&q.deliveryT>0;
+      u=setup(); useSkill(2,true,0,0); o.mae=M.maeT>7&&M.ball.owner===u; const mt=M.players.find(x=>x.team===0&&!x.isUser&&x.role==='FW'); passTo(u,mt,{power:0.5}); o.maePass=M.ball.maeSafe>M.t&&mt.maeFinT>M.t; M.maeT=0;
+      u=setup(); useSkill(3,true,0,0); b=M.ball; q=b.passTarget; o.god=!b.owner&&b.god===true&&b.split===true&&q&&q.finK==='god'&&q.delP>=1.8&&(M.ultN.godpass||0)===1&&M.cutin&&M.cutin.id==='godpass';
+      u=setup(); const fw=M.players.find(x=>x.team===0&&!x.isUser&&x.role==='FW'); fw.x=W/2; fw.y=14; setOwner(fw); fw.touchT=0; o.fin=mfFinish(fw,goalOf(0),1.5,'원터치!!','#fff')&&M.ball.skFin===1.5&&M.ball.isShot;
+      o.ai=AISK_MAX.pass===1&&typeof aiPassSkill==='function'; M.paused=false; return o; });
+    ok('v145 미드필더 스킬 4종: 바늘구멍 스루(라인 뒤·끊기지 않음·원터치 마무리) · 스쿱 패스(발리) · 마에스트로(동료 침투·패스 보호) · 신의 한 수(필살·컷인) · AI 미드필더 스루 스킬', R.defs&&R.thr&&R.scoop&&R.mae&&R.maePass&&R.god&&R.fin&&R.ai&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

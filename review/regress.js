@@ -765,6 +765,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       return o; });
     ok('v141 큰 경기(최종전 득점왕 맞대결) 홈 표시·자동 진행 전 한 번 묻기 · 자동 진행 내 기록 한 줄·시즌 끝이면 결산 버튼 하나 · 시즌 결산(구단 첫 시즌·지난 시즌 대비·이적시장으로) · 같은 리그 표시 · 찬스 모드 목표 맞춤', R.big0&&R.me&&R.hlOk&&R.last&&R.tag&&R.homeTag&&R.ask&&R.play&&R.once&&R.end&&R.sum&&R.rel&&R.home2&&R.fit1&&R.fit2&&R.fit3&&eG.length===0, JSON.stringify({...R,eG:eG.slice(0,2)}));
     await cG.close(); }
+  // v142·v143: 공격 폭 · 동료 침투·패스 요청 · 크로스 → 헤딩
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await px.waitForTimeout(2500);
+    const R=await px.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); const o={}; M.freeze=0; M.introT=0; M.paused=true; const u=M.user;
+      const sp=(sr,hx,bx)=>{ const q=M.players.find(x=>x.team===0&&!x.isUser&&subRole(x)===sr); if(!q) return null; const k=q.hx; q.hx=hx; const r=shapePoint(q,0,true,60,bx,null).x; q.hx=k; return r; }; const wf=sp('WF',W-8,8), fb=sp('FB',W-8,W/2); o.wide=(wf==null||wf>=W/2+20)&&(fb==null||fb>=W/2+25);
+      M.players.forEach(q=>{ if(q.team===0&&!q.isUser&&q.role!=='GK'){ q.x=clamp(q.hx,6,W-6); q.y=40+(q.i%4)*3; q.thruT=0; q.runT=0; } }); u.x=W-6; u.y=20; setOwner(u); u.touchT=0; u.kickCd=0; o.box0=boxMates().length===0; userCross(u,0,0,0.9,'high'); const rs=M.players.filter(q=>q.team===0&&!q.isUser&&q.thruT>0&&q.thruP); o.rush=rs.length===2&&rs.every(q=>q.thruP.y<20&&subRole(q)!=='CB'); o.tgt=!!M.ball.passTarget&&rs.includes(M.ball.passTarget)&&M.ball.crossH===true; o.land=rs[0]&&Math.abs(rs[0].thruP.x-W/2)<=11.5;
+      const src=String(header); o.hd=/1\.0\):1/.test(src)&&/0\.12\)/.test(src); M.paused=false; return o; });
+    ok('v142·v143 공격 대형 넓게(반대편 윙·풀백) · 빈 박스로 크로스하면 동료 둘이 낙하지점으로 달려듦(닿을 수 있는 곳으로 올림) · 헤딩 경합·슛 보정', R.wide&&R.box0&&R.rush&&R.tgt&&R.land&&R.hd&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

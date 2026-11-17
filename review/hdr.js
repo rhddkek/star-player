@@ -1,0 +1,17 @@
+// 크로스 → 헤딩 측정: AI끼리 경기에서 높은 크로스 수, 헤딩 슛 수, 헤딩 골 수
+const {chromium}=require('playwright'); const FILE=process.argv[2]; const N=+process.argv[3]||6;
+(async()=>{ const b=await chromium.launch(); const p=await b.newPage(); const er=[]; p.on('pageerror',e=>er.push(String(e.stack||e).slice(0,300)));
+ await p.goto('file://'+FILE); await p.click('#go-create'); await p.click('#btn-new'); await p.waitForTimeout(300);
+ const R=await p.evaluate(async(N)=>{ const process_ux=false; proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; S.startLock=1; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); draw=()=>{}; updateHUD=()=>{}; window.requestAnimationFrame=()=>0; renderResult=()=>{}; banner=()=>{}; toast=()=>{};
+  let xT=-9,xOpen=false; const C={ux:0,uxNoMate:0,uxHead:0,uxGoal:0,uxDefWin:0,cross:0,contest:0,won:0,hshot:0,hgoal:0,goals:0,runs:0,calls:0}; let lastX=false;
+  const oH=header; header=function(pl,b){ const wasX=b.crossH, at=b.lastKicker?b.lastKicker.team:-1; if(wasX) C.contest++; const s0=M.tstats[0].shots+M.tstats[1].shots; const r=oH.apply(this,arguments); if(xOpen&&wasX){ if(M.ball.lastKicker&&M.ball.lastKicker.team===0&&(M.ball.hdr||M.ball.pHead)) C.uxHead++; else if(M.ball.lastKicker&&M.ball.lastKicker.team===1) C.uxDefWin++; } if(M.ball.hdr||M.ball.pHead){ C.hshot++; if(wasX&&M.ball.lastKicker&&M.ball.lastKicker.team===at) C.won++; } return r; };
+  const oG=goalScored; goalScored=function(){ C.goals++; if(xOpen&&M.t-xT<5&&(M.ball.hdr||M.ball.pHead)&&M.ball.lastKicker&&M.ball.lastKicker.team===0){ C.uxGoal++; xOpen=false; } if(M.ball.hdr||M.ball.pHead) C.hgoal++; return oG.apply(this,arguments); };
+  const oPT=passTo; passTo=function(pl,t,o){ if(o&&o.cross==='high') C.cross++; return oPT.apply(this,arguments); };
+  let simT=0; for(let k=0;k<N;k++){ M=null; S.trust=95; S.sel=null; show('screen-hub'); renderHome.mode='play'; startMatch(false); { const g=el('lu-go'); if(g) g.click(); } el('m-overlay').hidden=true; M.paused=false; M.introT=0; M.botUser=true; M.chanceReq=false; M.chance=null;
+    const real=M.user; real.isUser=false; M.user={x:-60,y:-60,vx:0,vy:0,fx:0,fy:-1,team:0,i:99,role:'MF',isUser:true,st:{...real.st},hx:-60,hy:-60,ai:{},sta:1};
+    const oFT=fullTime; let over=false; fullTime=function(){ over=true; M.over=true; }; let fr=0, t=performance.now(); const t0=M.t; const seen=new Set();
+    while(!over&&fr<9000){ t+=33.3; lastT=t-33.3; try{ loop(t); }catch(e){ return {err:String(e.stack).slice(0,300)}; } fr++; if(M.htWait>0) M.htWait=0; if(M.paused){ M.paused=false; el('m-overlay').hidden=true; } if(M.replay) endReplay();
+      if(xOpen&&M.t-xT>5) xOpen=false; { const o=M.ball.owner; if(process_ux&&o&&o.team===0&&o.role!=='GK'&&!M.setPiece&&!(M.freeze>0)&&M.t-xT>6&&Math.abs(o.x-W/2)>16&&o.y<38&&o.y>4){ C.ux++; if(!boxMates().length) C.uxNoMate++; xT=M.t; xOpen=true; o.touchT=0; o.kickCd=0; userCross(o,0,0,0.9,'high'); } } M.players.forEach(q=>{ if(q.runT>M.t&&!seen.has(q.i+':'+q.team+':'+Math.floor(q.runT))){ seen.add(q.i+':'+q.team+':'+Math.floor(q.runT)); C.runs++; } }); }
+    fullTime=oFT; simT+=M.t-t0; }
+  const o={}; Object.keys(C).forEach(k=>o[k+'/경기']=+(C[k]/N).toFixed(2)); o['내 크로스→동료 헤딩슛 %']=C.ux?Math.round(C.uxHead/C.ux*100):0; o['내 크로스→헤딩골 %']=C.ux?Math.round(C.uxGoal/C.ux*100):0; o['크로스→헤딩슛 %']=C.cross?Math.round(C.won/C.cross*100):0; o['헤딩슛→골 %']=C.hshot?Math.round(C.hgoal/C.hshot*100):0; return o; },N);
+ console.log(JSON.stringify(R,null,1)); console.log('errs',JSON.stringify(er.slice(0,2))); await b.close(); })();

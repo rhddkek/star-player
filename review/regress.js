@@ -801,6 +801,18 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       o.ai=AISK_MAX.pass===1&&typeof aiPassSkill==='function'; M.paused=false; return o; });
     ok('v145 미드필더 스킬 4종: 바늘구멍 스루(라인 뒤·끊기지 않음·원터치 마무리) · 스쿱 패스(발리) · 마에스트로(동료 침투·패스 보호) · 신의 한 수(필살·컷인) · AI 미드필더 스루 스킬', R.defs&&R.thr&&R.scoop&&R.mae&&R.maePass&&R.god&&R.fin&&R.ai&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v146: 필살 슛 연출 (컷인 동안 정지 → 슬로 모션·카메라 추적·집중선 → 골망 폭발) · 새 혜성 그림 8종 · 필살 발동 연출
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE0); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.player.level=20; S.player.skills=SKILLS.map(s=>s.id); S.player.equip=['dragon','ice','tornado','fire']; S.trust=95; renderHome.mode='play'; S.lastMode='play'; startMatch(false); }); await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await px.waitForTimeout(2500);
+    const setup=()=>px.evaluate(()=>{ M.freeze=0; M.introT=0; M.setPiece=null; M.mp=999; M.cds=[0,0,0,0]; M.ultN={}; M.cine=null; M.cutin=null; const u=M.user; u.x=W/2; u.y=30; u.vx=u.vy=0; setOwner(u); u.touchT=0; u.kickCd=0; });
+    await setup(); const A=await px.evaluate(()=>{ const o={}; o.data=['dragon','meteor','thunder','mirage','fire','ice','gold','bike'].every(k=>{ const d=VFX_DATA['cx_'+k]; return d&&d.w===256&&d.n>=4&&d.sc>0; })&&!!VFX_DATA.cm_purple&&!VFX_DATA.cm_dragon;
+      useSkill(0,true,0,0); o.cine=!!M.cine&&M.cine.k==='dragon'&&M.cine.ult&&!!M.cutin; o.freeze=cineTick(0.03)<0.05&&M.cine.t===0; return o; });
+    await px.waitForTimeout(1500); const B=await px.evaluate(()=>({ slowed:!!M.cine&&M.cine.t>0&&M.cine.t<M.cine.T, k:M.cine?1-(1-M.cine.sl):0, cam:M.cam.z>1.1 }));
+    await setup(); const C=await px.evaluate(()=>{ useSkill(1,true,0,0); const o={iceKind:ballKind(M.ball)==='ice'}; cineTick(0.016); o.iceCine=!!M.cine&&!M.cine.ult; M.cine=null; M.cineOut=0; M.ball.dragon=true; M.ball.isShot=true; const g=goalOf(0); M.ball.x=g.x; M.ball.y=g.y; ultImpact('dragon',g.x,g.y); o.impact=M.hitStop>0.15&&M.flash&&M.flash.a>=0.5; M.hitStop=0; M.ball.dragon=false; return o; });
+    await setup(); const D=await px.evaluate(()=>{ useSkill(2,true,0,0); return { act:!!M.cine&&M.cine.focus==='user'&&M.tornT>0 }; });
+    const R={...A,...B,...C,...D}; ok('v146 필살 슛 연출: 컷인 정지 → 슬로·카메라 확대 · 새 혜성 그림 8종 · 아이스(일반 스킬) 짧은 연출 · 골 폭발(히트스톱·섬광) · 필살 발동 연출(토네이도)', R.data&&R.cine&&R.freeze&&R.slowed&&R.cam&&R.iceKind&&R.iceCine&&R.impact&&R.act&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

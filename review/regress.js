@@ -196,7 +196,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('리그 화면: 리그 선택 버튼·탭 한 줄·선수 순위(기회창출·클린시트) · 가로 넘침 없음', lg2.bad.length===0&&lg2.rows>3&&lg2.kpN>20&&lg2.csN>3&&lg2.co===true, JSON.stringify(lg2)); }
   // 3부 · 한글 약칭 · 엠블럼 · 기존 세이브 변환
   { const t3=await pg.evaluate(()=>{ const d3=['en','es','it','de','fr'].map(co=>S.divs[co+'-3']?S.divs[co+'-3'].clubs.length:0); const all=Object.values(CLUBS).filter(c=>!c.nat); const latin=all.filter(c=>/[A-Za-z]/.test(c.short)).length; const noEmb=all.filter(c=>EMB_IDX[c.id]==null&&CLUB_DATA[c.homeDiv]).length; const shorts=['맨체스터 레드','맨체스터 스카이','강릉 파도 FC'].map(n=>all.find(c=>c.name===n).short);
-      tab='league'; renderLeague.cur='en-3'; renderLeague.view='table'; renderHub(); const embs=document.querySelectorAll('#tab-league .emb').length; const sheetOk=getComputedStyle(document.documentElement).getPropertyValue('--emb').includes('data:image/png');
+      tab='league'; renderLeague.cur='en-3'; renderLeague.view='table'; renderHub(); const embs=document.querySelectorAll('#tab-league .emb').length; const sheetOk=getComputedStyle(document.documentElement).getPropertyValue('--emb').match(/data:image\/(png|webp)/)!=null;
       const keep=JSON.stringify(S); ['en','es','it','de','fr'].forEach(co=>{ delete S.divs[co+'-3']; delete S.tables[co+'-3']; delete S.fixtures[co+'-3']; }); S.v=3; migrateV4(); const mig={v:S.v,n:Object.keys(S.divs).length,p:standings('en-3')[0].p,r:S.round}; S=JSON.parse(keep); save(); renderLeague.cur=null; renderHub();
       return {d3,latin,noEmb,shorts,embs,sheetOk,mig}; });
     ok('3부 리그(5개국) · 한글 약칭 · 엠블럼 · 기존 세이브에 3부 추가', t3.d3.join()==='24,20,20,20,18'&&t3.latin===0&&t3.noEmb===0&&t3.shorts.join()==='맨레드,맨스카이,강릉'&&t3.embs>=24&&t3.sheetOk&&t3.mig.v===4&&t3.mig.n===37&&t3.mig.p===t3.mig.r-1, JSON.stringify(t3)); }
@@ -704,7 +704,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await cW.close(); }
   // v134: 경기장 폭 72 · 외형 8종(E~H 머리색 변형)
   { const R=await pg.evaluate(async()=>{ const o={W,H}; o.form=Object.values(FORMATIONS).every(f=>f.form.every(p=>p[0]>=2&&p[0]<=W-2)); o.mid=FORMATIONS[Object.keys(FORMATIONS)[0]].form[0][0];
-      o.looks=LOOKS.length; o.art=['f5','f6','f7','f8'].every(l=>UI2_LOOK[l]&&Object.keys(UI2_LOOK[l]).length===14&&Object.values(UI2_LOOK[l]).every(v=>v.startsWith('data:image/jpeg')));
+      o.looks=LOOKS.length; o.art=['f5','f6','f7','f8'].every(l=>UI2_LOOK[l]&&Object.keys(UI2_LOOK[l]).length===14&&Object.values(UI2_LOOK[l]).every(v=>/^data:image\/(jpeg|webp)/.test(v)));
       o.spr=['f5','f6','f7','f8'].every(l=>!!mySpr('idle','south',0,'#1d3f8f','#ffffff',null,l)); const px=l=>{ const t=tinted(SPR[l].idle.south[0],l+'idlesouth0',195,265,'#1d3f8f','#ffffff'); const d=t.getContext('2d').getImageData(0,0,t.width,t.height).data; let n=0,sum=0; for(let i=0;i<d.length;i+=4){ if(d[i+3]>10){ n++; sum+=d[i]*3+d[i+1]*5+d[i+2]*7; } } return sum; }; o.diff=new Set(['f2','f6','f7','f8'].map(px)).size===4&&px('field')!==px('f5');
       const keep=S.look; S.look='f7'; o.use=myLook()==='f7'&&NEWLOOK.f7==='x7'&&uimg('face')===UI2_LOOK.f7.face; S.look=keep; return o; });
     ok('v134 경기장 폭 72(포메이션 좌표 함께 넓어짐) · 외형 8종(E~H 초상 14장씩 · 경기 그림 머리색 변형)', R.W===72&&R.H===105&&R.form&&R.mid===36&&R.looks===8&&R.art&&R.spr&&R.diff&&R.use, JSON.stringify(R)); }
@@ -823,6 +823,15 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     R.match=await px.evaluate(()=>!bgmNode&&!bgmWant());
     R.art=await px.evaluate(()=>{ M.freeze=0; M.introT=0; M.setPiece=null; M.mp=999; M.cds=[0,0,0,0]; M.ultN={}; const u=M.user; setOwner(u); u.touchT=0; useSkill(0,true,0,0); const cl=(M.vfx||[]).filter(e=>e.k==='cx_clone'); return cl.length===2&&cl[0].dx===-cl[1].dx&&!!VFX_DATA.cx_triple&&VFX_DATA.cx_triple.w===256; });
     ok('v147 대기실 음악: 허브에서 이음매 없이 반복·경기 화면에서 멈춤·설정으로 끔 · 그림자 분신(양옆 분신 둘)·분신 슛 전용 그림', R.hub&&R.off&&R.match&&R.art&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v148: 다시보기에도 필살기 그림·슬로·집중선 · 그림 WebP 압축 · 캐스터 해설 음성
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE0); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=false; S.mute=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.player.level=20; S.player.skills=SKILLS.map(s=>s.id); S.player.equip=['dragon','fire','dash','wall']; S.trust=95; renderHome.mode='play'; S.lastMode='play'; audioInit(); startMatch(false); }); await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); cmLoad(); }); await px.waitForTimeout(2500);
+    await px.evaluate(()=>{ window.__cm=[]; const _c=caster; caster=function(k,p){ window.__cm.push(k); return _c(k,p); }; M.freeze=0; M.introT=0; M.setPiece=null; M.mp=999; M.cds=[0,0,0,0]; M.ultN={}; const u=M.user; u.x=W/2; u.y=26; u.vx=u.vy=0; M.players.forEach(q=>{ if(q.team===1&&q.role!=='GK'){ q.x=3; q.y=90; } }); setOwner(u); u.touchT=0; u.kickCd=0; useSkill(0,true,0,0); });
+    let rp=null; for(let i=0;i<120&&!rp;i++){ await px.waitForTimeout(80); rp=await px.evaluate(()=>M.replay&&M._rpC?{k:M.ball.dragon,col:M._rpC.col,ult:M._rpC.ult}:null); }
+    const R=await px.evaluate(()=>{ const o={}; o.webp=[...document.documentElement.innerHTML.matchAll(/data:image\/(webp|png|jpeg);base64/g)].reduce((a,m)=>(a[m[1]]=(a[m[1]]||0)+1,a),{}); o.cmBufs=Object.keys(CM_BUF).length; o.cm=window.__cm.slice(); o.goal=M.score[0]; o.recK=!!(M.rec||[]).find(f=>f.k==='dragon'); const bg=(S.bestGoal||{})[S.season]; o.bg=bg?{k:bg.k,n:bg.fr.length,v:bg.v}:null; return o; });
+    R.rp=rp; ok('v148 다시보기 필살기 그림·슬로·집중선 · 그림 WebP · 해설 음성(필살기 이름·골) · 시즌 베스트 골 저장', !!rp&&rp.k===true&&rp.ult&&R.recK&&R.webp.webp>500&&R.cmBufs===14&&R.cm.includes('dragon')&&(R.goal<1||R.cm.some(k=>/goal|lead|eq|hat/.test(k)))&&(R.goal<1||(R.bg&&R.bg.k==='dragon'&&R.bg.n>40))&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

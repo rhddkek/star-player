@@ -833,6 +833,22 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const R=await px.evaluate(()=>{ const o={}; o.webp=[...document.documentElement.innerHTML.matchAll(/data:image\/(webp|png|jpeg);base64/g)].reduce((a,m)=>(a[m[1]]=(a[m[1]]||0)+1,a),{}); o.cmBufs=Object.keys(CM_BUF).length; o.cm=window.__cm.slice(); o.goal=M.score[0]; o.recK=!!(M.rec||[]).find(f=>f.k==='dragon'); const bg=(S.bestGoal||{})[S.season]; o.bg=bg?{k:bg.k,n:bg.fr.length,v:bg.v}:null; return o; });
     R.rp=rp; ok('v148 다시보기 필살기 그림·슬로·집중선 · 그림 WebP · 해설 음성(필살기 이름·골) · 시즌 베스트 골 저장', !!rp&&rp.k===true&&rp.ult&&R.recK&&R.webp.webp>500&&R.cmBufs===14&&R.cm.includes('dragon')&&(R.goal<1||R.cm.some(k=>/goal|lead|eq|hat/.test(k)))&&(R.goal<1||(R.bg&&R.bg.k==='dragon'&&R.bg.n>40))&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v149: 전수조사 — 주간 활동 자동 · 5경기 진행 흐름 · 설정 스위치 · 알림 숫자 · 명단 제외 5경기 · 문구
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
+      S.lastWk='pass'; S.weekAct=null; o.ws=weekState()[0]; tab='home'; renderHub(); o.row=(document.querySelector('#tab-home .hm-wk .v')||{}).textContent||'';
+      const tg0=(S.player.tg&&S.player.tg.pass)||0, st0=S.player.stats.pass; S.trust=80; S.offers=[{clubId:Object.keys(CLUBS).find(k=>k!==S.clubId),wage:100,years:2}]; S.offersFor='mid';
+      while(nextEvent()&&nextEvent().type!=='league'){ autoMatch(true); }
+      const h0=S.history.length; autoBatch(5); await w(150); const am=document.querySelector('.ab-m'); o.played=S.history.length-h0; o.title=am?(am.querySelector('.ab-t')||{}).textContent:''; o.wk=!!(am&&am.querySelector('.ab-wk')); o.wkTxt=am&&am.querySelector('.ab-wk')?am.querySelector('.ab-wk').textContent:''; o.trained=((S.player.tg&&S.player.tg.pass)||0)!==tg0||S.player.stats.pass>st0; o.lastWk=S.lastWk; document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      S.offers=[]; S.offersFor=null; tab='home'; renderHub();
+      openSettings(); await w(60); const sm=document.querySelector('.st-m'); o.sw=sm?sm.querySelectorAll('.st-sw').length:0; const mu=S.mute; sm.querySelector('#st-mute').click(); o.mute=S.mute!==mu; sm.querySelector('#st-mute').click(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      S.inbox=(S.inbox||[]).concat(Array.from({length:12},(_,i)=>({t:'소식'+i,u:true}))); renderHub(); await w(30); const bell=el('hub-more'); o.bell=bell?bell.innerHTML.replace(/<svg[\s\S]*?<\/svg>/g,''):'';
+      S.trust=0; S.guaranteed=false; S.startLock=0; S.player.injury=0; while(nextEvent()&&nextEvent().type!=='league'){ autoMatch(true); } tab='home'; renderHub(); o.sel=(selFor(nextEvent())||{}).k; o.out=!!document.querySelector('#tab-home #btn-auto'); o.out5=!!document.querySelector('#tab-home #btn-auto5');
+      const r={injured:true,dnp:true,goals:0,assists:0,rating:0,home:true,opp:nextEvent().opp,ev:nextEvent(),ga:1,gb:0}; try{ o.paper=newspaperHTML(r,{myG:1,oppG:0}).includes('명단 제외'); }catch(e){ o.paper='err '+e.message; }
+      o.scout=scoutWhy(CLUBS[Object.keys(CLUBS)[0]],10); return o; });
+    ok('v149 주간 활동 자동(지난주와 같게) · 묵은 이적 제안으로 1경기만에 멈추지 않음 · 설정 스위치 · 알림은 할 일만 숫자 · 명단 제외 때 5경기 넘기기 · 명단 제외 기사', /자동 · 패스 훈련/.test(R.ws)&&/자동 · 패스 훈련/.test(R.row)&&R.played>=1&&!/이적 제안/.test(R.title||'')&&R.wk&&R.trained&&R.lastWk==='pass'&&R.sw>=8&&R.mute&&!/9\+|>1[0-9]</.test(R.bell)&&/dot0|dotn">[1-9]</.test(R.bell)&&(R.sel!=='out'||(R.out&&R.out5))&&R.paper===true&&R.scout.length<=14&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

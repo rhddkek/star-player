@@ -2822,6 +2822,7 @@ td.num.mine{font-weight:800;color:#1f8a66}
 
 
 
+
 /*<u16>*/
 /* v132: 가로 화면 알림 띠는 아래쪽 */
 .toast.tbot{top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:min(480px,56vw);padding:7px 14px;font-size:.84rem;line-height:1.35;border-radius:10px!important;box-shadow:0 4px 14px #0006}
@@ -3123,6 +3124,7 @@ body .hub-modal.st-m>.card.st-c{display:block!important}
 body #screen-hub .btn.sp-gear{background:#fffaf0!important;background-image:none!important;border:2px solid #d8cdb2!important;color:#1a2a4b!important;box-shadow:none!important}
 /* v149: 능력치 +/− 누르기 쉽게(22 → 30px) */
 body #screen-hub #tab-player .pm button{min-height:30px!important;min-width:46px}
+body .ab-k .ab-why.none{display:none!important}
 
 /*</u16>*/
 </style>
@@ -5724,7 +5726,7 @@ function abSummary(L,wk,cnt,req,wkA){ document.querySelectorAll('.ab-m').forEach
   const hl=x=>{ if(x.dnp) return '명단 제외'; if(x.inj) return '부상 결장'; const ms=[10,20,30,40].find(k=>x.sg>=k&&x.sg-x.g<k); if(ms&&x.g) return `시즌 ${ms}호골`; if(x.g>=3) return '해트트릭'; if(x.g===2) return '멀티골'; if(x.g) return `${x.g}골${x.a?' '+x.a+'도움':''}`; if(x.a) return `${x.a}도움`; return ''; };
   const more=!wk&&nx&&nx.type==='league'&&!bigMatch(nx); /* v149: 막힘 없이 끝났으면 '5경기 더' 한 번에 */ const go=more?'5경기 더 ▶▶':wk==='offer'?'제안 보기':!nx?'홈으로':wk==='rival'?'라이벌전 준비':wk==='strong'?'강팀전 준비':wk==='big'?'경기 준비':nx.type==='cup'?'컵 경기 준비':nx.type==='cc'?'대륙 대회 준비':nx.type==='nat'?'대표팀 합류':'다음 경기 준비';
   const m=h(`<div class="hub-modal ab-m"><div class="card ab-c"><button class="ab-x" type="button" aria-label="닫기">${luc('x',22)}</button><h2 class="ab-t">${req&&cnt<req&&wk&&wk!=='end'?`${cnt}경기 진행 · ${stop}`:`${cnt}경기 완료`}</h2><div class="ab-me">${luc('user',18)}<span>내 기록</span><b>${myLine}</b></div>${wkA&&Object.keys(wkA).length?`<div class="ab-wk">${luc('dumbbell',16)||''}<span>주간 활동 자동</span><b>${Object.entries(wkA).map(([k,n])=>`${wkName(k)}${n>1?' ×'+n:''}`).join(' · ')}</b></div>`:''}
-    <div class="ab-k"><div class="ab-rec">${luc('trophy',24)}<b>${w}승${d?` ${d}무`:''}${l?` ${l}패`:''}</b></div><div class="ab-why ${wk==='offer'?'hot':''}">${luc(wk==='offer'?'mail':'calendar',22)}<b>${stop}</b></div></div>
+    <div class="ab-k"><div class="ab-rec">${luc('trophy',24)}<b>${w}승${d?` ${d}무`:''}${l?` ${l}패`:''}</b></div><div class="ab-why ${wk==='offer'?'hot':''} ${!wk?'none':''}">${luc(wk==='offer'?'mail':'calendar',22)}<b>${stop}</b></div></div>
     <div class="ab-l">${L.map(x=>{ const r=x.my>x.op?'W':x.my<x.op?'L':'D'; return `<div class="ab-r"><span class="rs ${r}">${r==='W'?'승':r==='L'?'패':'무'}</span><span class="t">${embHTML(me,26)}<b>${esc(me.short||me.name)}</b></span><b class="sc num">${x.my} - ${x.op}</b><span class="t o"><b>${esc(x.opp.short||x.opp.name)}</b>${embHTML(x.opp,26)}</span>${hl(x)?`<i class="ab-hl ${x.g?'g':''}">${hl(x)}</i>`:''}</div>`; }).join('')}</div>
     ${(()=>{ const nm=typeof nearMiss==='function'?nearMiss():''; return nm?`<div class="ab-nm">${luc('target',18)||'🎯'}<b>${esc(nm)}</b></div>`:''; })()}
     ${nx&&wk!=='end'?`<div class="ab-nx">${luc('calendar',20)}<b>다음 ${esc(nx.label)} · ${esc(nx.opp.short||nx.opp.name)}</b>${embHTML(nx.opp,30)}</div>`:''}

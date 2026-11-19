@@ -865,6 +865,15 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const late=['후배의 부탁','몸 관리','대표팀 주장','은퇴 질문','기부 요청'].filter(t=>R.ev.includes(t)).length;
     ok('v150 경제(세금 40%·유지비·연체 시 혜택 정지·큰 목표 줄) · 선발 예상 %(빅클럽 낮게) · 벤치 길면 경기 감각↓·대표팀 제외 · 시즌 후반 사건 · 성장 배율 표시 · 드리블 터치 설정', R.tax===0.4&&R.tax0===0.08&&R.upk>0&&R.G.tax>0&&R.G.upk>0&&R.late&&R.bg&&R.bgRow&&R.md.join().startsWith('성장 100%,성장 100%,성장 45%')&&R.spTop<R.spLow&&R.spTop<=40&&R.rusty&&!R.rustyG&&!R.nat&&late>=3&&R.drib1==='touch'&&eX.length===0, JSON.stringify({...R,late,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v150b: 고향 구단 투자 상한 확장(시설 Lv.5 · 시즌 투자 5단계 · 훈련장 Lv.4·5 상한 +2) · 구단주 다음 목표
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; const p=S.player; const c=hcHome(), H=hcS();
+      p.money=30000000; H.sh=60; p.items=ITEMS.map(x=>x.id); o.cap0=hcCap(c); o.bg0=(bigGoal()||{}).k; hcModal(); await w(50); document.querySelector('.hc-m [data-ht="own"]').click(); await w(30);
+      for(const f of ['tr','st']) for(let i=0;i<12;i++){ const bt=document.querySelector(`.hc-m [data-fac="${f}"]`); if(!bt) break; bt.click(); await w(10); }
+      o.tr=H.fac.tr; o.st=H.fac.st; o.cap1=hcCap(c); o.wealth=c.wealth; const bd=document.querySelector('.hc-m [data-bud="5"]'); bd&&bd.click(); await w(20); o.bud=H.bud; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); return o; });
+    ok('v150b 고향 구단 투자 상한 확장 · 구단주 다음 목표', R.bg0==='hc'&&R.tr===5&&R.st===5&&R.cap1===R.cap0+4&&R.wealth===4&&R.bud===5&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

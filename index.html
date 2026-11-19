@@ -2829,6 +2829,8 @@ td.num.mine{font-weight:800;color:#1f8a66}
 
 
 
+
+
 /*<u16>*/
 /* v132: 가로 화면 알림 띠는 아래쪽 */
 .toast.tbot{top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:min(480px,56vw);padding:7px 14px;font-size:.84rem;line-height:1.35;border-radius:10px!important;box-shadow:0 4px 14px #0006}
@@ -3893,6 +3895,7 @@ const LUX_IDS=['car','mansion','jet','island','found','gym','lab','media','oxyge
 function taxRate(){ const w=S.wage||0; return w<300?0.08:w<1500?0.18:w<6000?0.3:0.4; }
 function bigGoal(){ const p=S.player; if(!p||S.prologue||S.season<2&&p.money<3000) return null; const it=ITEMS.filter(x=>!p.items.includes(x.id)&&x.price>p.money*0.9).sort((a,b)=>a.price-b.price)[0];
   try{ const c=hcHome(), H=hcS(); if(c&&H.sh<51&&(!it||p.money>=it.price*0.6||it.price>hcBlock(c,true)*Math.ceil((51-H.sh)/10))&&p.money>=hcBlock(c,true)*0.3){ const n=Math.ceil((51-H.sh)/10); return {k:'hc',t:`고향 ${c.short||c.name} 구단주`,pr:hcBlock(c,true)*n}; } }catch(e){}
+  try{ const c=hcHome(), H=hcS(); if(c&&hcOwner()&&(!it||it.price>p.money*3)){ const nx=Object.entries(HC_FAC).map(([id,F])=>{ const lv=H.fac[id]||0; return lv<F.c.length?{id,F,lv,pr:F.c[lv]}:null; }).filter(Boolean).sort((a,b)=>a.pr-b.pr)[0]; if(nx) return {k:'hc',t:`고향 ${c.short||c.name} ${nx.F.n} Lv.${nx.lv+1}`,pr:nx.pr}; } }catch(e){}
   return it?{k:it.id,t:it.name,pr:it.price}:null; }
 function luxUpkeep(){ const p=S.player; let t=0; (p.items||[]).forEach(id=>{ if(!LUX_IDS.includes(id)) return; const it=ITEMS.find(x=>x.id===id); if(it) t+=it.price*0.0035; }); return Math.round(t/10)*10; }
 function myFixture(){ ensureSplit(); const d=divOf(S.clubId); const ms=S.fixtures[d.id][S.round-1]; if(!ms) return null; return ms.find(m=>m[0]===S.clubId||m[1]===S.clubId)||null; }
@@ -6418,7 +6421,7 @@ function startMatch(highlight,practice){ try{ el('screen-match').classList.remov
     el('tut-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; S.tutSeen=true; save(); lastT=performance.now(); };
   }
   el('btn-mute').textContent=S.mute?'🔇':'🔊'; el('btn-mute').onclick=()=>{ S.mute=!S.mute; el('btn-mute').textContent=S.mute?'🔇':'🔊'; ambience(!S.mute); save(); };
-  el('btn-skip').onclick=()=>{ if(M.over) return; M.paused=true;
+  el('btn-skip').onclick=()=>{ if(!M||M.over) return; M.paused=true;
     if(M.practice){ showOverlay(`<h3>${M.chal?M.chal.ic+' '+M.chal.name:'연습장'}</h3>${M.chal?`<p style="margin:4px 0 0;font-size:.9rem">${M.chal.desc}</p><p class="muted" style="margin:4px 0 0;font-size:.82rem">💡 ${M.chal.tip}</p><p class="muted" style="margin:4px 0 0;font-size:.85rem">${M.chal.rew?`첫 성공 보상 ${fmtMoney(M.chal.rew)} · 커리어 경기 기록에는 반영되지 않아요.`:'기록 미반영.'}</p>`:`<p class="muted" style="margin:4px 0 0;font-size:.85rem">보상과 기록은 남지 않아요.`} 쿨타임 회복 3배 · 필살기 무제한${M.chal?'':'</p>'}<div class="list" style="margin-top:10px"><button class="btn primary" id="pr-go">연습 재개</button><button class="btn" id="pr-reset">${M.chal?'도전 초기화':'공 다시 받기'}</button><button class="btn" id="pr-end">연습 종료</button></div>`);
       el('pr-go').onclick=()=>{ el('m-overlay').hidden=true; M.paused=false; lastT=performance.now(); }; el('pr-reset').onclick=()=>{ el('m-overlay').hidden=true; if(M.chal) chalRestart(); else { practiceReset(); M.paused=false; lastT=performance.now(); } }; el('pr-end').onclick=()=>endPractice(); return; }
     const tt=M.tstats, tot0=Math.max(1,tt[0].poss+tt[1].poss), L0=M.home?0:1, R0=1-L0; const rw=(n,k,f)=>`<tr><td class="num${L0===0?' mine':''}" style="text-align:right">${f?f(tt[L0][k]):tt[L0][k]||0}</td><td style="text-align:center;color:var(--muted)">${n}</td><td class="num${R0===0?' mine':''}" style="text-align:left">${f?f(tt[R0][k]):tt[R0][k]||0}</td></tr>`;
@@ -9644,18 +9647,18 @@ function revModal(pre){ document.querySelectorAll('.rv-m').forEach(x=>x.remove()
 
 /* ===== v82 ④ 고향 구단 프로젝트: 후원 → 지분 → 구단주 (돈을 크게 쓰고, 오래 키우는 곳) ===== */
 const HC_SP=[[0,0,0],[6000,1,50],[16000,2,120],[40000,3,250]]; /* 시즌 후원: 비용 · 전력 · 명성 */
-const HC_BUD=[[0,0],[60000,1],[150000,2],[360000,3]]; /* 구단주 시즌 투자: 비용 · 전력 영구 성장 */
-const HC_FAC={tr:{n:'훈련장',c:[90000,240000,600000],d:lv=>`전력 +${lv} · 내가 뛰면 개인 코치 효과 +${lv*10}%`},yo:{n:'유스 아카데미',c:[60000,180000,450000],d:lv=>`시즌마다 ${lv*30}% 확률로 유망주 데뷔 (전력 +1)`},st:{n:'경기장',c:[120000,360000,900000],d:lv=>`수익 +${lv*30}% · 구단 재력 ${1+lv}단계`}};
+const HC_BUD=[[0,0],[60000,1],[150000,2],[360000,3],[900000,4],[2000000,5]]; /* 구단주 시즌 투자: 비용 · 전력 영구 성장 */
+const HC_FAC={tr:{n:'훈련장',c:[90000,240000,600000,1500000,3500000],d:lv=>`전력 +${lv} · 내가 뛰면 개인 코치 효과 +${lv*10}%`},yo:{n:'유스 아카데미',c:[60000,180000,450000],d:lv=>`시즌마다 ${lv*30}% 확률로 유망주 데뷔 (전력 +1)`},st:{n:'경기장',c:[120000,360000,900000,2200000,5000000],d:lv=>`수익 +${lv*30}% · 구단 재력 ${Math.min(4,1+lv)}단계`}};
 function hcHome(){ if(!S) return null; if(!S.homeClub) S.homeClub=CLUBS['kr-2-0']?'kr-2-0':((S.seasonLog||[])[0]||{}).club||S.clubId; return CLUBS[S.homeClub]||null; }
 function hcS(){ if(!S.hc) S.hc={sp:0,sh:0,bud:0,fac:{tr:0,yo:0,st:0},promo:0,log:[],paid:{}}; S.hc.fac=S.hc.fac||{tr:0,yo:0,st:0}; S.hc.paid=S.hc.paid||{}; return S.hc; }
 function hcOwner(){ return !!(S&&S.hc&&S.hc.sh>=51); }
 function hcDivLv(c){ const d=divOf(c.id); return d?+d.id.split('-')[1]:2; }
 function hcVal(c){ return Math.round(Math.pow(c.str,3)*16*[1.6,1,0.6][hcDivLv(c)-1]/100)*100; }
 function hcBlock(c,buy){ return Math.round(hcVal(c)*0.1*(buy?1.05:0.95)/10)*10; }
-function hcCap(c){ const d=divOf(c.id); if(!d) return 70; const top=Math.max(...d.clubs.filter(id=>id!==c.id).map(id=>CLUBS[id].str)); return top+3; }
+function hcCap(c){ const d=divOf(c.id); if(!d) return 70; const top=Math.max(...d.clubs.filter(id=>id!==c.id).map(id=>CLUBS[id].str)); const tr=(S&&S.hc&&S.hc.fac&&S.hc.fac.tr)||0; return Math.min(99,top+3+(tr>=4?2:0)+(tr>=5?2:0)); }
 function hcBoost(id){ return S&&S.hc&&id===S.homeClub?HC_SP[S.hc.sp][1]:0; }
 function hcGrow(c,n){ if(n<=0) return 0; const cap=hcCap(c); const before=c.str; S.baseStr=S.baseStr||{}; const b0=S.baseStr[c.id]!=null?S.baseStr[c.id]:c.str; const add=Math.max(0,Math.min(n,cap-c.str)); S.baseStr[c.id]=Math.min(b0+n,cap); c.str=clamp(c.str+add,20,99); if(typeof saveStr==='function') saveStr(); return c.str-before; }
-function hcApply(){ const c=hcHome(); if(!c||!S.hc) return; if(c._w0==null) c._w0=c.wealth||1; c.wealth=Math.max(c._w0,1+(S.hc.fac.st||0)); }
+function hcApply(){ const c=hcHome(); if(!c||!S.hc) return; if(c._w0==null) c._w0=c.wealth||1; c.wealth=Math.max(c._w0,Math.min(4,1+(S.hc.fac.st||0))); }
 function hcSeasonStart(){ const c=hcHome(); if(!c||!S.hc) return; const H=S.hc, p=S.player; const k='s'+S.season;
   if(H.sp&&!H.paid['sp'+k]){ while(H.sp>0&&p.money<HC_SP[H.sp][0]) H.sp--; if(H.sp){ p.money-=HC_SP[H.sp][0]; H.paid['sp'+k]=1; p.rep+=HC_SP[H.sp][2]; } else pushNews('🏟️','후원 중단','잔고 부족'); }
   if(hcOwner()&&H.bud&&!H.paid['bud'+k]){ while(H.bud>0&&p.money<HC_BUD[H.bud][0]) H.bud--; if(H.bud){ p.money-=HC_BUD[H.bud][0]; H.paid['bud'+k]=1; const g=hcGrow(c,HC_BUD[H.bud][1]); pushNews('🏟️','구단 투자',`${c.name} 시즌 투자 ${fmtMoney(HC_BUD[H.bud][0])} · 전력 +${g}`); } }
@@ -9681,8 +9684,8 @@ function hcModal(){ const m=document.createElement('div'); m.className='hub-moda
       <div class="hc-sh"><div class="hc-bar"><i style="width:${H.sh}%"></i><em style="left:51%"></em></div><div class="row between"><b class="num">${H.sh}%</b><small class="muted">구단 가치 ${fmtMoney(hcVal(c))} · 내 몫 ${fmtMoney(Math.round(hcVal(c)*H.sh/100))}</small></div></div>
       <div class="row" style="gap:8px;margin-top:10px"><button class="btn primary" style="flex:1" data-shb="1" ${H.sh<100&&p.money>=buy?'':'disabled'}>10% 사기 · ${fmtMoney(buy)}</button><button class="btn" style="flex:1" data-shs="1" ${H.sh>0?'':'disabled'}>10% 팔기 · ${fmtMoney(sell)}</button></div>${H.sh<51?`<small class="muted" style="display:block;margin-top:6px">운영권까지 ${Math.ceil((51-H.sh)/10)}회 매입 · 예상 ${fmtMoney(buy*Math.ceil((51-H.sh)/10))}</small>`:''}`; }
     else if(T==='own'){ if(!own) body=`<p class="muted hc-p">운영권 잠금 · 지분 ${H.sh}/51%</p>`;
-      else body=`<span class="label">시즌 투자 · 매 시즌 자동 결제 · 전력 영구 상승 (상한 리그 최강 +3)</span><div class="hc-tiers">${HC_BUD.map((x,i)=>`<button class="ar-op ${H.bud===i?'on':''}" data-bud="${i}" ${H.bud===i?'disabled':''}><b>${['투자 안 함','소규모','중규모','대규모'][i]}</b><small>${i?`시즌 ${fmtMoney(x[0])} · 전력 +${x[1]}`:'배당만 받아요'}</small></button>`).join('')}</div>
-        <span class="label" style="margin-top:10px;display:block">시설</span><div class="list" style="gap:6px">${Object.entries(HC_FAC).map(([id,F])=>{ const lv=H.fac[id]||0; const pr=lv<3?F.c[lv]:0; return `<div class="item"><div class="tx"><b>${F.n} <span class="st-pip">${'●'.repeat(lv)}${'○'.repeat(3-lv)}</span></b><small>${lv?F.d(lv):'아직 없음'}${lv<3?` → <b>${F.d(lv+1)}</b>`:''}</small></div>${lv<3?`<button class="btn sm ${p.money>=pr?'primary':''}" data-fac="${id}" ${p.money>=pr?'':'disabled'}>${fmtMoney(pr)}</button>`:'<span class="pill good">최고</span>'}</div>`; }).join('')}</div>`; }
+      else body=`<span class="label">시즌 투자 · 매 시즌 자동 결제 · 전력 영구 상승 (상한 ${hcCap(c)} · 훈련장 Lv.4·5마다 +2)</span><div class="hc-tiers">${HC_BUD.map((x,i)=>`<button class="ar-op ${H.bud===i?'on':''}" data-bud="${i}" ${H.bud===i?'disabled':''}><b>${['투자 안 함','소규모','중규모','대규모','초대형','오일머니급'][i]}</b><small>${i?`시즌 ${fmtMoney(x[0])} · 전력 +${x[1]}`:'배당만 받아요'}</small></button>`).join('')}</div>
+        <span class="label" style="margin-top:10px;display:block">시설</span><div class="list" style="gap:6px">${Object.entries(HC_FAC).map(([id,F])=>{ const lv=H.fac[id]||0, mx=F.c.length; const pr=lv<mx?F.c[lv]:0; return `<div class="item"><div class="tx"><b>${F.n} <span class="st-pip">${'●'.repeat(lv)}${'○'.repeat(mx-lv)}</span></b><small>${lv?F.d(lv):'아직 없음'}${lv<mx?` → <b>${F.d(lv+1)}</b>`:''}</small></div>${lv<mx?`<button class="btn sm ${p.money>=pr?'primary':''}" data-fac="${id}" ${p.money>=pr?'':'disabled'}>${fmtMoney(pr)}</button>`:'<span class="pill good">최고</span>'}</div>`; }).join('')}</div>`; }
     else body=(H.log&&H.log.length)?`<div class="list" style="gap:4px">${H.log.slice().reverse().map(x=>`<div class="item"><div class="tx"><b>시즌 ${x.s} · ${divName(x.div)} ${x.rank}위${x.up?' · 승격':x.down?' · 강등':''}</b><small>구단 가치 ${fmtMoney(x.val)}${x.divd?` · 배당 ${fmtMoney(x.divd)}`:''}</small></div></div>`).join('')}</div>${H.promo?`<small class="muted">구단주로서 승격 ${H.promo}회</small>`:''}`:'<p class="muted hc-p">기록 없음 · 시즌 종료 시 추가</p>';
     m.innerHTML=`<div class="card hc-card"><div class="row between" style="flex-wrap:nowrap;gap:8px;align-items:flex-start"><div class="row" style="gap:10px;align-items:center;flex-wrap:nowrap;min-width:0;flex:1">${crestHTML(c)}<div style="min-width:0"><h3 style="margin:0">${esc(c.name)}</h3><small class="muted">${d?divName(d.id):''} · 전력 ${c.str} · 가치 ${fmtMoney(hcVal(c))} · 잔고 ${fmtMoney(p.money)}</small></div></div><button class="btn sm" id="hc-x" style="flex:0 0 auto">닫기</button></div>
       <div class="seg hc-seg">${tabs.map(([kk,n])=>`<button data-ht="${kk}" class="${T===kk?'on':''}">${n}${kk==='own'&&own?' ✓':''}</button>`).join('')}</div><div class="hc-body">${body}</div></div>`;
@@ -9695,7 +9698,7 @@ function hcModal(){ const m=document.createElement('div'); m.className='hub-moda
     if(b.dataset.shb){ const pr=hcBlock(c,true); if(p.money<pr||H.sh>=100) return; const was=hcOwner(); p.money-=pr; H.sh+=10; if(!was&&hcOwner()){ pushNews('🏟️','구단주 취임',`${c.name}의 구단주가 됐어요`); p.rep+=200; toast(`${c.name} 구단주 취임!`); T='own'; } else toast(`지분 ${H.sh}%`); save(); draw(); return; }
     if(b.dataset.shs){ if(H.sh<=0) return; p.money+=hcBlock(c,false); H.sh-=10; if(H.sh<51){ H.bud=0; } save(); toast(`지분 ${H.sh}%`); draw(); return; }
     if(b.dataset.bud!=null){ const i=+b.dataset.bud; if(!hcOwner()) return; if(i>0&&!H.paid['bud'+k]){ if(p.money<HC_BUD[i][0]) return toast('잔고가 모자라요'); p.money-=HC_BUD[i][0]; H.paid['bud'+k]=1; const g=hcGrow(c,HC_BUD[i][1]); saveStr(); toast(`시즌 투자 · 전력 +${g}`); } else if(i>H.bud&&H.paid['bud'+k]){ const diff=HC_BUD[i][0]-HC_BUD[H.bud][0]; if(p.money<diff) return toast('잔고가 모자라요'); p.money-=diff; const g=hcGrow(c,HC_BUD[i][1]-HC_BUD[H.bud][1]); saveStr(); toast(`투자 확대 · 전력 +${g}`); } H.bud=i; save(); draw(); return; }
-    if(b.dataset.fac){ const id=b.dataset.fac, F=HC_FAC[id], lv=H.fac[id]||0; if(lv>=3||!hcOwner()) return; const pr=F.c[lv]; if(p.money<pr) return; p.money-=pr; H.fac[id]=lv+1; if(id==='tr') hcGrow(c,1); hcApply(); saveStr(); save(); toast(`${F.n} Lv.${lv+1}`); draw(); return; } });
+    if(b.dataset.fac){ const id=b.dataset.fac, F=HC_FAC[id], lv=H.fac[id]||0; if(lv>=F.c.length||!hcOwner()) return; const pr=F.c[lv]; if(p.money<pr) return; p.money-=pr; H.fac[id]=lv+1; if(id==='tr') hcGrow(c,1); hcApply(); saveStr(); save(); toast(`${F.n} Lv.${lv+1}`); draw(); return; } });
   draw(); document.body.append(m); }
 
 function fitFill(col){ col.querySelectorAll('.fl-fill').forEach(x=>x.classList.remove('fl-fill')); col.querySelectorAll('.fl-scroll').forEach(x=>x.classList.remove('fl-scroll')); col.querySelectorAll('.fl-mid').forEach(x=>x.classList.remove('fl-mid')); if(col.scrollHeight<=col.clientHeight+4) return;

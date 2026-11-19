@@ -755,6 +755,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const R=await pq.evaluate(async()=>{ const w=ms=>new Promise(r=>setTimeout(r,ms)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; const p=S.player; const d=divOf(S.clubId).id;
       o.big0=bigMatch(nextEvent())===null; S.trust=80; autoBatch(5); await w(150); const am=document.querySelector('.ab-m'); o.me=!!am&&/선발|교체|출전 없음/.test((am.querySelector('.ab-me b')||{}).textContent||''); o.hlOk=!am||[...am.querySelectorAll('.ab-hl')].every(x=>x.textContent.length>0); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
       let n=0; while(nextEvent()&&n<150){ const e=nextEvent(); if(e.type==='league'&&S.round>=seasonLen(d)) break; autoMatch(true); n++; } const ev=nextEvent(); o.last=!!ev&&ev.type==='league'&&S.round===seasonLen(d);
+      if(!o.last){ o.skip='최종전 전에 시즌이 끝남(무작위)'; return o; }
       const rk=Object.keys(S.pstats).find(k=>k!=='me'&&S.pstats[k].club===ev.opp.id); S.pstats.me.g=19; S.pstats[rk].g=20; Object.keys(S.pstats).forEach(k=>{ if(k!=='me'&&k!==rk&&S.pstats[k].g>18) S.pstats[k].g=12; }); S.bigAsk=null;
       const bg=bigMatch(ev); o.tag=!!bg&&bg.last&&bg.tags.includes('득점왕 맞대결')&&/나 19골/.test(bg.facts.join(' ')); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); goKey('home'); await w(80); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); o.homeTag=/최종전/.test((document.querySelector('.nm2-big')||{}).textContent||'');
       const h0=S.history.length; autoBatch(5); await w(100); o.ask=!!document.querySelector('.big-m')&&S.history.length===h0; document.getElementById('big-play').click(); await w(80); o.play=renderHome.mode==='chance'&&S.history.length===h0&&!document.querySelector('.big-m'); o.once=S.bigAsk===bg.key;
@@ -873,6 +874,18 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       for(const f of ['tr','st']) for(let i=0;i<12;i++){ const bt=document.querySelector(`.hc-m [data-fac="${f}"]`); if(!bt) break; bt.click(); await w(10); }
       o.tr=H.fac.tr; o.st=H.fac.st; o.cap1=hcCap(c); o.wealth=c.wealth; const bd=document.querySelector('.hc-m [data-bud="5"]'); bd&&bd.click(); await w(20); o.bud=H.bud; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); return o; });
     ok('v150b 고향 구단 투자 상한 확장 · 구단주 다음 목표', R.bg0==='hc'&&R.tr===5&&R.st===5&&R.cap1===R.cap0+4&&R.wealth===4&&R.bud===5&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v152: 꾸미기 확장(헤어·세리머니·액세서리·축구화 그림) · 단가 상향 · 기술 단가
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; const p=S.player; p.money=5000000; p.rep=6000;
+      cosBuy(COS.find(c=>c.id==='h_bun')); cosBuy(COS.find(c=>c.id==='c_ear')); ['a_arm','a_neck','a_wrist','a_band'].forEach(id=>cosBuy(COS.find(c=>c.id===id)));
+      o.face=uimg('face')===HAIR_IMG.bun.face&&uimg('hero')===HAIR_IMG.bun.hero; o.acc=accOn().length; o.cel=cosVal('cel'); o.an=['r2','r2b','r2c','r2d','f6','f8'].every(ch=>['cel_knee','cel_air','cel_ear'].every(a=>hasAn(ch,a)));
+      tab='home'; renderHub(); await w(60); o.strip=document.querySelectorAll('#tab-home .h2img .acc-strip img').length;
+      renderCos.tab=2; renderCos.prev='h_ash'; goKey('shop:cos'); await w(80); o.tabs=document.querySelectorAll('.cos2-t button').length; o.icons=document.querySelectorAll('.cos-sw .sw.ic img').length;
+      o.gold=COS.find(c=>c.id==='b_gold').price; o.zone=SKILLS.find(x=>x.id==='zone').price; o.dash=SKILLS.find(x=>x.id==='dash').price; o.up10=skUpReq(SKILLS.find(x=>x.id==='dash'),9).price;
+      S.cos.eq.cel='c_knee'; const n0=S.history.length; return o; });
+    ok('v152 꾸미기 확장(헤어 초상·세리머니 4체형·액세서리 3개·아이콘) · 단가 상향 · 기술 단가(초반 그대로·후반 ×14)', R.face&&R.acc===3&&R.cel==='cel_ear'&&R.an&&R.strip===3&&R.tabs===9&&R.icons>=4&&R.gold===300000&&R.zone===361200&&R.dash===300&&R.up10===128000&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

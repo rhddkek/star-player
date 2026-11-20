@@ -2846,6 +2846,7 @@ td.num.mine{font-weight:800;color:#1f8a66}
 
 
 
+
 /*<u16>*/
 /* v132: 가로 화면 알림 띠는 아래쪽 */
 .toast.tbot{top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:min(480px,56vw);padding:7px 14px;font-size:.84rem;line-height:1.35;border-radius:10px!important;box-shadow:0 4px 14px #0006}
@@ -5884,7 +5885,8 @@ function careerCardPNG(retired){ // 공유용 커리어 카드 (1080×1350)
   const F='"Black Han Sans","Noto Sans KR",sans-serif', N='"Noto Sans KR",sans-serif';
   x.fillStyle='#ffd25a'; x.font=`900 34px ${N}`; x.fillText(retired?'CAREER COMPLETE':'CAREER CARD',60,90); x.fillStyle='#fff'; x.font=`96px ${F}`; x.fillText(p.name,60,190);
   x.fillStyle='#cfe0ff'; x.font=`600 36px ${N}`; x.fillText(`${POS_INFO[p.pos]?POS_INFO[p.pos].name:p.pos} · ${p.age}세 · OVR ${ovr()} · ${club?club.name:''}`,60,250);
-  try{ const pc=document.createElement('canvas'); pc.width=168; pc.height=150; drawPortrait(pc,club); x.imageSmoothingEnabled=false; x.drawImage(pc,660,290,378,338); }catch(e){}
+  const hi=careerCardPNG.hero; if(hi&&hi.naturalWidth){ try{ x.save(); x.beginPath(); x.roundRect?x.roundRect(660,290,378,384,24):x.rect(660,290,378,384); x.clip(); x.imageSmoothingEnabled=false; x.drawImage(hi,660,290,378,384); x.restore(); }catch(e){} } /* v158: 카드도 초상 그림체로 */
+  else try{ const pc=document.createElement('canvas'); pc.width=168; pc.height=150; drawPortrait(pc,club); x.imageSmoothingEnabled=false; x.drawImage(pc,660,290,378,338); }catch(e){}
   const T=S.trophies||[]; const bal=T.filter(t=>/발롱|올해의 선수|MVP/.test(t.label||'')).length; const league=T.filter(t=>t.kind==='league').length, cups=T.filter(t=>t.kind==='cup'||t.kind==='cc'||t.kind==='wc').length;
   const kv=[['시즌',S.season],['출전',p.career.apps],['골',p.career.goals],['도움',p.career.assists],['평균 평점',avgRating().toFixed(2)],['A매치',`${p.natl?p.natl.caps:0}경기 ${p.natl?p.natl.goals:0}골`],['리그 우승',league],['컵·대회 우승',cups],['개인상',(S.awards||[]).length],['최종 명성',Math.round(p.rep).toLocaleString()]];
   kv.forEach(([k,v],i)=>{ const cx=60+(i%2)*300, cy=330+Math.floor(i/2)*118; x.fillStyle='rgba(255,255,255,.08)'; x.fillRect(cx,cy,280,98); x.fillStyle='#9fb3cc'; x.font=`600 26px ${N}`; x.fillText(k,cx+18,cy+36); x.fillStyle='#fff'; x.font=`44px ${F}`; x.fillText(String(v),cx+18,cy+84); });
@@ -5894,7 +5896,7 @@ function careerCardPNG(retired){ // 공유용 커리어 카드 (1080×1350)
   if(retired){ try{ const gR=legRank('g'), NM=S.nem; y+=10; x.fillStyle='#ffd25a'; x.font=`600 28px ${N}`; x.fillText(`세계 통산 득점 ${gR.ranked?gR.rank+'위':'순위 밖'}${NM?` · 동기 ${NM.name} ${p.career.goals}골 vs ${NM.tot.g}골`:''}`,60,y); y+=42; x.fillStyle='#cfe0ff'; x.font=`500 26px ${N}`; const ep=epilogue(); let a=ep, b2=''; if(ep.length>34){ const k=ep.lastIndexOf(' ',34); a=ep.slice(0,k>10?k:34); b2=ep.slice(a.length).trim(); } x.fillText(a,60,y); if(b2) x.fillText(b2.length>36?b2.slice(0,35)+'…':b2,60,y+34); }catch(e){} } /* v157: 은퇴 카드에 역대 순위·동기·에필로그 */
   x.fillStyle='#9fb3cc'; x.font=`600 26px ${N}`; x.fillText('⚽ 스타 플레이어, 나만의 축구 인생',60,1300); x.fillStyle='#ffd25a'; x.font=`600 26px ${N}`; x.textAlign='right'; x.fillText(new Date().toLocaleDateString('ko-KR'),1020,1300); x.textAlign='left';
   return cv0; }
-async function shareCareerCard(retired){ const cv0=careerCardPNG(retired); const name=`starplayer_${S.player.name}_card.png`;
+async function shareCareerCard(retired){ try{ await new Promise(r=>{ const i=new Image(); i.onload=()=>{ careerCardPNG.hero=i; r(); }; i.onerror=()=>r(); i.src=uimg('hero'); setTimeout(r,1500); }); }catch(e){} const cv0=careerCardPNG(retired); const name=`starplayer_${S.player.name}_card.png`;
   const blob=await new Promise(r=>cv0.toBlob(r,'image/png')); if(!blob){ toast('카드를 만들지 못했어요'); return; }
   try{ const file=new File([blob],name,{type:'image/png'}); if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'스타 플레이어 커리어 카드'}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.append(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000); toast('커리어 카드를 저장했어요'); }

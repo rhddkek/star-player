@@ -887,6 +887,28 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       S.cos.eq.cel='c_knee'; const n0=S.history.length; return o; });
     ok('v152 꾸미기 확장(헤어 초상·세리머니 4체형·액세서리 3개·아이콘) · 단가 상향 · 기술 단가(초반 그대로·후반 ×14)', R.face&&R.acc===3&&R.cel==='cel_ear'&&R.an&&R.strip===3&&R.tabs===9&&R.icons>=4&&R.gold===300000&&R.zone===361200&&R.dash===300&&R.up10===128000&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v154: 플레이 테스트 반영 — 경기 스킬 이름 고정 · 이적 추천(선발 45%+ 우선·잔류 비교) · 결과 버튼 고정·신뢰 이유 · 모드 성장률 · 성장 비용 · 리그 내 위치
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.compSeen=1; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
+      const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); const top=cs.slice().sort((a,b)=>b.str-a.str)[0];
+      S.offers=[{clubId:top.id,wage:Math.round(S.wage*3.5),years:3}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+4}; offerGrid.sel=null; const g=offerGrid(); o.stayRec=!!g.querySelector('.ofx-c.cur .best'); o.cmp=!!g.querySelector('.ofx-cmp'); o.spTop=startPct(S.offers[0]);
+      S.offers=[]; S.offersFor=null;
+      tab='home'; renderHome.mode='auto'; renderHub(); await w(50); o.mdr=[...document.querySelectorAll('#sel-mode button')].map(b=>getComputedStyle(b.querySelector('.md-r')).display!=='none'); 
+      S.player.points=6; renderPlayer.pend={}; goKey('player:stat'); await w(50); o.cst=document.querySelectorAll('.st2 .srow .cst').length;
+      const r={rating:5.0,goals:0,assists:0,bench:false,auto:false,injured:false,ev:{type:'league'}}; S.trust=50; const t=trustAfterMatch(r,{type:'league'}); o.tsum=t.parts.reduce((a,x)=>a+x[1],0)===t.d; o.tparts=t.parts.length;
+      for(let i=0;i<6;i++){ if(nextEvent()&&nextEvent().type==='league') autoMatch(true); } goKey('league'); await w(120); const tr=document.querySelector('#tab-league tr.me'); if(tr){ let sc=tr.parentElement; while(sc&&!(sc.scrollHeight>sc.clientHeight+4)) sc=sc.parentElement; const a=tr.getBoundingClientRect(), c=sc.getBoundingClientRect(); o.lgIn=a.top>=c.top-2&&a.bottom<=c.bottom+2; } else o.lgIn=true;
+      return o; });
+    // 결과 화면: 제안이 있어도 '다음 경기 준비' 고정 + 제안 버튼 · 신뢰 누르면 이유
+    await px.evaluate(()=>{ const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); S.offers=[{clubId:cs[3].id,wage:S.wage*2,years:2}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+6}; S.trust=50; goKey('home'); renderHome.mode='auto'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await px.tap('#btn-go'); await px.waitForTimeout(2500);
+    const R2=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; o.next=(document.querySelector('#res-next')||{}).textContent||''; o.off=!!document.querySelector('#res-off'); const tp=[...document.querySelectorAll('#result-col .tr-tap')].find(x=>x.offsetParent); if(tp){ tp.click(); await w(60); o.tw=!!document.querySelector('.tw-m .tw-l>div'); document.querySelectorAll('.tw-m').forEach(m=>m.remove()); } else o.tw=!window.__lastTrust||!window.__lastTrust.d; return o; });
+    // 경기 중 스킬 버튼: 공이 없어도 이름 그대로
+    await px.evaluate(()=>{ show('screen-hub'); S.offers=[]; S.player.level=20; S.player.skills=['fire','roll','dash','thunder']; S.player.equip=['fire','roll','dash','thunder']; goKey('home'); renderHome.mode='play'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await px.tap('#btn-go'); await px.waitForTimeout(1200);
+    const R3=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.overlay').forEach(o=>o.hidden=true); M.freeze=0; M.paused=false; await w(800); M.mp=5; await w(300); return [0,1,2,3].map(i=>{ const b=document.getElementById('k-s'+i); return {t:b.querySelector('small').textContent,nm:b.dataset.nm,low:b.classList.contains('lowmp'),ub:(b.querySelector('.ub')||{}).textContent||''}; }); });
+    ok('v154 플레이 테스트 반영 (스킬 이름 고정 · 이적 추천 · 결과 버튼·신뢰 이유 · 모드 성장률 · 성장 비용 · 리그 내 위치)', R.stayRec&&R.cmp&&R.spTop<45&&R.mdr.filter(Boolean).length===1&&R.cst>=7&&R.tsum&&R.tparts>=1&&R.lgIn&&/다음 경기 준비/.test(R2.next)&&R2.off&&R2.tw&&R3.every(x=>x.t===x.nm&&x.low)&&R3[3].ub==='×2'&&eX.length===0, JSON.stringify({R,R2,R3,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

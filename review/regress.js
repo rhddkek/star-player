@@ -26,7 +26,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const p1=await pg.evaluate(()=>({match:!el('screen-match').hidden,pro:!!(M&&M.ev.pro),me:M&&M.me.name,bench:!!(M&&M.bench),warmDone:S.warmDone}));
     ok('프롤로그 워밍업: 컷신 뒤 조작 배우기(수비 없이 시작) → 결승전으로', pw.warm&&pw.defs===0&&pw.me==='칠성고'&&pw.mateHas&&p1.warmDone===true, JSON.stringify(pw));
     await pg.evaluate(()=>{ if(el('tut-go')) el('tut-go').click(); M.score=[2,1]; M.stats.goals=1; M.min=90; M.over=true; concludeMatch(); }); await pg.waitForTimeout(400);
-    const p2=await pg.evaluate(()=>({pro:!el('screen-pro').hidden,offers:document.querySelectorAll('#pro-col [data-pj]').length,kr:S.prologue.offers.every(o=>CLUBS[o.club].country==='kr')}));
+    const p2=await pg.evaluate(()=>({pro:!el('screen-pro').hidden,offers:document.querySelectorAll('#pro-col [data-pj]').length,kr:S.prologue.offers.every(o=>o.abroad?CLUBS[o.club].country!=='kr':CLUBS[o.club].country==='kr')&&S.prologue.offers.filter(o=>!o.abroad).length>=3}));
     await pg.click('#pro-col [data-pj="0"]'); await pg.waitForTimeout(500);
     const p3=await pg.evaluate(()=>{ const o=S.proDone; return {hub:!el('screen-hub').hidden,club:S.clubId,trust:S.trust,comp:!!(S.comp&&S.comp.name),modal:!!document.querySelector('.ci-card'),strip:!!document.querySelector('#tab-home .tstrip'),pro:S.prologue}; });
     ok('프롤로그: 오프닝 애니메이션(건너뛰기) → 고교 결승 → 국내 스카우트 제안 → 입단 → 주전 경쟁 안내', p0.cut&&p0.skip&&p0.stage==='intro'&&p1.match&&p1.pro&&p1.me==='칠성고'&&!p1.bench&&p2.pro&&p2.offers>=2&&p2.kr&&p3.hub&&p3.trust>0&&p3.comp&&p3.modal&&p3.strip&&p3.pro==null, JSON.stringify({p0,p1,p2,p3}));
@@ -176,7 +176,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
   await pg.click('#go-create'); await pg.click('#btn-new'); await pg.waitForTimeout(250);
   const warn=await pg.$('#nw-x'); ok('저장 있을 때 새 커리어 → 덮어쓰기 경고', !!warn);
   if(warn){ await pg.click('#nw-go'); await pg.waitForTimeout(400); await pg.evaluate(()=>{ proSkipAll(); }); await pg.waitForTimeout(400); await pg.evaluate(()=>document.querySelectorAll('.hub-modal').forEach(m=>m.remove())); }
-  if(bkPath){ await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const [fc]=await Promise.all([pg.waitForEvent('filechooser'), pg.click('#btn-import')]); await fc.setFiles(bkPath); await pg.waitForTimeout(500);
+  if(bkPath){ await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); await pg.click('#btn-import'); await pg.waitForTimeout(150); const [fc]=await Promise.all([pg.waitForEvent('filechooser'), pg.click('.imp-m [data-f]')]); await fc.setFiles(bkPath); await pg.waitForTimeout(500);
     const back=await pg.evaluate(()=>{ const o=load(); return o&&o.player&&o.player.level; }); ok('백업 불러오기: 이전 커리어 복원', back===6, 'Lv.'+back); }
   { await pg.evaluate(()=>{ show('screen-title'); initTitle(); }); const c2=await pg.$('#btn-continue'); if(c2) await c2.click(); await pg.waitForTimeout(600); }
 
@@ -880,7 +880,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
     const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; const p=S.player; p.money=5000000; p.rep=6000;
       cosBuy(COS.find(c=>c.id==='h_bun')); cosBuy(COS.find(c=>c.id==='c_ear')); ['a_arm','a_neck','a_wrist','a_band'].forEach(id=>cosBuy(COS.find(c=>c.id===id)));
-      o.face=uimg('face')===HAIR_IMG.bun.face&&uimg('hero')===HAIR_IMG.bun.hero; o.acc=accOn().length; o.cel=cosVal('cel'); o.an=['r2','r2b','r2c','r2d','f6','f8'].every(ch=>['cel_knee','cel_air','cel_ear'].every(a=>hasAn(ch,a)));
+      o.face=uimg('face')===hairImg('bun','face')&&uimg('hero')===hairImg('bun','hero')&&!!hairImg('bun','face'); o.acc=accOn().length; o.cel=cosVal('cel'); o.an=['r2','r2b','r2c','r2d','f6','f8'].every(ch=>['cel_knee','cel_air','cel_ear'].every(a=>hasAn(ch,a)));
       tab='home'; renderHub(); await w(60); o.strip=document.querySelectorAll('#tab-home .h2img .acc-strip img').length;
       renderCos.tab=2; renderCos.prev='h_ash'; goKey('shop:cos'); await w(80); o.tabs=document.querySelectorAll('.cos2-t button').length; o.icons=document.querySelectorAll('.cos-sw .sw.ic img').length;
       o.gold=COS.find(c=>c.id==='b_gold').price; o.zone=SKILLS.find(x=>x.id==='zone').price; o.dash=SKILLS.find(x=>x.id==='dash').price; o.up10=skUpReq(SKILLS.find(x=>x.id==='dash'),9).price;
@@ -900,11 +900,12 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       for(let i=0;i<6;i++){ if(nextEvent()&&nextEvent().type==='league') autoMatch(true); } goKey('league'); await w(120); const tr=document.querySelector('#tab-league tr.me'); if(tr){ let sc=tr.parentElement; while(sc&&!(sc.scrollHeight>sc.clientHeight+4)) sc=sc.parentElement; const a=tr.getBoundingClientRect(), c=sc.getBoundingClientRect(); o.lgIn=a.top>=c.top-2&&a.bottom<=c.bottom+2; } else o.lgIn=true;
       return o; });
     // 결과 화면: 제안이 있어도 '다음 경기 준비' 고정 + 제안 버튼 · 신뢰 누르면 이유
-    await px.evaluate(()=>{ const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); S.offers=[{clubId:cs[3].id,wage:S.wage*2,years:2}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+6}; S.trust=50; goKey('home'); renderHome.mode='auto'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await px.evaluate(()=>{ const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); S.offers=[{clubId:cs[3].id,wage:S.wage*2,years:2}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+6}; S.trust=50; S.compIntro=false; goKey('home'); renderHome.mode='auto'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
     await px.tap('#btn-go'); await px.waitForTimeout(2500);
     const R2=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; o.next=(document.querySelector('#res-next')||{}).textContent||''; o.off=!!document.querySelector('#res-off'); const tp=[...document.querySelectorAll('#result-col .tr-tap')].find(x=>x.offsetParent); if(tp){ tp.click(); await w(60); o.tw=!!document.querySelector('.tw-m .tw-l>div'); document.querySelectorAll('.tw-m').forEach(m=>m.remove()); } else o.tw=!window.__lastTrust||!window.__lastTrust.d; return o; });
     // 경기 중 스킬 버튼: 공이 없어도 이름 그대로
-    await px.evaluate(()=>{ show('screen-hub'); S.offers=[]; S.player.level=20; S.player.skills=['fire','roll','dash','thunder']; S.player.equip=['fire','roll','dash','thunder']; goKey('home'); renderHome.mode='play'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await px.evaluate(()=>{ show('screen-hub'); S.offers=[]; S.player.level=20; S.player.skills=['fire','roll','dash','thunder']; S.player.equip=['fire','roll','dash','thunder']; S.compIntro=false; goKey('home'); renderHome.mode='play'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await px.waitForTimeout(400); await px.evaluate(()=>{ S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
     await px.tap('#btn-go'); await px.waitForTimeout(1200);
     const R3=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.overlay').forEach(o=>o.hidden=true); M.freeze=0; M.paused=false; await w(800); M.mp=5; await w(300); return [0,1,2,3].map(i=>{ const b=document.getElementById('k-s'+i); return {t:b.querySelector('small').textContent,nm:b.dataset.nm,low:b.classList.contains('lowmp'),ub:(b.querySelector('.ub')||{}).textContent||''}; }); });
     ok('v154 플레이 테스트 반영 (스킬 이름 고정 · 이적 추천 · 결과 버튼·신뢰 이유 · 모드 성장률 · 성장 비용 · 리그 내 위치)', R.stayRec&&R.cmp&&R.spTop<45&&R.mdr.filter(Boolean).length===1&&R.cst>=7&&R.tsum&&R.tparts>=1&&R.lgIn&&/다음 경기 준비/.test(R2.next)&&R2.off&&R2.tw&&R3.every(x=>x.t===x.nm&&x.low)&&R3[3].ub==='×2'&&eX.length===0, JSON.stringify({R,R2,R3,eX:eX.slice(0,2)}));
@@ -918,6 +919,45 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       save(); await w(1600); o.keys=await IDB.keys(); const code=await saveCode(); o.code=code.slice(0,4); const back=await parseSaveCode(code); o.same=back.player.name===S.player.name&&back.clubId===S.clubId;
       localStorage.removeItem(SAVE_KEY); S=null; initTitle(); await w(600); o.cont=!el('cont-card').hidden&&/백업에서 복구/.test(el('cont-desc').textContent)&&!!localStorage.getItem(SAVE_KEY); return o; });
     ok('v155 저장 보호(IndexedDB 사본·시즌 백업·시작 화면 복구·압축 코드) · 해외 하위 리그 시작(국내 1부보다 낮은 해외 리그·적응)', R.ab.length>=1&&R.ab.every(x=>x[0]!=='kr'&&x[1]<=4)&&R.club!=='kr'&&R.adapt&&R.keys.includes('cur')&&R.keys.some(k=>/^bak-s/.test(k))&&R.code==='SP1:'&&R.same&&R.cont&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v156: 폰 성능 — 경기 HUD 변화가 문구 검사·이름 맞춤을 부르지 않음 · 유니폼 색칠 미리 하기 · 화질 자동 · 익명 통계(코드 비면 안 보냄)
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); renderHome.mode='play'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); el('btn-go').click(); });
+    await px.waitForTimeout(2500);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); document.querySelectorAll('.overlay').forEach(o=>o.hidden=true); M.freeze=0; M.paused=false; const o={};
+      for(let i=0;i<120&&M.tw&&M.tw.length;i++) await w(100); o.warm=!!M.tw&&M.tw.length===0; o.tint=Object.keys(TINT).length;
+      let q=0; const e0=Element.prototype.querySelectorAll, d0=Document.prototype.querySelectorAll; Element.prototype.querySelectorAll=function(x){ q++; return e0.call(this,x); }; Document.prototype.querySelectorAll=function(x){ q++; return d0.call(this,x); };
+      const n0=Object.keys(TINT).length; let fr=0; await new Promise(r=>{ const t0=performance.now(); const f=()=>{ fr++; if(performance.now()-t0<2000) requestAnimationFrame(f); else r(); }; requestAnimationFrame(f); });
+      Element.prototype.querySelectorAll=e0; Document.prototype.querySelectorAll=d0; o.qPerFrame=+(q/fr).toFixed(2); o.newTint=Object.keys(TINT).length-n0;
+      S.autoDpr=2; S.gfxQ=null; M.pf={last:performance.now(),ema:40,t:4000}; perfTick(performance.now()+40); o.dpr=S.autoDpr; S.gfxQ='hi'; o.hi=gfxDpr(); S.gfxQ=null; S.autoDpr=2; o.ana=typeof ana==='function'&&GC_CODE===''; return o; });
+    ok('v156 폰 성능(경기 중 DOM 검사 없음·색칠 미리·화질 자동 낮춤) · 익명 통계 꺼져 있음(코드 없음)', R.warm&&R.qPerFrame<0.5&&R.dpr===1.5&&R.hi===2&&R.ana&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v157: 커리어 연대기 · 역대 순위(가상 레전드) · 동기 라이벌 · 은퇴 에필로그
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.player.stats.shot=80; let n=0; while(nextEvent()&&n<20){ autoMatch(true); S.offers=[]; n++; }
+      const o={}; const N=nemInit(); o.nem=!!N&&!!N.name&&!!CLUBS[N.club]; const s0=S.season; nemSeason(); S.season++; nemSeason(); S.season=s0; o.hist=N.hist.length===2&&N.tot.apps>0;
+      o.chron=chronicle().length>=2&&chronicle().some(e=>/데뷔/.test(e.t||e.title||JSON.stringify(e))); o.lists=['g','a','apps','ng','caps'].every(k=>LEG_LISTS[k].L.length>=15&&LEG_LISTS[k].L.every((x,i,a)=>i===0||a[i-1].v>=x.v));
+      const r=legRank('g'); o.rank=!r.ranked&&r.rank===LEG_LISTS.g.L.length+1; o.line=/위/.test(legLine(legMain()));
+      show('screen-hub'); goKey('career'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const vs={}; for(const v of ['chron','leg','nem']){ renderRecord.v=v; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); vs[v]=v==='chron'?document.querySelectorAll('.chr-e,.chr li,.chr>div').length:v==='leg'?document.querySelectorAll('.leg-t tr,.leg-r,.lg-row').length:1; } o.vs=JSON.stringify(vs); o.views=document.querySelectorAll('.rec-seg [data-rv]').length>=6; o.nemV=!!document.querySelector('.nem .nm-h');
+      renderRecord.v='season'; goKey('home'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); legModal(); await w(150); const lm=document.querySelector('.leg-m'); o.modal=!!lm&&!!lm.querySelector('.me'); lm&&lm.remove();
+      o.epi=typeof epilogue()==='string'&&epilogue().length>8; retire(true); await w(500); const e=document.querySelector('.ret-epi'); o.ret=!!e&&e.scrollHeight<=e.clientHeight+2&&/동기/.test(e.textContent); return o; });
+    ok('v157 커리어 연대기 · 역대 순위(레전드 표·내 자리) · 동기 라이벌(시즌마다 기록) · 은퇴 에필로그(넘침 없음)', Object.entries(R).every(([k,v])=>k==='vs'||v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v158: 그림체 통일 — 외형 A 홈·능력치·승리 그림이 다른 외형과 같은 그림체 · 헤어 초상이 외형별 · 코치·에이전트·스카우트·기자 초상 새로
+  { const cX=await b.newContext({viewport:{width:852,height:393}}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.click('#go-create'); await px.waitForTimeout(300); await px.click('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
+      const dim=src=>new Promise(r=>{ const i=new Image(); i.onload=()=>r([i.naturalWidth,i.naturalHeight]); i.onerror=()=>r([0,0]); i.src=src; });
+      const L=['field','f2','f3','f4','f5','f6','f7','f8'], H=['buzz','blonde','bun','ash']; const seen=new Set(); let ok=0;
+      for(const h of H) for(const l of L){ const f=HAIR_IMG[h][l]; if(f&&f.face&&f.hero){ seen.add(f.face); seen.add(f.hero); ok++; } } o.all=ok===32&&seen.size===64;
+      o.heroDim=(await dim(HAIR_IMG.ash.f3.hero)).join('x')==='410x417'&&(await dim(HAIR_IMG.ash.f3.face)).join('x')==='179x168';
+      S.look='f3'; S.cos.owned=(S.cos.owned||[]).concat(['h_bun']); S.cos.eq=S.cos.eq||{}; S.cos.eq.hair='h_bun'; o.look=uimg('face')===HAIR_IMG.bun.f3.face&&uimg('hero')===HAIR_IMG.bun.f3.hero; S.look='field'; o.field=uimg('hero')===HAIR_IMG.bun.field.hero; S.cos.eq.hair=null;
+      o.aHero=(await dim(UI2_IMG.hero)).join('x')==='410x417'&&uimg('hero')===UI2_IMG.hero; o.aMissing=['half','press','vs','inj','mv_up','mv_dn','cer_boot','stat','res_win'].every(k=>!!uimg(k));
+      o.por=(await Promise.all(['coach','agent','scout','press'].map(k=>dim(ART.por[k])))).every(d=>d[0]===128&&d[1]===128);
+      return o; });
+    ok('v158 그림체 통일(외형 A 장면 그림·헤어 초상 외형별 32쌍·NPC 초상 4)', Object.values(R).every(v=>v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

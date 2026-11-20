@@ -909,6 +909,16 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     const R3=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.overlay').forEach(o=>o.hidden=true); M.freeze=0; M.paused=false; await w(800); M.mp=5; await w(300); return [0,1,2,3].map(i=>{ const b=document.getElementById('k-s'+i); return {t:b.querySelector('small').textContent,nm:b.dataset.nm,low:b.classList.contains('lowmp'),ub:(b.querySelector('.ub')||{}).textContent||''}; }); });
     ok('v154 플레이 테스트 반영 (스킬 이름 고정 · 이적 추천 · 결과 버튼·신뢰 이유 · 모드 성장률 · 성장 비용 · 리그 내 위치)', R.stayRec&&R.cmp&&R.spTop<45&&R.mdr.filter(Boolean).length===1&&R.cst>=7&&R.tsum&&R.tparts>=1&&R.lgIn&&/다음 경기 준비/.test(R2.next)&&R2.off&&R2.tw&&R3.every(x=>x.t===x.nm&&x.low)&&R3[3].ub==='×2'&&eX.length===0, JSON.stringify({R,R2,R3,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v155: 저장 보호(IndexedDB 사본·시즌 백업·복구·코드 복사) · 해외 하위 리그 시작
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); if(CUT){ CUT.end=true; CUT=null; } try{ cancelAnimationFrame(raf); }catch(e){} M=null; const o={};
+      const offs=proOffers({rating:7.2,goals:2,assists:0}); o.ab=offs.filter(x=>x.abroad).map(x=>[CLUBS[x.club].country,lgLvOf(CLUBS[x.club])]); S.prologue={stage:'offers',r:{my:2,op:1,win:true,pk:false,rating:7.2,goals:2,assists:0},offers:offs};
+      proJoin(offs.findIndex(x=>x.abroad)); await w(200); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); o.club=CLUBS[S.clubId].country; o.adapt=!!S.adaptL;
+      save(); await w(1600); o.keys=await IDB.keys(); const code=await saveCode(); o.code=code.slice(0,4); const back=await parseSaveCode(code); o.same=back.player.name===S.player.name&&back.clubId===S.clubId;
+      localStorage.removeItem(SAVE_KEY); S=null; initTitle(); await w(600); o.cont=!el('cont-card').hidden&&/백업에서 복구/.test(el('cont-desc').textContent)&&!!localStorage.getItem(SAVE_KEY); return o; });
+    ok('v155 저장 보호(IndexedDB 사본·시즌 백업·시작 화면 복구·압축 코드) · 해외 하위 리그 시작(국내 1부보다 낮은 해외 리그·적응)', R.ab.length>=1&&R.ab.every(x=>x[0]!=='kr'&&x[1]<=4)&&R.club!=='kr'&&R.adapt&&R.keys.includes('cur')&&R.keys.some(k=>/^bak-s/.test(k))&&R.code==='SP1:'&&R.same&&R.cont&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

@@ -2840,6 +2840,7 @@ td.num.mine{font-weight:800;color:#1f8a66}
 
 
 
+
 /*<u16>*/
 /* v132: 가로 화면 알림 띠는 아래쪽 */
 .toast.tbot{top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;max-width:min(480px,56vw);padding:7px 14px;font-size:.84rem;line-height:1.35;border-radius:10px!important;box-shadow:0 4px 14px #0006}
@@ -3862,8 +3863,20 @@ const W=72,H=105, GOAL_W=8.0; /* v134: 경기장 폭 68 → 72 (살짝 넓게) *
    ========================================================= */
 let S=null; // game state
 const SAVE_KEY='star-player-save-v1';
-function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+function save(){ let j=null; try{ j=JSON.stringify(S); localStorage.setItem(SAVE_KEY, j); }catch(e){} try{ if(j) idbMirror(j); }catch(e){} }
+/* v155: 저장 보호 — 브라우저 저장소(localStorage)에 더해 IndexedDB에 사본 + 시즌마다 백업 3칸. localStorage가 비거나 깨지면 시작 화면에서 복구 */
+const IDB={db:null,open(){ if(this.db) return Promise.resolve(this.db); return new Promise((res,rej)=>{ try{ const q=indexedDB.open('star-player',1); q.onupgradeneeded=()=>{ q.result.createObjectStore('kv'); }; q.onsuccess=()=>{ this.db=q.result; res(this.db); }; q.onerror=()=>rej(q.error); }catch(e){ rej(e); } }); },
+  async put(k,v){ const db=await this.open(); return new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); },
+  async get(k){ const db=await this.open(); return new Promise((res,rej)=>{ const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); },
+  async keys(){ const db=await this.open(); return new Promise((res,rej)=>{ const q=db.transaction('kv').objectStore('kv').getAllKeys(); q.onsuccess=()=>res(q.result||[]); q.onerror=()=>rej(q.error); }); },
+  async del(k){ const db=await this.open(); return new Promise(res=>{ const t=db.transaction('kv','readwrite'); t.objectStore('kv').delete(k); t.oncomplete=()=>res(); t.onerror=()=>res(); }); } };
+function idbMirror(j){ clearTimeout(idbMirror.t); idbMirror.t=setTimeout(async()=>{ try{ await IDB.put('cur',j); const o=S; if(o&&o.player&&o.season&&idbMirror.ss!==o.season){ idbMirror.ss=o.season; await IDB.put('bak-s'+String(o.season).padStart(3,'0'),{t:Date.now(),name:o.player.name,season:o.season,j});
+    const ks=(await IDB.keys()).filter(k=>/^bak-s/.test(k)).sort(); for(const k of ks.slice(0,-3)) await IDB.del(k); } }catch(e){} },1200); }
+async function idbRecover(){ try{ const j=await IDB.get('cur'); if(!j) return null; const o=JSON.parse(j); return o&&o.player&&o.clubId?{o,j}:null; }catch(e){ return null; } }
 function load(){ try{ const r=localStorage.getItem(SAVE_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function isStandalone(){ try{ return matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches||navigator.standalone===true; }catch(e){ return false; } }
+function isIOS(){ return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); }
+let INSTALL_EV=null; addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); INSTALL_EV=e; });
 function rnd(a,b){ return a+Math.random()*(b-a); }
 function irnd(a,b){ return Math.floor(rnd(a,b+1)); }
 function clamp(v,a,b){ return v<a?a:v>b?b:v; }
@@ -4415,7 +4428,8 @@ function openHubMore(){ if(document.querySelector('.hub-modal.more-m')) return; 
 /* v117: 홈 '지금 할 일' · 지금 상황에서 가장 도움 되는 행동 하나 */
 function nextAct(ev){ const p=S.player; const L=[];
   try{ if(p.injury>0){ const r=CONS.find(c=>c.id==='c_rehab'); const why=r&&r.can(p); L.push({ic:'bandage',t:`부상 회복 · ${p.injury}주`,d:why?'다음 경기까지 쉬면서 회복':'집중 재활로 회복 기간 단축',b:why?'소모품 보기':'집중 재활',go:()=>goKey('shop:life')}); } }catch(e){}
-  if(p.points>0) L.push({ic:'trending-up',t:`능력치 포인트 ${p.points}`,d:'추천 분배로 바로 OVR 올리기',b:'능력치 올리기',go:()=>goKey('player:stat')});
+  { const le=S.lastExport; const due=S.season>=2&&(!le||le.season<=S.season-2||(isIOS()&&!isStandalone()&&le.season<S.season)); if(due) L.push({ic:'shield',t:'커리어 백업',d:le?`마지막 백업 시즌 ${le.season}`:'브라우저를 지우면 커리어도 사라져요',b:'코드 복사',go:()=>{ save(); copySaveCode().then(ok=>{ if(ok){ S.lastExport={season:S.season,round:S.round,t:Date.now()}; save(); renderHub(); } }); }}); } /* v155: 두 시즌마다 백업 권유 (아이폰·미설치면 매 시즌) */
+  if(p.points>0) L.push({ic:'trending-up',t:`능력치 포인트 ${p.points}`,d:'추천 배분으로 바로 OVR 올리기',b:'능력치 올리기',go:()=>goKey('player:stat')});
   try{ endoInit(); if(S.endo.offers.length) L.push({ic:'handshake',t:`후원 제안 ${S.endo.offers.length}건`,d:'수락 시 경기마다 수입',b:'후원 보기',go:()=>goKey('shop:endo')}); }catch(e){}
   const bench=ev&&ev.type!=='nat'&&isBenched();
   if(ev&&ev.type!=='nat'&&!S.weekAct&&p.injury<=0) L.push({ic:'calendar',t:bench?'주전 경쟁 · 이번 주 준비':'이번 주 활동 아직',d:bench?`감독 신뢰 ${S.trust} / 선발 ${trustThr().up} · 동료 연습으로 호흡 맞추기`:'훈련·휴식·동료 연습 중 하나 고르기',b:'주간 준비',go:()=>weekSheet()});
@@ -4874,11 +4888,12 @@ function openSettings(){ const m=document.createElement('div'); m.className='hub
   const draw=()=>{ const row=([id,t,on,lb])=>`<div class="st-r"><b>${t}</b>${lb?`<button class="st-chip" id="${id}" type="button">${lb}</button>`:`<button class="st-sw ${on?'on':''}" id="${id}" type="button" role="switch" aria-checked="${on?'true':'false'}" aria-label="${t}"><i></i></button>`}</div>`; /* v149: 켬/끔은 스위치 · 여러 값은 칩 — 노란 버튼 11개 줄 서 있던 것 */
     m.innerHTML=`<div class="card st-c"><div class="st-h"><h2>설정</h2><button class="btn sm" id="st-x">닫기</button></div><div class="st-g"><div class="st-col"><h4>소리</h4>${[['st-mute','소리',!S.mute],['st-bgm','대기실 음악',!S.noBgm],['st-cm','해설',!S.noCaster],['st-chant','응원가',!S.noChant]].map(row).join('')}<h4>화면</h4>${[['st-shake','화면 흔들림',!S.noShake],['st-tilt','경기 시점',!S.noTilt,S.noTilt?'탑뷰':'원근']].map(row).join('')}</div><div class="st-col"><h4>경기</h4>${[['st-drib','드리블',S.dribMode==='touch',S.dribMode==='touch'?'터치':'붙임'],['st-tempo','경기 속도',S.tempo!=='real',S.tempo==='real'?'느리게':'빠르게'],['st-lu','경기 준비 화면',!S.skipLineup],['st-rp','골 리플레이',!S.noReplay],['st-run','추천 위치',runHintOn()],['st-act','조작 힌트',actHintOn(),hintModeLabel()]].map(row).join('')}</div></div><div class="list st-more">
     ${window.__SP_PC||window.__SP_FRAMED?`<div class="row between"><b>화면</b><span class="row" style="gap:4px">${[['pc','PC'],['mp','모바일 세로'],['ml','모바일 가로']].map(([k,n])=>`<button class="btn sm st-vw ${spView()===k?'primary':''}" data-vw="${k}">${n}</button>`).join('')}</span></div>`:''}
-    <div class="row between" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--line)"><b>커리어 백업</b><span class="row" style="gap:6px"><button class="btn sm" id="st-exp">백업 저장</button><button class="btn sm" id="st-imp">백업 불러오기</button></span></div>
+    <div class="row between" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--line)"><span><b>커리어 백업</b><small class="muted" style="display:block">${S.lastExport?`마지막 백업 · 시즌 ${S.lastExport.season} ${S.lastExport.round}R`:'아직 백업 안 함'}</small></span><span class="row" style="gap:6px"><button class="btn sm" id="st-exp">파일로 저장</button><button class="btn sm" id="st-code">코드 복사</button><button class="btn sm" id="st-imp">불러오기</button></span></div>
+    ${isStandalone()?'':`<div class="row between" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--line)"><span><b>홈 화면에 설치</b><small class="muted" style="display:block">${isIOS()?'설치 안 하면 7일 안 들어올 때 저장이 지워질 수 있어요':'앱처럼 전체 화면 · 저장이 더 안전'}</small></span><button class="btn sm" id="st-inst">${INSTALL_EV?'설치':'방법 보기'}</button></div>`}
     <div class="row between" style="margin-top:6px;padding-top:10px;border-top:1px solid var(--line)"><span><b>커리어 초기화</b><small class="muted" style="display:block">현재 커리어 삭제 · 되돌릴 수 없음</small></span><button class="btn sm danger" id="st-reset">커리어 초기화</button></div></div></div>`;
     m.querySelector('#st-x').onclick=()=>m.remove(); m.querySelector('#st-mute').onclick=()=>{ S.mute=!S.mute; save(); draw(); try{ bgmSync(); }catch(e){} }; m.querySelector('#st-cm').onclick=()=>{ S.noCaster=!S.noCaster; save(); draw(); }; m.querySelector('#st-bgm').onclick=()=>{ S.noBgm=!S.noBgm; save(); draw(); try{ audioInit(); bgmSync(); }catch(e){} }; m.querySelector('#st-chant').onclick=()=>{ S.noChant=!S.noChant; if(S.noChant) chantStop(); save(); draw(); }; m.querySelector('#st-shake').onclick=()=>{ S.noShake=!S.noShake; save(); draw(); }; m.querySelector('#st-tilt').onclick=()=>{ S.noTilt=!S.noTilt; save(); draw(); try{ resize(); }catch(e){} };
     m.querySelector('#st-run').onclick=()=>{ S.runHint=!runHintOn(); save(); draw(); }; m.querySelector('#st-drib').onclick=()=>{ S.dribMode=S.dribMode==='touch'?'glue':'touch'; save(); draw(); toast(S.dribMode==='touch'?'드리블: 터치 — 뛰면 공이 발에서 떨어졌다 붙어요':'드리블: 붙임 (기존)'); };m.querySelector('#st-tempo').onclick=()=>{ S.tempo=S.tempo==='real'?'arcade':'real'; save(); draw(); }; m.querySelector('#st-act').onclick=()=>{ hintModeNext(); draw(); };
-    m.querySelector('#st-exp').onclick=()=>{ save(); exportSave(); }; m.querySelector('#st-imp').onclick=()=>importSave(()=>{ m.remove(); S=null; initTitle(); show('screen-title'); }); m.querySelector('#st-rp').onclick=()=>{ S.noReplay=!S.noReplay; save(); draw(); }; m.querySelector('#st-lu').onclick=()=>{ S.skipLineup=!S.skipLineup; save(); draw(); };
+    m.querySelector('#st-exp').onclick=async()=>{ save(); if(await exportSave()){ S.lastExport={season:S.season,round:S.round,t:Date.now()}; save(); draw(); } }; m.querySelector('#st-code').onclick=()=>{ save(); copySaveCode().then(ok=>{ if(ok){ S.lastExport={season:S.season,round:S.round,t:Date.now()}; save(); draw(); } }); }; { const ib=m.querySelector('#st-inst'); if(ib) ib.onclick=()=>installHelp(); } m.querySelector('#st-imp').onclick=()=>importChoose(()=>{ m.remove(); S=null; initTitle(); show('screen-title'); }); m.querySelector('#st-rp').onclick=()=>{ S.noReplay=!S.noReplay; save(); draw(); }; m.querySelector('#st-lu').onclick=()=>{ S.skipLineup=!S.skipLineup; save(); draw(); };
     m.querySelector('#st-reset').onclick=()=>{ if(confirmReset){ try{localStorage.removeItem(SAVE_KEY);}catch(e){} S=null; m.remove(); initTitle(); show('screen-title'); confirmReset=false; } else { confirmReset=true; toast('한 번 더 누르면 현재 커리어가 삭제돼요'); setTimeout(()=>confirmReset=false,3000);} }; };
   m.addEventListener('click',e=>{ if(e.target===m) m.remove(); }); draw(); document.body.append(m); }
 document.getElementById('btn-settings').addEventListener('click',()=>openSettings());
@@ -8943,11 +8958,11 @@ function drawTitleArt(num){ const c=el('title-cv'); if(!c) return; const x=c.get
 function initTitle(){
   const sv=load(); const cc=el('cont-card'); try{ drawTitleBg(); }catch(e){} titleView('start'); el('go-create').classList.toggle('primary',!(sv&&sv.player)); el('go-create').classList.toggle('ghost2',!!(sv&&sv.player));
   if(sv&&sv.player){ cc.hidden=false; el('cont-name').textContent=`${sv.player.name} · Lv.${sv.player.level} ${POS_INFO[sv.player.pos].name}`; el('cont-desc').textContent=sv.prologue?'프롤로그 · 고교 졸업반 결승':`${CLUBS[sv.clubId].name} · 시즌 ${sv.season} · ${sv.round}라운드`+(sv.hook&&!sv.prologue?`\n다음 화 · ${sv.hook}`:''); }
-  else cc.hidden=true;
+  else { cc.hidden=true; idbRecover().then(rc=>{ if(!rc||load()) return; const o=rc.o; cc.hidden=false; el('cont-name').textContent=`${o.player.name} · Lv.${o.player.level} ${POS_INFO[o.player.pos]?POS_INFO[o.player.pos].name:''}`; el('cont-desc').textContent=`백업에서 복구 · ${CLUBS[o.clubId]?CLUBS[o.clubId].name:''} · 시즌 ${o.season}`; try{ localStorage.setItem(SAVE_KEY,rc.j); }catch(e){} el('go-create').classList.remove('primary'); el('go-create').classList.add('ghost2'); }); }
   el('pos-desc').textContent=POS_INFO[pos].desc;
   try{ el('btn-hof').hidden=!hofLoad().length; }catch(e){}
 }
-el('btn-import').addEventListener('click',()=>importSave(()=>initTitle()));
+el('btn-import').addEventListener('click',()=>importChoose(()=>initTitle()));
 el('btn-hof').addEventListener('click',()=>showHof());
 el('go-create').addEventListener('click',()=>titleView('create'));
 el('tc-back').addEventListener('click',()=>titleView('start'));
@@ -9026,20 +9041,24 @@ function proOffers(r){ const sc=(r.rating||6)+(r.goals||0)*0.5+(r.assists||0)*0.
   L.push(mk(pick(k2,0.5,1),90,'2부 상위',48));
   if(sc>=6.2) L.push(mk(pick(k1,0,0.45),130,'1부',42));
   if(sc>=7.0) L.push(mk(pick(k1,0.6,1),170,'1부 명문',36));
+  /* v155: 해외 도전 — 꼭 한국에서 시작할 필요 없음. 국내 2부 수준 이하의 해외 리그 구단 1곳 (평점 좋으면 2곳) */
+  try{ const kLv=lgLvOf(k1[0])-1; const fd=Object.keys(S.divs).filter(d=>{ const c0=CLUBS[S.divs[d].clubs[0]]; return c0&&c0.country&&c0.country!=='kr'&&!c0.nat&&!c0.school&&lgLvOf(c0)<=kLv; }).sort(()=>Math.random()-0.5); /* 국내 1부보다 낮은 해외 리그 (유럽 3부·동남아·중앙아시아 등) */
+    const nAb=sc>=6.6?2:1; const seen=new Set(); for(const d of fd){ if(L.filter(x=>x.tag==='해외 도전').length>=nAb) break; const cty=CLUBS[S.divs[d].clubs[0]].country; if(seen.has(cty)) continue; seen.add(cty); const c=pick(byStr(d),0,0.35); L.push({...mk(c,irnd(55,85),'해외 도전',52),abroad:1}); } }catch(e){}
   return L; }
-const PRO_TAG={'출전 기회':['빨리 뛰며 배우는 길','작은 팀 · 주급은 낮음'],'2부 상위':['주전 경쟁의 길','더 강한 팀 · 주급 높음'],'1부':['큰 무대의 길','1부 리그 · 경쟁 치열'],'1부 명문':['명문의 길','최고 무대 · 최고 주급']};
+const PRO_TAG={'해외 도전':['낯선 무대의 길','수준 낮은 해외 리그 · 적응 필요'],'출전 기회':['빨리 뛰며 배우는 길','작은 팀 · 주급은 낮음'],'2부 상위':['주전 경쟁의 길','더 강한 팀 · 주급 높음'],'1부':['큰 무대의 길','1부 리그 · 경쟁 치열'],'1부 명문':['명문의 길','최고 무대 · 최고 주급']};
 function proFinish(r){ const p=S.player; const my=r.home?r.ga:r.gb, op=r.home?r.gb:r.ga; const pk=my===op; const win=my>op||(pk&&Math.random()<0.5);
   p.xp+=Math.round(20+r.rating*4); p.rep+=Math.round(10+Math.max(0,r.rating-6)*15+(r.goals||0)*8);
   S.prologue={stage:'offers',r:{my,op,win,pk,rating:+r.rating.toFixed(1),goals:r.goals||0,assists:r.assists||0},offers:proOffers(r)}; S.tutSeen=true; save(); showProOffers(); }
 function showProOffers(){ const P=S.prologue, R=P.r; const col=el('pro-col'); show('screen-pro');
   col.innerHTML=`<div class="card pro-res pro2"><img src="${uimg('face')}" alt=""><b class="t">고교 마지막 경기</b><div class="pro-sc"><span>칠성고</span><b class="num">${R.my} : ${R.op}</b><span>서진고</span></div><span class="pr-k">${luc('trophy',20)} ${R.win?'우승':'준우승'}${R.pk?` <small>(승부차기 ${R.win?'승':'패'})</small>`:''}</span><span class="pr-k">${luc('star',20)} 평점 <b style="color:${ratingColor(R.rating)}">${R.rating.toFixed(1)}</b></span></div>
     <div class="pro-h">프로 입단 제안 <small>스카우트 ${P.offers.length}곳</small></div>
-    <div class="pro-grid n${P.offers.length}">${P.offers.map((o,i)=>{ const c=CLUBS[o.club]; const pb0=clamp(Math.round(((R.rating||6.5)-6.5)*6)+(R.goals||0)*3,0,12); const st=o.trust0+pb0>=TRUST_UP; return `<div class="card pro-o po2 ${i===0?'first':''}" style="animation-delay:${0.2+i*0.2}s"><div class="po-h">${embHTML(c,48)}<div><b>${esc(c.name)}</b><small>${divName(divOf(c.id).id)}</small></div></div>
+    <div class="pro-grid n${P.offers.length}">${P.offers.map((o,i)=>{ const c=CLUBS[o.club]; const pb0=clamp(Math.round(((R.rating||6.5)-6.5)*6)+(R.goals||0)*3,0,12); const st=o.trust0+pb0>=TRUST_UP; return `<div class="card pro-o po2 ${i===0?'first':''}" style="animation-delay:${0.2+i*0.2}s"><div class="po-h">${embHTML(c,48)}<div><b>${esc(c.name)}</b><small>${o.abroad?`${(COUNTRIES.find(x=>x.id===c.country)||{}).fl||''} 해외 · `:''}${divName(divOf(c.id).id)}</small></div></div>
       <div class="po-ban ${st?'go':''}">${st?`<b>바로 선발</b>`:`<b>주전 경쟁</b> 신뢰 +${TRUST_UP-o.trust0-pb0} 필요`}</div>
       <div class="po-r"><span>구단 전력</span><b class="num">${c.str}</b></div><div class="po-r"><span>주급</span><b class="num">${fmtMoney(o.wage)}</b></div><div class="po-r"><span>계약 기간</span><b class="num">${o.years}년</b></div>
       <button class="btn ${i===0?'primary':''} block" data-pj="${i}">${esc(c.short||c.name)} 입단</button></div>`; }).join('')}</div>`;
   col.onclick=e=>{ const b=e.target.closest('button[data-pj]'); if(b) proJoin(+b.dataset.pj); }; col.parentElement.scrollTop=0; }
 function proJoin(i){ const P=S.prologue; const o=P.offers[i]; const c=CLUBS[o.club];
+  if(o.abroad){ try{ const home=CLUBS[S.divs['kr-2'].clubs[0]]; adaptStart(home,c); }catch(e){} S.abroadStart=c.country; }
   S.clubId=c.id; S.wage=o.wage; S.contractEnd=S.season+o.years-1; S.role=roleAt(c).k; S.form=[]; const pb=clamp(Math.round((((P.r&&P.r.rating)||6.5)-6.5)*6)+((P.r&&P.r.goals)||0)*3,0,12); S.trust=o.trust0+pb; S.proBonus=pb; S.starter=S.trust>=TRUST_UP; S.comp=o.comp; S.compIntro=true; S.proDone={club:c.id,...P.r}; S.prologue=null;
   try{ S.rival=pickRival(); }catch(e){} save(); tab='home'; const ci0=!!S.compIntro; show('screen-hub'); renderHub(); if(!document.querySelector('.hub-modal')&&!ci0) toast(`${c.name} 입단! 주급 ${fmtMoney(o.wage)}`); } /* v92: 첫 감독 대화창과 입단 알림이 한꺼번에 뜨지 않게 — 주급은 대화창 머리에 */
 function proSkipAll(i=0){ if(CUT){ CUT.end=true; CUT=null; } if(typeof M!=='undefined'&&M){ try{ cancelAnimationFrame(raf); ambience(false); }catch(e){} M=null; } S.prologue={stage:'offers',r:{my:2,op:1,win:true,pk:false,rating:6.8,goals:1,assists:0},offers:proOffers({rating:6.8,goals:1,assists:0})}; proJoin(Math.min(i,S.prologue.offers.length-1)); }
@@ -9052,6 +9071,16 @@ async function exportSave(){ try{ const raw=localStorage.getItem(SAVE_KEY); if(!
   if(dl){ try{ await dl.save({filename:nm,data:raw}); toast('백업 파일을 저장했어요'); return true; }catch(e){ toast(e&&e.code==='declined'?'백업 저장을 취소했어요':'백업 저장 실패: '+((e&&e.message)||e)); return false; } }
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([raw],{type:'application/json'})); a.download=nm; document.body.append(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
   try{ navigator.clipboard&&navigator.clipboard.writeText(raw).catch(()=>{}); }catch(e){} toast('백업 파일을 저장했어요 (클립보드에도 복사)'); return true; }catch(e){ toast('백업 실패: '+e.message); return false; } }
+/* v155: 코드로 옮기기 — 압축(gzip)해서 글자로. 폰에서 파일 고르기가 번거로울 때 메모장·메신저로 옮김 */
+async function saveCode(){ const raw=localStorage.getItem(SAVE_KEY)||JSON.stringify(S); try{ if(typeof CompressionStream==='function'){ const cs=new Blob([raw]).stream().pipeThrough(new CompressionStream('gzip')); const buf=new Uint8Array(await new Response(cs).arrayBuffer()); let b=''; for(let i=0;i<buf.length;i+=0x8000) b+=String.fromCharCode.apply(null,buf.subarray(i,i+0x8000)); return 'SP1:'+btoa(b); } }catch(e){} return 'SP0:'+btoa(unescape(encodeURIComponent(raw))); }
+async function parseSaveCode(code){ code=(code||'').trim(); if(code.startsWith('{')) return JSON.parse(code); const m=code.match(/^SP([01]):([A-Za-z0-9+/=\s]+)$/); if(!m) throw new Error('코드 형식이 아니에요'); const bin=atob(m[2].replace(/\s+/g,''));
+  if(m[1]==='0') return JSON.parse(decodeURIComponent(escape(bin))); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); const ds=new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip')); return JSON.parse(await new Response(ds).text()); }
+async function copySaveCode(){ try{ const c=await saveCode(); let ok=false; try{ await navigator.clipboard.writeText(c); ok=true; }catch(e){} if(!ok){ const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card" style="max-width:520px;width:calc(100vw - 32px)"><b>백업 코드</b><small class="muted" style="display:block;margin:4px 0">길게 눌러 전체 선택 → 복사해서 메모장·메신저에 보관</small><textarea readonly style="width:100%;height:140px;font:11px monospace">${c}</textarea><button class="btn primary sm" type="button">닫기</button></div>`; m.querySelector('button').onclick=()=>m.remove(); document.body.append(m); m.querySelector('textarea').select(); } else toast(`백업 코드를 복사했어요 (${Math.round(c.length/1024)}KB) · 메모장에 붙여 보관`); return true; }catch(e){ toast('코드 만들기 실패: '+e.message); return false; } }
+function importChoose(after){ const m=document.createElement('div'); m.className='hub-modal imp-m'; m.innerHTML=`<div class="card" style="max-width:520px;width:calc(100vw - 32px);display:flex;flex-direction:column;gap:8px"><b>커리어 불러오기</b><textarea placeholder="백업 코드(SP1:…)를 붙여 넣기" style="width:100%;height:96px;font:12px monospace"></textarea><div class="row" style="gap:6px;justify-content:flex-end"><button class="btn sm" data-f>파일에서</button><button class="btn sm" data-x>취소</button><button class="btn primary sm" data-c>코드로 불러오기</button></div></div>`;
+  m.addEventListener('click',async e=>{ const b=e.target.closest('button'); if(e.target===m||(b&&b.dataset.x!=null)){ m.remove(); return; } if(!b) return; if(b.dataset.f!=null){ m.remove(); importSave(after); return; }
+    if(b.dataset.c!=null){ try{ const o=await parseSaveCode(m.querySelector('textarea').value); if(!o||!o.player||!o.clubId) throw new Error('스타 플레이어 백업이 아니에요'); localStorage.setItem(SAVE_KEY,JSON.stringify(o)); toast(`${o.player.name} 커리어를 불러왔어요`); m.remove(); after&&after(); }catch(err){ toast('불러오기 실패: '+err.message); } } }); document.body.append(m); }
+function installHelp(){ if(INSTALL_EV){ INSTALL_EV.prompt(); INSTALL_EV.userChoice.finally(()=>{ INSTALL_EV=null; }); return; }
+  const m=document.createElement('div'); m.className='hub-modal'; m.innerHTML=`<div class="card" style="max-width:440px;width:calc(100vw - 32px)"><b>홈 화면에 설치</b><ol style="margin:8px 0 10px 18px;line-height:1.7">${isIOS()?'<li>사파리 아래 <b>공유</b> 버튼</li><li><b>홈 화면에 추가</b></li><li>홈 화면 아이콘으로 실행</li>':'<li>브라우저 메뉴 <b>⋮</b></li><li><b>앱 설치</b> 또는 <b>홈 화면에 추가</b></li><li>홈 화면 아이콘으로 실행</li>'}</ol><button class="btn primary sm" type="button">확인</button></div>`; m.querySelector('button').onclick=()=>m.remove(); m.addEventListener('click',e=>{ if(e.target===m) m.remove(); }); document.body.append(m); }
 function importSave(after){ const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json,text/plain'; inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ try{ const o=JSON.parse(rd.result); if(!o||!o.player||!o.clubId) throw new Error('스타 플레이어 백업 파일이 아니에요'); localStorage.setItem(SAVE_KEY,JSON.stringify(o)); toast(`${o.player.name} 커리어를 불러왔어요`); after&&after(); }catch(e){ toast('불러오기 실패: '+e.message); } }; rd.readAsText(f); }; inp.click(); }
 function resetInputs(){ Object.keys(keys).forEach(k=>keys[k]=false); ['pass','shot','thru'].forEach(k=>{ input[k+'Hold']=false; input[k+'Release']=false; }); input.sprint=false; input.joyActive=false; input.jx=input.jy=0; input.shotMod=null; input.sk=[false,false,false,false]; if(typeof joyId!=='undefined'){ joyId=null; try{ joyEl.classList.remove('show'); }catch(e){} } if(M) M.charge=null; }
 window.addEventListener('blur',resetInputs);

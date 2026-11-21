@@ -892,7 +892,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
     const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.compSeen=1; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
       const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); const top=cs.slice().sort((a,b)=>b.str-a.str)[0];
-      S.offers=[{clubId:top.id,wage:Math.round(S.wage*3.5),years:3}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+4}; offerGrid.sel=null; const g=offerGrid(); o.stayRec=!!g.querySelector('.ofx-c.cur .best'); o.cmp=!!g.querySelector('.ofx-cmp'); o.spTop=startPct(S.offers[0]);
+      S.trust=80; S.starter=true; Object.keys(S.player.stats).forEach(k=>S.player.stats[k]=Math.max(S.player.stats[k],CLUBS[S.clubId].str+2)); S.offers=[{clubId:top.id,wage:Math.round(S.wage*3.5),years:3}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+4}; offerGrid.sel=null; const g=offerGrid(); o.stayRec=!!g.querySelector('.ofx-c.cur .best'); o.cmp=!!g.querySelector('.ofx-cmp'); o.spTop=startPct(S.offers[0]);
       S.offers=[]; S.offersFor=null;
       tab='home'; renderHome.mode='auto'; renderHub(); await w(50); o.mdr=[...document.querySelectorAll('#sel-mode button')].map(b=>getComputedStyle(b.querySelector('.md-r')).display!=='none'); 
       S.player.points=6; renderPlayer.pend={}; goKey('player:stat'); await w(50); o.cst=document.querySelectorAll('.st2 .srow .cst').length;
@@ -900,13 +900,13 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       for(let i=0;i<6;i++){ if(nextEvent()&&nextEvent().type==='league') autoMatch(true); } goKey('league'); await w(120); const tr=document.querySelector('#tab-league tr.me'); if(tr){ let sc=tr.parentElement; while(sc&&!(sc.scrollHeight>sc.clientHeight+4)) sc=sc.parentElement; const a=tr.getBoundingClientRect(), c=sc.getBoundingClientRect(); o.lgIn=a.top>=c.top-2&&a.bottom<=c.bottom+2; } else o.lgIn=true;
       return o; });
     // 결과 화면: 제안이 있어도 '다음 경기 준비' 고정 + 제안 버튼 · 신뢰 누르면 이유
-    await px.evaluate(()=>{ const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); S.offers=[{clubId:cs[3].id,wage:S.wage*2,years:2}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+6}; S.trust=50; S.compIntro=false; goKey('home'); renderHome.mode='auto'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
-    await px.tap('#btn-go'); await px.waitForTimeout(2500);
+    await px.evaluate(()=>{ const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId); S.offers=[{clubId:cs[3].id,wage:S.wage*2,years:2}]; S.offersFor='mid'; S.win={k:'summer',end:S.round+6}; S.trust=80; S.starter=true; S.player.injury=0; S.player.cond=100; S.compIntro=false; goKey('home'); renderHome.mode='auto'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
+    await px.waitForTimeout(500); await px.evaluate(()=>{ S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); }); await px.evaluate(()=>{ S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); el('btn-go').click(); }); await px.waitForTimeout(2500);
     const R2=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={}; o.next=(document.querySelector('#res-next')||{}).textContent||''; o.off=!!document.querySelector('#res-off'); const tp=[...document.querySelectorAll('#result-col .tr-tap')].find(x=>x.offsetParent); if(tp){ tp.click(); await w(60); o.tw=!!document.querySelector('.tw-m .tw-l>div'); document.querySelectorAll('.tw-m').forEach(m=>m.remove()); } else o.tw=!window.__lastTrust||!window.__lastTrust.d; return o; });
     // 경기 중 스킬 버튼: 공이 없어도 이름 그대로
     await px.evaluate(()=>{ show('screen-hub'); S.offers=[]; S.player.level=20; S.player.skills=['fire','roll','dash','thunder']; S.player.equip=['fire','roll','dash','thunder']; S.compIntro=false; goKey('home'); renderHome.mode='play'; renderHub(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
     await px.waitForTimeout(400); await px.evaluate(()=>{ S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); });
-    await px.tap('#btn-go'); await px.waitForTimeout(1200);
+    await px.evaluate(()=>{ S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); el('btn-go').click(); }); await px.waitForTimeout(1200);
     const R3=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); document.querySelectorAll('.overlay').forEach(o=>o.hidden=true); M.freeze=0; M.paused=false; await w(800); M.mp=5; await w(300); return [0,1,2,3].map(i=>{ const b=document.getElementById('k-s'+i); return {t:b.querySelector('small').textContent,nm:b.dataset.nm,low:b.classList.contains('lowmp'),ub:(b.querySelector('.ub')||{}).textContent||''}; }); });
     ok('v154 플레이 테스트 반영 (스킬 이름 고정 · 이적 추천 · 결과 버튼·신뢰 이유 · 모드 성장률 · 성장 비용 · 리그 내 위치)', R.stayRec&&R.cmp&&R.spTop<45&&R.mdr.filter(Boolean).length===1&&R.cst>=7&&R.tsum&&R.tparts>=1&&R.lgIn&&/다음 경기 준비/.test(R2.next)&&R2.off&&R2.tw&&R3.every(x=>x.t===x.nm&&x.low)&&R3[3].ub==='×2'&&eX.length===0, JSON.stringify({R,R2,R3,eX:eX.slice(0,2)}));
     await cX.close(); }
@@ -958,6 +958,20 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       o.por=(await Promise.all(['coach','agent','scout','press'].map(k=>dim(ART.por[k])))).every(d=>d[0]===128&&d[1]===128);
       return o; });
     ok('v158 그림체 통일(외형 A 장면 그림·헤어 초상 외형별 32쌍·NPC 초상 4)', Object.values(R).every(v=>v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v159: 10시즌 봇 후기 반영 — 남은 시간 자동 내 몫 · 세율 · 짧은 이적 비용 · 훈련 장면 줄임 · 해외 도전 실제 저수준 · 에필로그
+  { const cX=await b.newContext({viewport:{width:852,height:393}}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.click('#go-create'); await px.waitForTimeout(300); await px.click('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); const o={};
+      const pv=proOffers({rating:7.2,goals:2,assists:1}); const ab=pv.filter(x=>x.abroad); o.abroad=ab.length>=1&&ab.every(x=>lgLvOf(CLUBS[x.club])<=4&&CLUBS[x.club].str<=62);
+      proSkipAll(1); S.tutSeen=true; S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); o.join=S.joinS===S.season;
+      let gA=0; for(let k=0;k<8;k++){ document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=80; S.starter=true; startMatch(false); await w(250); if(!M) break; const g0=S.player.career.goals+S.player.career.assists; skipRest(); await w(150); gA+=S.player.career.goals+S.player.career.assists-g0; show('screen-hub'); goKey('home'); } o.skip=gA>=2; o.gA=gA;
+      const w0=S.wage; S.wage=20000; const t1=taxRate(); S.wage=40000; const t2=taxRate(); S.wage=w0; o.tax=t1===0.48&&t2===0.55;
+      document.querySelectorAll('.hub-modal,.trfx-m').forEach(m=>m.remove()); trainFx(['shot'],'슈팅 훈련 +40 · 40/100'); await w(100); const m1=!!document.querySelector('.trfx-m'); document.querySelectorAll('.trfx-m').forEach(m=>m.remove()); trainFx(['shot'],'슈팅 훈련 +40 · 80/100'); await w(100); const m2=!!document.querySelector('.trfx-m'); document.querySelectorAll('.trfx-m').forEach(m=>m.remove()); trainFx(['shot'],'슈팅 훈련 +40 · 슈팅 40 → 41'); await w(100); const m3=!!document.querySelector('.trfx-m'); document.querySelectorAll('.trfx-m').forEach(m=>m.remove()); o.trfx=m1&&!m2&&m3;
+      const other=S.divs[divOf(S.clubId).id].clubs.find(id=>id!==S.clubId); S.offersFor='end'; const off={clubId:other,wage:200,years:2}; S.offers=[off]; o.hopNow=hopNow(off); const ts=trustStart(CLUBS[other]); acceptOffer(off); o.hop=(S.hops||[]).length===1&&S.trust<=ts-7&&hopMul()<1; document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      S.abroadStart='es'; o.epi=/스페인으로 돌아가/.test(epilogue()); S.abroadStart=null;
+      return o; });
+    ok('v159 남은 시간 자동 내 골·도움 · 세율 구간 · 짧은 이적 비용 · 훈련 장면 시즌 첫 회만 · 해외 도전 저수준 · 에필로그 갈래', Object.entries(R).every(([k,v])=>k==='gA'||v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

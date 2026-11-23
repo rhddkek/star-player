@@ -973,6 +973,18 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       return o; });
     ok('v159 남은 시간 자동 내 골·도움 · 세율 구간 · 짧은 이적 비용 · 훈련 장면 시즌 첫 회만 · 해외 도전 저수준 · 에필로그 갈래', Object.entries(R).every(([k,v])=>k==='gA'||v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v160: 플레이 후기 2차 — 홈 목표 = 경기 목표(찬스 모드) · 재계약 카드 밝게 · 교체 출전 신뢰 벌점 완화 · 스카우트 참관을 경기 카드에 · 백업 알림 맨 뒤
+  { const cX=await b.newContext({viewport:{width:852,height:393}}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.click('#go-create'); await px.waitForTimeout(300); await px.click('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); const o={}; proSkipAll(1); S.tutSeen=true; S.compIntro=false; let n=0; while(nextEvent()&&n<3){ autoMatch(true); S.offers=[]; n++; }
+      const cs=Object.values(CLUBS).filter(c=>!c.nat&&!c.school&&c.id!==S.clubId&&c.country==='kr'); S.scout=S.scout||{}; S.scout.visit=cs[2].id; S.trust=30; S.starter=false; S.season=3; S.lastExport=null; S.player.injury=0; renderHome.mode='chance'; show('screen-hub'); goKey('home'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); await w(300); S.compIntro=false; document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      const ev=nextEvent(); if(!ev||ev.type==='nat'||!isBenched()||!el('btn-go')){ o.skip=true; return o; }
+      const hg=document.querySelector('.hm-goal b'); o.scout=!!document.querySelector('.hm-scout'); const A=nextAct(ev); o.bk=A.length>1&&A[A.length-1].t==='커리어 백업'&&A[0].t!=='커리어 백업'; o.wk=/· 자동/.test((document.querySelector('.hm-wk .v')||{}).textContent||'');
+      S.offers=[{clubId:S.clubId,wage:Math.round(S.wage*1.3),years:2,renew:1}]; negotiate(0); await w(150); const on=document.querySelector('.neg3 button.on'); const cs2=getComputedStyle(on); const rgb=x=>x.match(/\d+/g).map(Number); const bg=rgb(cs2.backgroundColor); o.negLight=bg[0]>200&&bg[1]>200&&rgb(getComputedStyle(on.querySelector('u')).color)[0]<80; o.negBtn=/균형 조건으로 재계약/.test(document.querySelector('.neg-b .primary').textContent); o.negRows=on.querySelectorAll('.nr').length===4; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.offers=[];
+      el('btn-go').click(); await w(1200); o.same=!!M&&!!hg&&M.objs[0].t===hg.textContent; o.h=hg&&hg.textContent; o.m=M&&M.objs.map(x=>x.t).join('|'); if(M){ M.paused=false; skipRest(); await w(300); }
+      S.trust=70; S.comp=S.comp||{ovr:ovr()}; const t0=S.trust; const g=trustAfterMatch({bench:true,rating:4.6,goals:0,assists:0},{type:'league'}); o.sub=!!g&&S.trust>=t0-5; return o; });
+    ok('v160 홈 목표 = 경기 목표(찬스·교체) · 재계약 고른 카드 밝게·값 4줄·버튼 문구 · 교체 출전 신뢰 최대 −5 · 스카우트 참관 경기 카드 · 백업 알림 맨 뒤', R.skip||(Object.entries(R).every(([k,v])=>k==='h'||k==='m'||v===true)&&eX.length===0), JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

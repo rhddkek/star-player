@@ -985,6 +985,20 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       S.trust=70; S.comp=S.comp||{ovr:ovr()}; const t0=S.trust; const g=trustAfterMatch({bench:true,rating:4.6,goals:0,assists:0},{type:'league'}); o.sub=!!g&&S.trust>=t0-5; return o; });
     ok('v160 홈 목표 = 경기 목표(찬스·교체) · 재계약 고른 카드 밝게·값 4줄·버튼 문구 · 교체 출전 신뢰 최대 −5 · 스카우트 참관 경기 카드 · 백업 알림 맨 뒤', R.skip||(Object.entries(R).every(([k,v])=>k==='h'||k==='m'||v===true)&&eX.length===0), JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v161: 선수 데이터베이스 — 선수마다 고유 번호·능력치·나이 · 이적하면 진짜로 팀을 옮김 · 은퇴하면 새 이름 · 시즌 기록 쌓임 · 선수 카드(능력치/기록/이력/나와 비교) · 리그 선수 DB 목록·이름 찾기
+  { const cX=await b.newContext({viewport:{width:852,height:393}}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.click('#go-create'); await px.waitForTimeout(300); await px.click('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); const o={}; proSkipAll(1); S.tutSeen=true; S.compIntro=false; let n=0; while(nextEvent()&&n<10){ autoMatch(true); S.offers=[]; n++; } document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      o.n=PDB.N0>7000&&pdbLoc().size===PDB.N0; const id9=pidAt(S.clubId,9); o.name=playerName(S.clubId,9)===pName(id9); const at=pAttrs(id9); o.attr=at.length===7&&at.every(x=>x[1]>=15&&x[1]<=99);
+      const L=pdbArchive(1); o.arch=L>7000&&pHist(id9).length===1&&pHist(id9)[0].ap>0;
+      S.season=2; const before=new Set(pdbLoc().keys()); seasonTransferNews(); const NW=S.news.filter(x=>x.pid!=null); o.move=NW.length>=5&&NW.every(x=>{ const w=pWhere(x.pid); return w&&w[0]===x.to; }); const after=pdbLoc(); o.retire=Object.keys(PDB.H.ret).length>50&&[...after.keys()].filter(k=>!before.has(k)).length===Object.keys(PDB.H.ret).length; o.young=[...after.keys()].filter(k=>!before.has(k)).every(k=>pAge(k)>=17&&pAge(k)<=21);
+      o.nm=NW.length?playerName(NW[0].to,pWhere(NW[0].pid)[1])===NW[0].nm:false;
+      pcard(id9); await w(150); const pm=document.querySelector('.pc-m'); o.card=!!pm&&/OVR/.test(pm.textContent); pm.querySelector('#pc-cmp')&&pm.querySelector('#pc-cmp').click(); await w(80); o.cmp=document.querySelectorAll('.pc-m .pc-bar em').length===7; document.querySelector('.pc-m [data-pt="rec"]').click(); await w(80); o.rec=document.querySelectorAll('.pc-m .pc-tb tr').length>=3; document.querySelector('.pc-m [data-pt="car"]').click(); await w(80); o.car=!!document.querySelector('.pc-m .pc-car'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      show('screen-hub'); renderLeague.view='players'; renderLeague.pf='ovr'; goKey('league'); await w(200); const rows=document.querySelectorAll('#div-table tr[data-pid]'); o.list=rows.length>=20; rows[0].click(); await w(150); o.click=!!document.querySelector('.pc-m'); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      const qn=pName(id9).slice(0,2); renderLeague.pq=qn; renderLeague(); await w(150); o.search=[...document.querySelectorAll('#div-table tr[data-pid]')].every(r=>r.textContent.includes(qn)); renderLeague.pq=''; renderLeague.pf='g'; renderLeague.view='table';
+      o.size=JSON.stringify(S.pdb).length<120000; o.sz=JSON.stringify(S.pdb).length; return o; });
+    ok('v161 선수 DB(고유 번호·능력치·이적 실제 이동·은퇴 새 얼굴·시즌 기록) · 선수 카드 능력치/기록/이력/나와 비교 · 리그 선수 DB 목록·이름 찾기', Object.entries(R).every(([k,v])=>k==='sz'||v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;

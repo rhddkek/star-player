@@ -542,7 +542,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('v78 이적시장 기간: 제안 유지 · 개별 거절 · 조건 올려 재제안 · 기간 끝나면 마감', R.win.n0>=2&&R.win.n1===R.win.n0-1&&R.win.back&&R.win.closed, JSON.stringify(R.win));
     ok('v78 개인 코치 팝업: 횟수 골라 한 번에 · 주당 제한 · 높은 능력치일수록 비쌈', R.coach.shot===52&&R.coach.paid&&R.coach.limitHit&&R.coach.left===0&&R.coach.hiCost[2]>R.coach.hiCost[1]&&R.coach.hiCost[1]>R.coach.hiCost[0], JSON.stringify(R.coach));
     ok('v78 리그 수준: 한국 1부 > 중국·태국, 일본보다 조금 아래', R.lg.kr>R.lg.cn&&R.lg.kr>R.lg.th&&R.lg.kr<R.lg.jp, JSON.stringify(R.lg));
-    { const N=await pv.evaluate(()=>{ const lg={}; Object.values(CLUBS).forEach(c=>{ if(c.nat||!c.homeDiv) return; (lg[c.homeDiv]=lg[c.homeDiv]||[]); for(let i=0;i<18;i++) lg[c.homeDiv].push(playerName(c.id,i)); }); let dupLg=0, n=0; Object.values(lg).forEach(a=>{ n+=a.length; if(new Set(a).size<a.length) dupLg++; }); const b=ensureBuddy&&ensureBuddy(); return {leagues:Object.keys(lg).length,n,dupLg,buddyOk:!b||b.name===playerName(b.club,b.i)}; });
+    { const N=await pv.evaluate(()=>{ const lg={}; Object.values(CLUBS).forEach(c=>{ if(c.nat||!c.homeDiv) return; (lg[c.homeDiv]=lg[c.homeDiv]||[]); for(let i=0;i<18;i++) lg[c.homeDiv].push(playerName(c.id,i)); }); let dupLg=0, n=0; Object.values(lg).forEach(a=>{ n+=a.length; if(new Set(a).size<a.length) dupLg++; }); const b=ensureBuddy&&ensureBuddy(); return {leagues:Object.keys(lg).length,n,dupLg,buddyOk:!b||(b.pid!=null?b.name===pName(b.pid)&&pWhere(b.pid)[0]===b.club:b.name===playerName(b.club,b.i))}; });
       ok('v79 선수 이름: 같은 리그 안에서 겹치는 이름 없음 · 호흡 동료 이름 일치', N.dupLg===0&&N.buddyOk&&N.leagues>=30, JSON.stringify(N)); }
     ok('v78 내 팀(스태프 4명)·고향 축구교실 · 아이콘 뒤 글자 보임', R.life.st===4&&R.life.coachLv===1&&R.life.acad===1&&R.life.lucText&&ev.length===0, JSON.stringify({...R.life,ms:R.ms,ev:ev.slice(0,2)})); await cv.close(); }
   // v80: 새 스킬 5종 · 플레이 스타일 · 패스 성공률 (별도 프로세스)
@@ -998,6 +998,33 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       const qn=pName(id9).slice(0,2); renderLeague.pq=qn; renderLeague(); await w(150); o.search=[...document.querySelectorAll('#div-table tr[data-pid]')].every(r=>r.textContent.includes(qn)); renderLeague.pq=''; renderLeague.pf='g'; renderLeague.view='table';
       o.size=JSON.stringify(S.pdb).length<120000; o.sz=JSON.stringify(S.pdb).length; return o; });
     ok('v161 선수 DB(고유 번호·능력치·이적 실제 이동·은퇴 새 얼굴·시즌 기록) · 선수 카드 능력치/기록/이력/나와 비교 · 리그 선수 DB 목록·이름 찾기', Object.entries(R).every(([k,v])=>k==='sz'||v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v162: 보이는 능력치 = 경기 엔진 능력치 · 주전 경쟁자 = 선수 DB의 진짜 선수(내 포지션 마지막 선발 자리) · 교체 요원 구단 · 경쟁자 부상 · 능력치 따라 득점자·성향 · 선수단이 전력을 결정
+  { const cX=await b.newContext({viewport:{width:852,height:393}}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.click('#go-create'); await px.waitForTimeout(300); await px.click('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(async()=>{ const w=t=>new Promise(r=>setTimeout(r,t)); const o={}; proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.skipLineup=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      const c=CLUBS[S.clubId], cp=ensureComp(); o.comp=cp.pid!=null&&pidAt(S.clubId,cp.num)===cp.pid&&cp.ovr===pOvr(cp.pid)&&mySlot()===cp.num&&ROLES[cp.num]===S.player.pos;
+      { const fm=FORMATIONS[TACTIC_FORM[tacticOf(c).id]]; const n=Math.min(fm.roles.filter(r=>r===S.player.pos).length,[1,2,3,4,5,6,7,8,9,10].filter(s=>ROLES[s]===S.player.pos).length); const L=[1,2,3,4,5,6,7,8,9,10].filter(s=>ROLES[s]===S.player.pos).map(s=>pOvr(pidAt(S.clubId,s))).sort((a,b)=>b-a); o.weakest=L[n-1]===cp.ovr; }
+      { const big=Object.values(CLUBS).filter(x=>!x.nat&&!x.school).sort((a,b)=>b.str-a.str)[0]; const sv=JSON.stringify(S.player.stats); Object.keys(S.player.stats).forEach(k=>S.player.stats[k]=60); o.sub=roleAt(big).k==='sub'&&roleAt(big).t==='교체 요원'&&trustStart(big)<25; S.player.stats=JSON.parse(sv); }
+      // 경기: 선수 DB 그대로
+      S.trust=95; S.starter=true; S.sel=null; S.player.injury=0; S.player.cond=90; show('screen-hub'); startMatch(); await w(400); if(M.paused){ M.paused=false; el('m-overlay').hidden=true; }
+      const opp=M.players.filter(q=>q.team===1), mine=M.players.filter(q=>q.team===0&&!q.isUser);
+      o.oppDb=opp.every(q=>q.pid!=null&&q.pid===pidAt(M.opp.id,q.db)&&q.name===pName(q.pid)&&(q.role==='GK'||q.st.shot===pSt(q.pid).shot&&q.st.tackle===pSt(q.pid).tackle))&&new Set(opp.map(q=>q.db)).size===11;
+      o.mineDb=mine.every(q=>q.pid!=null)&&!mine.some(q=>q.pid===cp.pid)&&M.myDb===cp.num&&new Set(mine.map(q=>q.db)).size===10;
+      const fw=mine.filter(q=>q.role!=='GK')[0]; M.ball.lastKicker=fw; M.lastPasser=null; const nE=M.events.length; goalScored(0); const ge=M.events[nE]; o.goalKey=!!ge&&ge.key===M.me.id+'-'+fw.db&&ge.name===pName(fw.pid);
+      const same=mine.find(q=>q.role===S.player.pos); if(same){ subPlayer(same,false); o.compSub=same.name===cp.name&&same.pid===cp.pid&&same.st.shot===pSt(cp.pid).shot; } else o.compSub=true;
+      o.style=mine.filter(q=>q.role!=='GK').every(q=>!!q.style)&&!!mindOf(fw); M.over=true; M=null; show('screen-hub');
+      // 능력치 따라 득점자
+      { const fws=[9,10].map(s=>({s,sh:pSt(pidAt(c.id,s)).shot})); const cnt={}; for(let k=0;k<4000;k++){ const s=pickRoster(c.id,{FW:5,MF:0,DF:0}); cnt[s]=(cnt[s]||0)+1; } const hi=fws[0].sh>=fws[1].sh?fws[0]:fws[1], lo=hi===fws[0]?fws[1]:fws[0]; o.scorer=hi.sh===lo.sh||cnt[hi.s]>cnt[lo.s]; }
+      // 경쟁자 부상 → 내가 선발
+      S.trust=10; S.starter=false; S.comp.inj=2; S.sel=null; const ev=nextEvent(); const sl=selFor(ev); o.inj=sl.k==='start'&&/부상/.test(sl.why); S.comp.inj=0; S.sel=null;
+      // 선수 카드: 성향·내 경쟁자 표시
+      pcard(cp.pid); await w(120); const pm=document.querySelector('.pc-m'); o.card=!!pm&&/내 경쟁자/.test(pm.textContent); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      // 선수단이 전력을 결정
+      { const cc=pdbClubs().find(x=>x.id!==S.clubId&&x.str>50); const ids=[...Array(11).keys()].map(s=>pidAt(cc.id,s)); const s0=cc.str; ids.forEach(id=>{ if(id<PDB.N0) S.pdb.b[id]=S.season-33; }); PDB.stc=null; squadPull(); o.squad=cc.str<s0; }
+      o.age=(()=>{ const id=pidAt(S.clubId,9); const a=pAttrs(id); return a.every(x=>x[1]>=15&&x[1]<=99); })();
+      return o; });
+    ok('v162 경기 엔진 = 선수 DB 능력치(양 팀 11명·이름·골 기록 키) · 경쟁자 = 내 포지션 마지막 선발(DB 선수·벤치에서 교체 투입) · 빅클럽 교체 요원 · 경쟁자 부상이면 선발 · 슈팅 좋은 선수가 더 넣음 · 선수단이 전력 결정', Object.values(R).every(v=>v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

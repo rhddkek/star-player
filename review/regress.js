@@ -113,7 +113,7 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
     ok('내 선수 지원: 공을 잡으면 동료 2명이 서로 다른 빈 각도(9~16m)로 이동', sp.sup===2&&sp.spots===2&&sp.d.every(x=>x>3.5&&x<24), JSON.stringify(sp)); }
   { const mo=await pg.evaluate(()=>{ const D8=['south','south-east','east','north-east','north','north-west','west','south-west']; const D5=D8.slice(0,5); const full=['r2','r2b','r2c','r2d'].every(c=>['run','sprint','shoot','header','trap','slide'].every(a=>SPRITE_DATA[c][a]&&D5.every(d=>(SPRITE_DATA[c][a][d]||[]).length>=4)))&&!SPRITE_DATA.field; /* v126: 새 그림 4체형×5방향(서쪽은 좌우 반전), 예전 그림 없음 */
       const u=M.user, sv={vx:u.vx,vy:u.vy,sp:M.sprinting}; const r={full}; M.sprinting=false; setOwner(u,{clean:true}); u.touchT=0; u.vx=7; u.vy=0; r.drib=animFor(u).an; M.charge={type:'shot',dur:0.4}; u.vx=0; r.charge=animFor(u).an; M.charge=null; u.shotAnimT=0.3; r.shot=animFor(u).an; u.shotAnimT=0; u.headT=0.2; r.head=animFor(u).an; u.headT=0; u.trapT=0.2; r.trap=animFor(u).an; u.trapT=0; Object.assign(u,{vx:sv.vx,vy:sv.vy}); M.sprinting=sv.sp; return r; });
-    ok('세부 모션: 4체형×8방향 (달리기·질주·슛·헤딩·트래핑) · 드리블(v83부터 달리기 동작을 잔걸음으로)/슛 와인드업/팔로스루/헤딩/트래핑 상태 전환', mo.full&&mo.drib==='run'&&mo.charge==='shoot'&&mo.shot==='shoot'&&mo.head==='header'&&mo.trap==='trap', JSON.stringify(mo)); }
+    ok('세부 모션: 4체형×8방향 (달리기·질주·슛·헤딩·트래핑) · 드리블(v83부터 달리기 동작을 잔걸음으로)/슛 와인드업/팔로스루/헤딩/트래핑 상태 전환', mo.full&&(mo.drib==='run'||mo.drib==='dribble')&&mo.charge==='shoot'&&mo.shot==='shoot'&&mo.head==='header'&&mo.trap==='trap', JSON.stringify(mo)); }
   ok('체력·기력 숫자 정상(NaN 아님)·달리면 체력 감소', Number.isFinite(run.sta)&&Number.isFinite(run.mp)&&run.sta<100, `체력 ${run.sta&&run.sta.toFixed(0)} 기력 ${run.mp&&run.mp.toFixed(0)}`);
   await pg.evaluate(()=>{ M.paused=true; });
 
@@ -1025,6 +1025,24 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       o.age=(()=>{ const id=pidAt(S.clubId,9); const a=pAttrs(id); return a.every(x=>x[1]>=15&&x[1]<=99); })();
       return o; });
     ok('v162 경기 엔진 = 선수 DB 능력치(양 팀 11명·이름·골 기록 키) · 경쟁자 = 내 포지션 마지막 선발(DB 선수·벤치에서 교체 투입) · 빅클럽 교체 요원 · 경쟁자 부상이면 선발 · 슈팅 좋은 선수가 더 넣음 · 선수단이 전력 결정', Object.values(R).every(v=>v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
+    await cX.close(); }
+  // v165: 새 동작(드리블·찌르기 태클·버티기·끌어 돌기·넘어짐·스로인·롱패스, 키퍼 펀칭·몸 던지기) · 수비 뒷걸음 · 공격수는 상대 마지막 라인에
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    await px.evaluate(()=>{ proSkipAll(1); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); S.trust=95; S.starter=true; S.sel=null; S.player.injury=0; renderHome.mode='play'; S.lastMode='play'; startMatch(false); });
+    await px.waitForTimeout(800); await px.evaluate(()=>{ const g=el('lu-go'); if(g) g.click(); }); await px.waitForTimeout(2000);
+    const R=await px.evaluate(()=>{ const o={}; const AN=['dribble','poke','shield','turn','fall','throwin','lpass'];
+      o.art=['r2','r2b','r2c','r2d'].every(ch=>AN.every(a=>hasAn(ch,a)&&['south','south-east','east','north-east','north'].every(d=>SPR[ch][a][d]&&SPR[ch][a][d].length>=6)))&&hasAn('gk2','punch')&&hasAn('gk2','smother');
+      M.freeze=0; M.setPiece=null; M.paused=false; const q=M.players.find(p=>p.team===1&&p.role==='MF'); setOwner(q,{clean:true}); q.vx=4; q.vy=0; q.shieldAI=0; q.prT=0; q.turnAT=0; q._pfx=null;
+      const A=()=>animFor(q).an; o.drib=A()==='dribble'; q.fallT=0.5; o.fall=A()==='fall'; q.fallT=0; q.tackleT=0.2; q.tackleKind='stand'; o.poke=A()==='poke'; q.tackleT=0; q.lpassT=0.3; o.lp=A()==='lpass'; q.lpassT=0; q.shieldAI=M.t+1; q.vx=1; o.sh=A()==='shield'; q.shieldAI=0;
+      q.fx=1; q.fy=0; A(); q.fx=-1; q.fy=0; o.turn=A()==='turn';
+      const gk=M.players.find(p=>p.team===1&&p.role==='GK'); gk.punchT=0.3; o.punch=animFor(gk).an==='punch'; gk.punchT=0;
+      // 수비 뒷걸음: 상대 공을 보며 물러설 때 공 쪽을 봄
+      const d=M.players.find(p=>p.team===0&&p.role==='DF'&&!p.isUser); d.x=36; d.y=60; d.vx=d.vy=0; q.x=36; q.y=50; d.chase=false; steer(d,36,70,1/30,true); o.back=d.backT===-1&&d.fy<0;
+      // 공격수는 상대 마지막 수비 라인 근처
+      const fw=M.players.find(p=>p.team===1&&p.role==='FW'); const P=shapePoint(fw,1,true,40,36,null); const line=secondLastY(0); o.fwLine=Math.abs(P.y-line)<4||P.y>=40+10-0.5;
+      return o; });
+    ok('v165 새 동작 7종(몸통 4종 × 5방향) + 키퍼 펀칭·몸 던지기 · 상황별 동작 연결 · 수비 뒷걸음 · 공격수 라인', Object.values(R).every(v=>v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();

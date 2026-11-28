@@ -1044,6 +1044,42 @@ const results=[]; const ok=(name,cond,info='')=>{ results.push([cond?'통과':'�
       return o; });
     ok('v165 새 동작 7종(몸통 4종 × 5방향) + 키퍼 펀칭·몸 던지기 · 상황별 동작 연결 · 수비 뒷걸음 · 공격수 라인', Object.values(R).every(v=>v===true)&&eX.length===0, JSON.stringify({...R,eX:eX.slice(0,2)}));
     await cX.close(); }
+  // v167: 끝난 시즌에 PO 재생성 막기 · 재활 선택 창(서두른 복귀 대가) · 결과 요약에서 바로 직접/자동 · 시즌 종료 버튼 행선지 · 추천 배분 실제 OVR · 자동 훈련 표시 · 결장 낀 연속골 끊김 · 결산 골 범위
+  { const cX=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true}); const px=await cX.newPage(); const eX=[]; px.on('pageerror',e=>eX.push(e.message));
+    await px.goto(FILE); await px.waitForTimeout(500); await px.tap('#go-create'); await px.waitForTimeout(300); await px.tap('#btn-new'); await px.waitForTimeout(400);
+    const R=await px.evaluate(()=>{ proSkipAll(0); S.tutSeen=true; S.compIntro=false; S.noReplay=true; document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); const o={};
+      // 리그 끝까지
+      let n=0; while(n<200){ const e=nextEvent(); if(!e||(e.type!=='league'&&leagueOver())) break; autoMatch(true); n++; }
+      { const d=divOf(S.clubId).id; const st=standings(d); const T=S.tables[d]; T[S.clubId].pts=T[st[3].c].pts+1; }
+      let k=0; while(nextEvent()&&k++<10) autoMatch(true); document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      S.player.rep=5000; Object.keys(S.player.stats).forEach(x=>S.player.stats[x]=Math.max(S.player.stats[x],70)); S.player.injury=0;
+      const ws=wcSeason(); o.lbl=endLbl()===(ws?'월드컵 합류 ›':'A매치 합류 ›'); S.natDone[ws?'wc'+S.season:'end'+S.season]=true; if(ws) S.natDone['end'+S.season]=true; o.lbl2=endLbl()==='시즌 결산 ›';
+      tab='home'; show('screen-hub'); renderHub(); o.btn=(el('btn-endseason')||{}).textContent==='시즌 결산 ›';
+      endSeason(); o.noPO=nextEvent()===null;
+      document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      return o; });
+    // 재활 · 요약 · 문구 (새 시즌 상태에서)
+    const R2=await px.evaluate(()=>{ const o={}; if(!(S.offers&&S.offers.length)){ S.offers=makeOffers(); S.offersFor='end'; } const o0=(S.offers||[]).find(x=>x.renew)||(S.offers||[])[0]; if(o0) acceptOffer(o0); o.s2=S.season===2&&!!nextEvent(); document.querySelectorAll('.hub-modal').forEach(m=>m.remove()); show('screen-hub'); tab='home';
+      const p=S.player; p.money=1e9; p.injury=2; p.cond=95; renderHub(); o.btn=!!el('btn-rehab'); const na=nextAct(nextEvent())[0]; o.na=na.b==='재활 선택'&&/집중 재활/.test(na.d);
+      rehabModal(); const m=document.querySelector('.rh-m'); o.modal=!!m&&/서두른 복귀/.test(m.textContent); m.querySelector('#rh-a').click(); o.healed=p.injury===0&&S.rush&&S.rush.n===2&&p.cond<=70;
+      // 서두른 복귀 → 2경기 뒤 해제
+      let g=0; while(S.rush&&g++<6){ const e=nextEvent(); if(!e) break; if(p.injury>0){ p.injury=0; } S.trust=95; S.starter=true; S.sel=null; autoMatch(true); } o.rushEnd=!S.rush;
+      // 결장 3경기 → 결과 보기 선택
+      p.injury=3; rehabModal(); document.querySelector('.rh-m #rh-b').click(); o.batch=p.injury===0||!!document.querySelector('.ab-m');
+      document.querySelectorAll('.hub-modal').forEach(m=>m.remove());
+      // 결과 요약: 다음 경기 직접 뛰기/자동 버튼
+      p.injury=0; S.trust=95; S.starter=true; S.sel=null; abSummary([{opp:CLUBS[S.clubId],my:1,op:0,g:1,a:0,sg:1}],'rival',1,5,{}); const ab=document.querySelector('.ab-m'); o.ab=!!ab.querySelector('#ab-play')&&!!ab.querySelector('#ab-auto'); if(!o.ab) o.abD=JSON.stringify({nx:(nextEvent()||{}).type,sf:selFor(nextEvent()),inj:p.injury}); ab.remove();
+      // 추천 배분 문구: 실제 OVR 계산
+      p.points=40; const L=nextAct(nextEvent()).find(x=>/능력치 포인트/.test(x.t)); o.rec=!!L&&(/OVR \d+ → \d+/.test(L.d)||/유지/.test(L.d)); p.points=0;
+      // 자동 훈련 표시
+      S.weekAct=null; S.lastWk='shot'; const W=nextAct(nextEvent()).find(x=>x.b==='주간 준비'); o.wk=!W||!/아직/.test(W.t);
+      // 연속골: 긴 결장이 끼면 끊김
+      const H=S.history; const base={season:S.season,type:'league',goals:1,assists:0,rating:7}; H.push({...base},{...base},{...base},{...base,goals:0,injured:true},{...base,goals:0,injured:true},{...base,goals:0,injured:true},{...base}); o.streak=goalStreak()===1; H.splice(-7);
+      // 결산 골 범위 표시
+      o.split=gsTxt(goalSplit([{type:'league',goals:3},{type:'cup',goals:1},{type:'nat',goals:2}]))==='리그 3 · 컵·대륙 1 · 대표팀 2';
+      return o; });
+    ok('v167 끝난 시즌 PO 재생성 없음 · 시즌 종료 버튼 행선지 · 재활 선택(서두른 복귀 2경기 대가) · 결과 요약에서 직접/자동 · 추천 배분 실제 OVR · 자동 훈련 표시 · 결장 낀 연속골 끊김 · 골 범위', Object.values(R).every(v=>v===true)&&Object.values(R2).every(v=>v===true)&&eX.length===0, JSON.stringify({R,R2,eX:eX.slice(0,2)}));
+    await cX.close(); }
   ok('페이지 오류 없음', errs.length===0, errs.slice(0,3).join(' / '));
   await b.close();
   const fail=results.filter(r=>r[0]==='실패').length;
